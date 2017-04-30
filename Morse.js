@@ -84,14 +84,14 @@ function Morse() {
   };
   this.morsepro2textH = {};
   this.text2morseproH = {};
-  for (var text in text2morseH) {
-    text2morseproH[text] = text2morseH[text];
-    morse2textH[text2morseH[text]] = text;
-    morsepro2textH[text2morseH[text]] = text;
+  for (var text in this.text2morseH) {
+    this.text2morseproH[text] = this.text2morseH[text];
+    this.morse2textH[this.text2morseH[text]] = text;
+    this.morsepro2textH[this.text2morseH[text]] = text;
   }
-  for (var sign in prosign2morseH) {
-    text2morseproH[sign] = prosign2morseH[sign];
-    morsepro2textH[prosign2morseH[sign]] = sign;
+  for (var sign in this.prosign2morseH) {
+    this.text2morseproH[sign] = this.prosign2morseH[sign];
+    this.morsepro2textH[this.prosign2morseH[sign]] = sign;
   }
 }
 
