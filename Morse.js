@@ -12,9 +12,9 @@ if(typeof(String.prototype.trim) === "undefined") {
 //   }
 // }
 
-Morse = function() {
-  var DITS_PER_WORD = 50;  // based on "PARIS "
-  var text2morseH = {
+function Morse() {
+  this.DITS_PER_WORD = 50;  // based on "PARIS "
+  this.text2morseH = {
     'A': ".-",
     'B': "-...",
     'C': "-.-.",
@@ -65,8 +65,8 @@ Morse = function() {
     '=': "-...-",
     ' ': "/" //Not morse but helps translation
   };
-  var morse2textH = {};
-  var prosign2morseH = {
+  this.morse2textH = {};
+  this.prosign2morseH = {
     '<AA>': '.-.-',
     '<AR>': '.-.-.',
     '<AS>': '.-...',
@@ -82,8 +82,8 @@ Morse = function() {
     '<VE>': '...-.',
     '<SOS>': '...---...'
   };
-  var morsepro2textH = {};
-  var text2morseproH = {};
+  this.morsepro2textH = {};
+  this.text2morseproH = {};
   for (var text in text2morseH) {
     text2morseproH[text] = text2morseH[text];
     morse2textH[text2morseH[text]] = text;
@@ -93,7 +93,7 @@ Morse = function() {
     text2morseproH[sign] = prosign2morseH[sign];
     morsepro2textH[prosign2morseH[sign]] = sign;
   }
-};
+}
 
 Morse.prototype = {
 
