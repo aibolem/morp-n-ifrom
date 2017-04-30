@@ -217,3 +217,5 @@ Morse.prototype = {
     }
   },
 };
+
+module.exports = new Morse();
