@@ -156,6 +156,12 @@ Morse.prototype = {
     return ret;
   },
 
+  test2ditdah: function(text, useProsigns) {
+    var morse = this.morse2text(test, useProsigns);
+    var ditdah = morse.replace(/ \/ /g, '#').replace(/./g, 'dit ').replace(/-/g, 'dah ').replace(/ /g, ', ').replace(/#/g, '. ');
+    return ditdah;
+  },
+
   tidyMorse: function(morse) {
     morse = morse.trim();
     morse = morse.replace(/\|/g, "/");  // unify the word separator
