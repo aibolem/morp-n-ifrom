@@ -156,8 +156,8 @@ Morse.prototype = {
     return ret;
   },
 
-  test2ditdah: function(text, useProsigns) {
-    var morse = this.morse2text(test, useProsigns);
+  text2ditdah: function(text, useProsigns) {
+    var morse = this.text2morse(test, useProsigns).morse;
     var ditdah = morse.replace(/ \/ /g, '#').replace(/./g, 'dit ').replace(/-/g, 'dah ').replace(/ /g, ', ').replace(/#/g, '. ');
     return ditdah;
   },
