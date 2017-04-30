@@ -109,7 +109,7 @@ Morse.prototype = {
   text2morse: function(text, useProsigns) {
     if (typeof useProsigns === "undefined") { useProsigns = true; }
 
-    text = Morse.tidyText(text);
+    text = this.tidyText(text);
     var ret = {
       morse: "",
       message: "",
@@ -135,9 +135,9 @@ Morse.prototype = {
     }
     var dict;
     if (useProsigns) {
-      dict = Morse.text2morseproH;
+      dict = this.text2morseproH;
     } else {
-      dict = Morse.text2morseH;
+      dict = this.text2morseH;
     }
     var i, c, t;
     for (i = 0; i < tokens.length; i++) {
@@ -173,7 +173,7 @@ Morse.prototype = {
   morse2text: function(morse, useProsigns) {
     if (typeof useProsigns === "undefined") { useProsigns = true; }
 
-    morse = Morse.tidyMorse(morse);
+    morse = this.tidyMorse(morse);
     var ret = {
       morse: "",
       message: "",
@@ -186,9 +186,9 @@ Morse.prototype = {
     var tokens = morse.split(" ");
     var dict;
     if (useProsigns) {
-      dict = Morse.morsepro2textH;
+      dict = this.morsepro2textH;
     } else {
-      dict = Morse.morse2textH;
+      dict = this.morse2textH;
     }
     var c, t;
     for (var i = 0; i < tokens.length; i++) {
@@ -209,7 +209,7 @@ Morse.prototype = {
 
   isMorse: function(input) {
     // perhaps should be called "looksLikeMorse"?!
-    input = Morse.tidyMorse(input);
+    input = this.tidyMorse(input);
     if (input.match(/^[ /.-]*$/)) {
       return true;
     } else {
