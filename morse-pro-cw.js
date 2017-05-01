@@ -53,12 +53,12 @@ MorseCW.prototype = {
      * wordSpace - the length of an inter-word space in milliseconds (normally 7 * dit)
      */
     getTimingsGeneral: function(dit, dah, ditSpace, charSpace, wordSpace) {
-        log("Morse: " + this.message.morse);
-        //log("Morse speeds/ms: " + dit + ", " + dah + ", " + ditSpace + ", " + charSpace + ", " + wordSpace);
+        console.log("Morse: " + this.message.morse);
+        //console.log("Morse speeds/ms: " + dit + ", " + dah + ", " + ditSpace + ", " + charSpace + ", " + wordSpace);
         //morse = Morse.tidyMorse(morse);
 
         if (this.message.hasError) {
-            log("Error in message: cannot compute timings");
+            console.log("Error in message: cannot compute timings");
             return [];  // TODO: or throw exception?
         }
         var morse = this.message.morse.replace(/ \/ /g, '/');  // this means that a space is only used for inter-character
@@ -84,7 +84,7 @@ MorseCW.prototype = {
         if (times[times.length - 1] == -ditSpace) {
             times.pop();  // take off the last ditSpace
         }
-        log("Timings: " + times);
+        console.log("Timings: " + times);
         return times;
     }
 };

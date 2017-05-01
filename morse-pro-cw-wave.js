@@ -33,7 +33,7 @@ MorseCWWave.prototype = {
             }
             on = 1 - on;
         }
-        log("Sample length: " + sample.length);
+        console.log("Sample length: " + sample.length);
         return sample;
     },
 
