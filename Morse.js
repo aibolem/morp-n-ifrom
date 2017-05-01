@@ -1,4 +1,4 @@
-// This code is © Copyright Stephen C. Phillips, 2013-2016.
+// This code is © Copyright Stephen C. Phillips, 2013-2017.
 // Email: steve@scphillips.com
 
 if(typeof(String.prototype.trim) === "undefined") {
@@ -157,8 +157,11 @@ Morse.prototype = {
   },
 
   text2ditdah: function(text, useProsigns) {
-    var morse = this.text2morse(text, useProsigns).morse;
-    var ditdah = morse.replace(/ \/ /g, '#').replace(/ /g, ', ').replace(/\./g, 'dit ').replace(/\-/g, 'dah ').replace(/#/g, '. ').replace(/ ,/g, ',').replace(/ \./g, '.');
+    var ditdah = this.text2morse(text, useProsigns).morse;  // get the dots and dashes
+    ditdah = ditdah.replace(/ \/ /g, '#').replace(/ /g, '~');  // put in placeholders
+    ditdah = ditdah.replace(/\./g, 'dit ').replace(/\-/g, 'dah ');  // do the basic job
+    ditdah = ditdah.replace(/ #/g, '. ').replace(/ ~/g, ', ').replace(/ $/, '.');  // do punctuation
+    ditdah = ditdah.replace(/^d/, 'D').replace(/ \.d/, 'D');  // do capitalisation
     return ditdah;
   },
 
@@ -224,4 +227,6 @@ Morse.prototype = {
   },
 };
 
-module.exports = new Morse();
+module.exports = function factory() {
+  return new Morse();
+};
