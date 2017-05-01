@@ -160,7 +160,7 @@ Morse.prototype = {
     ditdah = ditdah.replace(/ \/ /g, '#').replace(/ /g, '~');  // put in placeholders
     ditdah = ditdah.replace(/\./g, 'dit ').replace(/\-/g, 'dah ');  // do the basic job
     ditdah = ditdah.replace(/ #/g, '. ').replace(/ ~/g, ', ').replace(/ $/, '.');  // do punctuation
-    ditdah = ditdah.replace(/^d/, 'D').replace(/\. d/, 'D');  // do capitalisation
+    ditdah = ditdah.replace(/^d/, 'D').replace(/\. d/, '. D');  // do capitalisation
     return ditdah;
   },
 
