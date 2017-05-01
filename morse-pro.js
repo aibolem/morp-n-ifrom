@@ -13,7 +13,6 @@ if(typeof(String.prototype.trim) === "undefined") {
 // }
 
 function Morse() {
-  this.DITS_PER_WORD = 50;  // based on "PARIS "
   this.text2morseH = {
     'A': ".-",
     'B': "-...",
@@ -227,6 +226,6 @@ Morse.prototype = {
   },
 };
 
-module.exports = function factory() {
-  return new Morse();
+module.exports = {
+  Morse: Morse
 };
