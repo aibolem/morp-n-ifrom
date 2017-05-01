@@ -1,8 +1,8 @@
 // This code is © Copyright Stephen C. Phillips, 2013-2017.
 // Email: steve@scphillips.com
 
-var dataURIMod = require('morse-pro-util-datauri.js');
-var riffWaveMod = require('morse-pro-util-riffwave.js');
+var dataURIMod = require('./morse-pro-util-datauri.js');
+var riffWaveMod = require('./morse-pro-util-riffwave.js');
 
 // pass in a Morse.CW instance (or something with a getTimings() method)
 MorseCWWave = function(cw) {
