@@ -48,7 +48,7 @@ MorseCWWave.prototype = {
     },
 
     getWAV: function() {
-      // TODO: should be getWAVByteArray
+        // TODO: should be getWAVByteArray
         var wav = new riffWaveMod.RIFFWAVE();
         wav.header.sampleRate = this.sampleRate;
         return wav.getWAV(this.getPCMSample());
@@ -60,5 +60,5 @@ MorseCWWave.prototype = {
 };
 
 module.exports = {
-  MorseCWWave: MorseCWWave
+    MorseCWWave: MorseCWWave
 };
