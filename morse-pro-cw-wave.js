@@ -48,6 +48,7 @@ MorseCWWave.prototype = {
     },
 
     getWAV: function() {
+      // TODO: should be getWAVByteArray
         var wav = new riffWaveMod.RIFFWAVE();
         wav.header.sampleRate = this.sampleRate;
         return wav.getWAV(this.getPCMSample());

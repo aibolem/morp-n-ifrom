@@ -1,8 +1,8 @@
 /*
- * RIFFWAVE adapted from RIFFWAVE.js v0.03 - Audio encoder for HTML5 <audio> elements.
- * Copyleft 2011 by Pedro Ladaria <pedro.ladaria at Gmail dot com>
- * Public Domain
- */
+* RIFFWAVE adapted from RIFFWAVE.js v0.03 - Audio encoder for HTML5 <audio> elements.
+* Copyleft 2011 by Pedro Ladaria <pedro.ladaria at Gmail dot com>
+* Public Domain
+*/
 
 var RIFFWAVE = function(data) {
     this.header = {                           // OFFS SIZE NOTES
@@ -77,5 +77,5 @@ RIFFWAVE.prototype = {
 };
 
 module.exports = {
-  RIFFWAVE: RIFFWAVE
+    RIFFWAVE: RIFFWAVE
 };

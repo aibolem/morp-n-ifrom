@@ -17,7 +17,7 @@ MorseMessage = function() {
 MorseMessage.prototype = {
 
     constructor: MorseMessage,
-
+    
     translate: function(input, isMorse) {
         var translation;
         this.input = input;
@@ -65,5 +65,5 @@ MorseMessage.prototype = {
 };
 
 module.exports = {
-  MorseMessage: MorseMessage
+    MorseMessage: MorseMessage
 };
