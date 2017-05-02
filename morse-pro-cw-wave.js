@@ -4,7 +4,7 @@
 var dataURIMod = require('./morse-pro-util-datauri.js');
 var riffWaveMod = require('./morse-pro-util-riffwave.js');
 
-// pass in a Morse.CW instance (or something with a getTimings() method)
+// pass in a MorseCW instance (or something with a getTimings() method)
 MorseCWWave = function(cw) {
     this.cw = cw;
     this.sampleRate = 8000;
