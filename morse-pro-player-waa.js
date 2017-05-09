@@ -1,24 +1,38 @@
 // This code is © Copyright Stephen C. Phillips, 2013-2017.
 // Email: steve@scphillips.com
 
-// Web browser sound player using Web Audio API.
+/*
+    Web browser sound player using Web Audio API.
+    Pass in an instance of MorseCWWave.
 
-//TODO: sort out how to get and where to store an AudioContext
-Morse.AudioContext = window.AudioContext || window.webkitAudioContext;
+    Usage:
 
-// Pass in an instance of MorseCWWave (or something with a getSample method)
-MorsePlayerWAA = function(wave) {
-    this.wave = wave;
+    var morsePro = new MorsePro();
+    var morseMessage = new MorseMessage(morsePro);
+    var morseCW = new MorseCW(morseMessage);
+    var morseCWWave = new MorseCWWave(morseCW);
+    var audioCtxClass = window.AudioContext || window.webkitAudioContext;
+    var morsePlayerWAA = new MorsePlayerWAA(morseCWWave, audioCtxClass);
+
+    morseCW.setWPM(25);  // set the speed to 25 wpm
+    morseCW.setFWPM(10);  // set the Farnsworth speed to 10 wpm
+    morseCWWave.sampleRate = 8000;  // per second
+    morseCWWave.frequency = 600;  // frequency in Hz
+
+    morseMessage.translate("abc");
+    morsePlayerWAA.play();
+*/
+var MorsePlayerWAA = function(morseCWWave, audioContextClass) {
+    this.morseCWWave = morseCWWave;
+    this.audioContextClass = audioContextClass;
     this.isPlayingB = false;
     this.volume = 1;  // not currently settable
     this.noAudio = false;
 
-    // create web audio api context
-    console.log("Trying Web Audio API");
-    if (Morse.AudioContext === undefined) {
+    if (this.audioContextClass === undefined) {
         this.noAudio = true;
     } else {
-        this.audioCtx = new Morse.AudioContext();
+        this.audioCtx = new this.audioContextClass();
     }
 };
 
@@ -32,14 +46,14 @@ MorsePlayerWAA.prototype = {
         this.audioCtx = new Morse.AudioContext();
     },
 
-    play: function(message) {
+    play: function() {
         if (this.noAudio) {
             return;
         }
 
         this.stop();
 
-        var timings = this.wave.cw.getTimings();
+        var timings = this.morseCWWave.morseCW.getTimings();
         if (timings.length === 0) {
             return [];
         }
@@ -52,7 +66,7 @@ MorsePlayerWAA.prototype = {
             if (duration > 0) {
                 var oscillator = this.audioCtx.createOscillator();
                 oscillator.type = 'sine';
-                oscillator.frequency.value = this.wave.frequency;
+                oscillator.frequency.value = this.morseCWWave.frequency;
                 oscillator.connect(this.audioCtx.destination);
                 oscillator.start(cumT);
                 oscillator.stop(cumT + duration);
@@ -80,8 +94,4 @@ MorsePlayerWAA.prototype = {
         // 0: Audio element using Mozilla Audio Data API (https://wiki.mozilla.org/Audio_Data_API) (using PCM audio data)
         // -1: no audio support
     }
-};
-
-module.exports = {
-    MorsePlayerWAA: MorsePlayerWAA
 };

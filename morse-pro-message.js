@@ -1,10 +1,33 @@
 // This code is © Copyright Stephen C. Phillips, 2013-2017.
 // Email: steve@scphillips.com
 
-var morseMod = require('./morse-pro.js');
-var Morse = new morseMod.Morse();
+/*
+    Class for conveniently translating to and from Morse code.
+    Deals with error handling.
+    Works out if the input is Morse code or not.
 
-MorseMessage = function() {
+    Usage:
+
+    var morsePro = new MorsePro();
+    var morseMessage = new MorseMessage(morsePro);
+    morseMessage.useProsigns = true;
+    var input;
+    var output;
+    try {
+        output = morseMessage.translate("abc");
+    catch (ex) {
+        // input will have errors surrounded by paired '#' signs
+        // output will be best attempt at translation, with untranslatables replaced with '#'
+        morseMessage.clearError();  // remove all the '#'
+    }
+    if (morseMessage.inputWasMorse) {
+        // do something
+    }
+
+*/
+
+var MorseMessage = function(morsePro) {
+    this.morsePro = morsePro;
     this.input = "";
     this.output = "";
     this.morse = "";
@@ -17,21 +40,20 @@ MorseMessage = function() {
 MorseMessage.prototype = {
 
     constructor: MorseMessage,
-    
+
     translate: function(input, isMorse) {
         var translation;
-        this.input = input;
 
         if (typeof isMorse === "undefined") {
             // make a guess: could be wrong if someone wants to translate "." into Morse for instance
-            isMorse = Morse.isMorse(input);
+            isMorse = this.morsePro.isMorse(input);
         }
         if (isMorse) {
             this.inputWasMorse = true;
-            translation = Morse.morse2text(input, this.useProsigns);
+            translation = this.morsePro.morse2text(input, this.useProsigns);
         } else {
             this.inputWasMorse = false;
-            translation = Morse.text2morse(input, this.useProsigns);
+            translation = this.morsePro.text2morse(input, this.useProsigns);
         }
 
         this.morse = translation.morse;
@@ -62,8 +84,4 @@ MorseMessage.prototype = {
         }
         this.hasError = false;
     }
-};
-
-module.exports = {
-    MorseMessage: MorseMessage
 };

@@ -1,7 +1,7 @@
 // This code is © Copyright Stephen C. Phillips, 2013-2017.
 // Email: steve@scphillips.com
 
-function getDataURIModule() {
+var getDataURI = (function() {
     var Base64 = {
 
         /*
@@ -48,13 +48,7 @@ function getDataURIModule() {
     };
     Base64.init();
 
-    function getDataURI(data, type) {
+    return function(data, type) {
         return 'data:' + type + ';base64,' + Base64.encode(data);
-    }
-
-    return {
-        getDataURI: getDataURI
     };
-}
-
-module.exports = getDataURIModule();
+})();

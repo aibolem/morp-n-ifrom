@@ -5,15 +5,16 @@
 // XAudioJS is not in npm so you need to sort out the dependency manually.
 
 // Pass in an instance of MorseCWWave (or something with a getSample method)
-MorsePlayerXAS = function(wave) {
-    this.wave = wave;
+var MorsePlayerXAS = function(morseCWWave, xaudioServerClass) {
+    this.morseCWWave = morseCWWave;
+    this.xaudioServerClass = xaudioServerClass;
     this.isPlayingB = false;
     this.sample = [];
     this.volume = 1;  // not currently settable
     this.samplePos = undefined;
     this.noAudio = false;
     this.audioServer = undefined;
-    this.sampleRate = wave.sampleRate || 8000;  // Player's samplerate will not update with the wave ref
+    this.sampleRate = morseCWWave.sampleRate || 8000;  // Player's samplerate will not update with the wave ref
 
     for (var i = 0; i < this.sampleRate; i += 1) {
         this.silence.push(0.0);
@@ -45,14 +46,14 @@ MorsePlayerXAS = function(wave) {
 
     console.log("Trying XAudioServer");
 
-    this.audioServer = new XAudioServer(
-        1,  // number of channels
-        this.sampleRate,  // sample rate
-        this.sampleRate >> 2,  // buffer low point for underrun callback triggering
-        this.sampleRate << 1,  // internal ring buffer size
-        audioGenerator,  // audio refill callback triggered when samples remaining < buffer low point
-        this.volume,  // volume
-        failureCallback  // callback triggered when the browser is found to not support any audio API
+    this.audioServer = new this.xaudioServerClass(
+        1,                      // number of channels
+        this.sampleRate,        // sample rate
+        this.sampleRate >> 2,   // buffer low point for underrun callback triggering
+        this.sampleRate << 1,   // internal ring buffer size
+        audioGenerator,         // audio refill callback triggered when samples remaining < buffer low point
+        this.volume,            // volume
+        failureCallback         // callback triggered when the browser is found to not support any audio API
     );
 
     setInterval(
@@ -79,7 +80,7 @@ MorsePlayerXAS.prototype = {
 
     play: function(message) {
         this.stop();
-        this.sample = this.wave.getSample().concat(this.silence);  // add on a second of silence to the end to keep IE quiet
+        this.sample = this.morseCWWave.getSample().concat(this.silence);  // add on a second of silence to the end to keep IE quiet
         this.isPlayingB = true;
         this.samplePos = 0;
         this.audioServer.changeVolume(this.volume);
@@ -101,8 +102,4 @@ MorsePlayerXAS.prototype = {
         // 0: Audio element using Mozilla Audio Data API (https://wiki.mozilla.org/Audio_Data_API)
         // -1: no audio support
     }
-};
-
-module.exports = {
-    MorsePlayerXAS: MorsePlayerXAS
 };

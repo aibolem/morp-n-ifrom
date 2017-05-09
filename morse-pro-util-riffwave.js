@@ -4,7 +4,28 @@
 * Public Domain
 */
 
-var RIFFWAVE = function(data) {
+/*
+    Class to create RIFF WAVE file data.
+    Pass in a MorseCWWave instance.
+
+    Usage:
+
+    var morsePro = new MorsePro();
+    var morseMessage = new MorseMessage(morsePro);
+    var morseCW = new MorseCW(morseMessage);
+    var morseCWWave = new MorseCWWave(morseCW);
+    var riffWave = new RIFFWAVE(morseCWWave);
+
+    morseCW.setWPM(25);  // set the speed to 25 wpm
+    morseCW.setFWPM(10);  // set the Farnsworth speed to 10 wpm
+    morseCWWave.sampleRate = 8000;  // per second
+    morseCWWave.frequency = 600;  // frequency in Hz
+
+    morseMessage.translate("abc");
+    var wav = riffWave.getWAV();  // returns byte array of WAV file
+*/
+var RIFFWAVE = function(morseCWWave) {
+    this.morseCWWave = morseCWWave;
     this.header = {                           // OFFS SIZE NOTES
         chunkId      : [0x52,0x49,0x46,0x46], // 0    4    "RIFF" = 0x52494646
         chunkSize    : 0,                     // 4    4    36+SubChunk2Size = 4+(8+SubChunk1Size)+(8+SubChunk2Size)
@@ -20,10 +41,6 @@ var RIFFWAVE = function(data) {
         subChunk2Id  : [0x64,0x61,0x74,0x61], // 36   4    "data" = 0x64617461
         subChunk2Size: 0                      // 40   4    data size = NumSamples*NumChannels*BitsPerSample/8
     };
-    this.data = [];
-    if (data instanceof Array) {
-        return this.getWAV(data);
-    }
 };
 
 RIFFWAVE.prototype = {
@@ -49,13 +66,13 @@ RIFFWAVE.prototype = {
         return r;
     },
 
-    getWAV: function(data) {
-        if (data instanceof Array) {
-            this.data = data;
-        }
+    getWAV: function() {
+        var data = this.morseCWWave.getPCMSample();
+        this.header.sampleRate = morseCWWave.sampleRate;
+
         this.header.blockAlign = (this.header.numChannels * this.header.bitsPerSample) >> 3;
         this.header.byteRate = this.header.blockAlign * this.header.sampleRate;
-        this.header.subChunk2Size = this.data.length * (this.header.bitsPerSample >> 3);
+        this.header.subChunk2Size = data.length * (this.header.bitsPerSample >> 3);
         this.header.chunkSize = 36 + this.header.subChunk2Size;
 
         return this.header.chunkId.concat(
@@ -71,11 +88,11 @@ RIFFWAVE.prototype = {
             this.u16ToArray(this.header.bitsPerSample),
             this.header.subChunk2Id,
             this.u32ToArray(this.header.subChunk2Size),
-            (this.header.bitsPerSample == 16) ? split16bitArray(this.data) : this.data
+            (this.header.bitsPerSample == 16) ? split16bitArray(data) : data
         );
-    }
-};
+    },
 
-module.exports = {
-    RIFFWAVE: RIFFWAVE
+    getMIMEType: function() {
+        return "audio/wav";
+    }
 };

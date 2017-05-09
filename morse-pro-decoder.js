@@ -1,7 +1,7 @@
 // This code is © Copyright Stephen C. Phillips, 2013-2017.
 // Email: steve@scphillips.com
 
-MorseDecoder = function(timeStep, wpm) {
+var MorseDecoder = function(timeStep, wpm) {
     this.timeStep = timeStep;
     this.wpm = undefined;
     this.timings = [];
@@ -103,8 +103,4 @@ MorseDecoder.prototype = {
         }
         return ditdah;
     }
-};
-
-module.exports = {
-    MorseDecoder: MorseDecoder
 };

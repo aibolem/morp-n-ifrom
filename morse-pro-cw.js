@@ -1,8 +1,23 @@
 // This code is © Copyright Stephen C. Phillips, 2013-2017.
 // Email: steve@scphillips.com
 
-MorseCW = function(message) {
-    this.message = message;
+/*
+    Class to convert create the on/off timings needed by e.g. sound generators.
+    Timings are in milliseconds; "off" timings are negative.
+    Pass in a MorseMessage instance.
+
+    Usage:
+
+    var morsePro = new MorsePro();
+    var morseMessage = new MorseMessage(morsePro);
+    var morseCW = new MorseCW(morseMessage);
+    morseMessage.translate("abc");
+    morseCW.setWPM(25);  // set the speed to 25 wpm
+    morseCW.setFWPM(10);  // set the Farnsworth speed to 10 wpm
+    var timings = morseCW.getTimings();
+*/
+var MorseCW = function(morseMessage) {
+    this.morseMessage = morseMessage;
     this.wpm = 20;
     this.fwpm = 20;
     this.DITS_PER_WORD = 50;  // based on "PARIS "
@@ -53,15 +68,13 @@ MorseCW.prototype = {
     * wordSpace - the length of an inter-word space in milliseconds (normally 7 * dit)
     */
     getTimingsGeneral: function(dit, dah, ditSpace, charSpace, wordSpace) {
-        console.log("Morse: " + this.message.morse);
-        //console.log("Morse speeds/ms: " + dit + ", " + dah + ", " + ditSpace + ", " + charSpace + ", " + wordSpace);
-        //morse = Morse.tidyMorse(morse);
+        console.log("Morse: " + this.morseMessage.morse);
 
-        if (this.message.hasError) {
+        if (this.morseMessage.hasError) {
             console.log("Error in message: cannot compute timings");
             return [];  // TODO: or throw exception?
         }
-        var morse = this.message.morse.replace(/ \/ /g, '/');  // this means that a space is only used for inter-character
+        var morse = this.morseMessage.morse.replace(/ \/ /g, '/');  // this means that a space is only used for inter-character
         var times = [];
         var c;
         for (var i = 0; i < morse.length; i++) {
@@ -87,8 +100,4 @@ MorseCW.prototype = {
         console.log("Timings: " + times);
         return times;
     }
-};
-
-module.exports = {
-    MorseCW: MorseCW
 };

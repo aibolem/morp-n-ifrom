@@ -1,13 +1,13 @@
 // This code is © Copyright Stephen C. Phillips, 2013-2017.
 // Email: steve@scphillips.com
 
-if(typeof(String.prototype.trim) === "undefined") {
+if (typeof(String.prototype.trim) === "undefined") {
     String.prototype.trim = function() {
         return String(this).replace(/^\s+|\s+$/g, '');
     };
 }
 
-function Morse() {
+var Morse = function() {
     this.text2morseH = {
         'A': ".-",
         'B': "-...",
@@ -65,14 +65,14 @@ function Morse() {
         '<AR>': '.-.-.',
         '<AS>': '.-...',
         '<BK>': '-...-.-',
-        '<BT>': '-...-',  // also <TV>
+        '<BT>': '-...-', // also <TV>
         '<CL>': '-.-..-..',
         '<CT>': '-.-.-',
         '<DO>': '-..---',
         '<KN>': '-.--.',
-        '<SK>': '...-.-',  // also <VA>
+        '<SK>': '...-.-', // also <VA>
         '<VA>': '...-.-',
-        '<SN>': '...-.',  // also <VE>
+        '<SN>': '...-.', // also <VE>
         '<VE>': '...-.',
         '<SOS>': '...---...'
     };
@@ -101,7 +101,9 @@ Morse.prototype = {
     },
 
     text2morse: function(text, useProsigns) {
-        if (typeof useProsigns === "undefined") { useProsigns = true; }
+        if (typeof useProsigns === "undefined") {
+            useProsigns = true;
+        }
 
         text = this.tidyText(text);
         var ret = {
@@ -119,7 +121,7 @@ Morse.prototype = {
         while (text.length > 0) {
             token_length = 1;
             if (useProsigns) {
-                prosign = text.match(/^<...?>/);  // array of matches
+                prosign = text.match(/^<...?>/); // array of matches
                 if (prosign) {
                     token_length = prosign[0].length;
                 }
@@ -151,30 +153,32 @@ Morse.prototype = {
     },
 
     text2ditdah: function(text, useProsigns) {
-        var ditdah = this.text2morse(text, useProsigns).morse;  // get the dots and dashes
-        ditdah = ditdah.replace(/ \/ /g, '#').replace(/ /g, '~');  // put in placeholders
-        ditdah = ditdah.replace(/\./g, 'dit ').replace(/\-/g, 'dah ');  // do the basic job
-        ditdah = ditdah.replace(/ #/g, '. ').replace(/ ~/g, ', ').replace(/ $/, '.');  // do punctuation
-        ditdah = ditdah.replace(/^d/, 'D').replace(/\. d/, '. D');  // do capitalisation
+        var ditdah = this.text2morse(text, useProsigns).morse; // get the dots and dashes
+        ditdah = ditdah.replace(/ \/ /g, '#').replace(/ /g, '~'); // put in placeholders
+        ditdah = ditdah.replace(/\./g, 'dit ').replace(/\-/g, 'dah '); // do the basic job
+        ditdah = ditdah.replace(/ #/g, '. ').replace(/ ~/g, ', ').replace(/ $/, '.'); // do punctuation
+        ditdah = ditdah.replace(/^d/, 'D').replace(/\. d/, '. D'); // do capitalisation
         return ditdah;
     },
 
     tidyMorse: function(morse) {
         morse = morse.trim();
-        morse = morse.replace(/\|/g, "/");  // unify the word separator
-        morse = morse.replace(/\//g, " / ");  // make sure word separators are spaced out
-        morse = morse.replace(/\s+/g, " ");  // squash multiple spaces into single spaces
-        morse = morse.replace(/(\/ )+\//g, "/");  // squash multiple word separators
+        morse = morse.replace(/\|/g, "/"); // unify the word separator
+        morse = morse.replace(/\//g, " / "); // make sure word separators are spaced out
+        morse = morse.replace(/\s+/g, " "); // squash multiple spaces into single spaces
+        morse = morse.replace(/(\/ )+\//g, "/"); // squash multiple word separators
         //morse = morse.replace(/^ \/ /, "");  // remove initial word separators
         //morse = morse.replace(/ \/ $/, "");  // remove trailing word separators
         morse = morse.replace(/^\s+/, "");
         morse = morse.replace(/\s+$/, "");
-        morse = morse.replace(/_/g, "-");  // unify the dash character
+        morse = morse.replace(/_/g, "-"); // unify the dash character
         return morse;
     },
 
     morse2text: function(morse, useProsigns) {
-        if (typeof useProsigns === "undefined") { useProsigns = true; }
+        if (typeof useProsigns === "undefined") {
+            useProsigns = true;
+        }
 
         morse = this.tidyMorse(morse);
         var ret = {
@@ -219,8 +223,4 @@ Morse.prototype = {
             return false;
         }
     },
-};
-
-module.exports = {
-    Morse: Morse
 };
