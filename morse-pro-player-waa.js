@@ -43,7 +43,7 @@ MorsePlayerWAA.prototype = {
     stop: function() {
         this.isPlayingB = false;
         this.audioCtx.close();
-        this.audioCtx = new Morse.AudioContext();
+        this.audioCtx = new this.audioContextClass();
     },
 
     play: function() {
