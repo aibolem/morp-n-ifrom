@@ -7,7 +7,7 @@ if (typeof(String.prototype.trim) === "undefined") {
     };
 }
 
-var Morse = function() {
+var MorsePro = function() {
     this.text2morseH = {
         'A': ".-",
         'B': "-...",
@@ -87,11 +87,11 @@ var Morse = function() {
         this.text2morseproH[sign] = this.prosign2morseH[sign];
         this.morsepro2textH[this.prosign2morseH[sign]] = sign;
     }
-}
+};
 
-Morse.prototype = {
+MorsePro.prototype = {
 
-    constructor: Morse,
+    constructor: MorsePro,
 
     tidyText: function(text) {
         text = text.toUpperCase();
