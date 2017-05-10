@@ -3,7 +3,7 @@
 
 /*
     Web browser sound player using Web Audio API.
-    Pass in an instance of MorseCWWave.
+    Pass in an instance of MorseCWWave and window.AudioContext.
 
     Usage:
 
@@ -23,6 +23,7 @@
     morsePlayerWAA.play();
 */
 var MorsePlayerWAA = function(morseCWWave, audioContextClass) {
+    console.log("Trying Web Audio API (Oscillators)");
     this.morseCWWave = morseCWWave;
     this.audioContextClass = audioContextClass;
     this.isPlayingB = false;
@@ -39,7 +40,7 @@ MorsePlayerWAA.prototype = {
         this.noAudio = true;
         var ctx;
         if (this.audioContextClass === undefined) {
-            throw "No AudioContext class defined";
+            throw (new Error("No AudioContext class defined"));
         } else {
             ctx = new this.audioContextClass();
             this.noAudio = false;
