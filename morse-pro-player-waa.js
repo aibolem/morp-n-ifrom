@@ -29,7 +29,7 @@ var MorsePlayerWAA = function(morseCWWave, audioContextClass) {
     this.isPlayingB = false;
     this.volume = 1;  // not currently settable
     this.noAudio = true;
-    this.audioCtx = getAudioContext();
+    this.audioCtx = this.getAudioContext();
 };
 
 MorsePlayerWAA.prototype = {
