@@ -1,10 +1,27 @@
 // This code is © Copyright Stephen C. Phillips, 2013-2017.
 // Email: steve@scphillips.com
 
-// Web browser sound player using XAudioJS by Grant Galitz (https://github.com/taisel/XAudioJS)
-// XAudioJS is not in npm so you need to sort out the dependency manually.
+/*
+    Web browser sound player for older browsers, using XAudioJS by Grant Galitz (https://github.com/taisel/XAudioJS)
+    Pass in an instance of MorseCWWave and the XAudioServer class.
 
-// Pass in an instance of MorseCWWave (or something with a getSample method)
+    Usage:
+
+    var morsePro = new MorsePro();
+    var morseMessage = new MorseMessage(morsePro);
+    var morseCW = new MorseCW(morseMessage);
+    var morseCWWave = new MorseCWWave(morseCW);
+    var audioCtxClass = window.AudioContext || window.webkitAudioContext;
+    var morsePlayerXAS = new MorsePlayerXAS(morseCWWave, XAudioServer);
+
+    morseCW.setWPM(25);  // set the speed to 25 wpm
+    morseCW.setFWPM(10);  // set the Farnsworth speed to 10 wpm
+    morseCWWave.sampleRate = 8000;  // per second
+    morseCWWave.frequency = 600;  // frequency in Hz
+
+    morseMessage.translate("abc");
+    morsePlayerXAS.play();
+*/
 var MorsePlayerXAS = function(morseCWWave, xaudioServerClass) {
     this.morseCWWave = morseCWWave;
     this.xaudioServerClass = xaudioServerClass;
