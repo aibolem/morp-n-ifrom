@@ -99,5 +99,14 @@ MorseCW.prototype = {
         }
         console.log("Timings: " + times);
         return times;
+    },
+
+    getDuration: function() {
+        var times = this.getTimings();
+        var t = 0;
+        for (var i = 0; i < times.length; i++) {
+            t += Math.abs(times[i]);
+        }
+        return t;
     }
 };
