@@ -27,23 +27,30 @@ var MorsePlayerWAA = function(morseCWWave, audioContextClass) {
     this.audioContextClass = audioContextClass;
     this.isPlayingB = false;
     this.volume = 1;  // not currently settable
-    this.noAudio = false;
-
-    if (this.audioContextClass === undefined) {
-        this.noAudio = true;
-    } else {
-        this.audioCtx = new this.audioContextClass();
-    }
+    this.noAudio = true;
+    this.audioCtx = getAudioContext();
 };
 
 MorsePlayerWAA.prototype = {
 
     constructor: MorsePlayerWAA,
 
+    getAudioContext: function() {
+        this.noAudio = true;
+        var ctx;
+        if (this.audioContextClass === undefined) {
+            throw "No AudioContext class defined";
+        } else {
+            ctx = new this.audioContextClass();
+            this.noAudio = false;
+        }
+        return ctx;
+    },
+
     stop: function() {
         this.isPlayingB = false;
         this.audioCtx.close();
-        this.audioCtx = new this.audioContextClass();
+        this.audioCtx = getAudioContext();
     },
 
     play: function() {
