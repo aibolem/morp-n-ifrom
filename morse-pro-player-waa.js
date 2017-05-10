@@ -51,7 +51,7 @@ MorsePlayerWAA.prototype = {
     stop: function() {
         this.isPlayingB = false;
         this.audioCtx.close();
-        this.audioCtx = getAudioContext();
+        this.audioCtx = this.getAudioContext();
     },
 
     play: function() {
