@@ -214,8 +214,7 @@ MorsePro.prototype = {
         return ret;
     },
 
-    isMorse: function(input) {
-        // perhaps should be called "looksLikeMorse"?!
+    looksLikeMorse: function(input) {
         input = this.tidyMorse(input);
         if (input.match(/^[ /.-]*$/)) {
             return true;
