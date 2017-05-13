@@ -1,6 +1,8 @@
 // This code is © Copyright Stephen C. Phillips, 2013-2017.
 // Email: steve@scphillips.com
 
+/*jshint esversion: 6 */
+
 /*
     Class for conveniently translating to and from Morse code.
     Deals with error handling.
@@ -8,8 +10,7 @@
 
     Usage:
 
-    var morsePro = new MorsePro();
-    var morseMessage = new MorseMessage(morsePro);
+    var morseMessage = new MorseMessage();
     morseMessage.useProsigns = true;
     var input;
     var output;
@@ -26,34 +27,32 @@
 
 */
 
-var MorseMessage = function(morsePro) {
-    this.morsePro = morsePro;
-    this.input = "";
-    this.output = "";
-    this.morse = "";
-    this.message = "";
-    this.useProsigns = true;
-    this.inputWasMorse = undefined;
-    this.hasError = undefined;
-};
+import * as Morse from 'morse-pro';
 
-MorseMessage.prototype = {
+class MorseMessage {
+    constructor() {
+        this.input = "";
+        this.output = "";
+        this.morse = "";
+        this.message = "";
+        this.useProsigns = true;
+        this.inputWasMorse = undefined;
+        this.hasError = undefined;
+    }
 
-    constructor: MorseMessage,
-
-    translate: function(input, isMorse) {
+    translate(input, isMorse) {
         var translation;
 
         if (typeof isMorse === "undefined") {
             // make a guess: could be wrong if someone wants to translate "." into Morse for instance
-            isMorse = this.morsePro.isMorse(input);
+            isMorse = Morse.looksLikeMorse(input);
         }
         if (isMorse) {
             this.inputWasMorse = true;
-            translation = this.morsePro.morse2text(input, this.useProsigns);
+            translation = Morse.morse2text(input, this.useProsigns);
         } else {
             this.inputWasMorse = false;
-            translation = this.morsePro.text2morse(input, this.useProsigns);
+            translation = Morse.text2morse(input, this.useProsigns);
         }
 
         this.morse = translation.morse;
@@ -72,10 +71,10 @@ MorseMessage.prototype = {
             throw new Error("Error in input");
         }
         return this.output;
-    },
+    }
 
     // Clear all the errors from the morse and message
-    clearError: function() {
+    clearError() {
         if (this.inputWasMorse) {
             this.morse = this.morse.replace(/#/g, "");  // leave in the bad Morse
         } else {
@@ -84,4 +83,4 @@ MorseMessage.prototype = {
         }
         this.hasError = false;
     }
-};
+}

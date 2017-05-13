@@ -1,19 +1,20 @@
 // This code is © Copyright Stephen C. Phillips, 2013-2017.
 // Email: steve@scphillips.com
 
+/*jshint esversion: 6 */
+
 /*
     Class to create sine-wave samples.
     Pass in a MorseCW instance (or something with a getTimings() method)
 
     Usage:
 
-    var morsePro = new MorsePro();
-    var morseMessage = new MorseMessage(morsePro);
+    var morseMessage = new MorseMessage();
     var morseCW = new MorseCW(morseMessage);
     var morseCWWave = new MorseCWWave(morseCW);
 
-    morseCW.setWPM(25);  // set the speed to 25 wpm
-    morseCW.setFWPM(10);  // set the Farnsworth speed to 10 wpm
+    morseCW.wpm = 25;  // set the speed to 25 wpm
+    morseCW.fwpm = 10;  // set the Farnsworth speed to 10 wpm
     morseCWWave.sampleRate = 8000;  // per second
     morseCWWave.frequency = 600;  // frequency in Hz
 
@@ -21,18 +22,14 @@
     var sample = morseCWWave.getSample();
 */
 
-var MorseCWWave = function(morseCW) {
-    this.morseCW = morseCW;
-    this.sampleRate = 8000;
-    this.frequency = 550;
-};
+export default class MorseCWWave {
+    constructor(morseCW) {
+        this.morseCW = morseCW;
+        this.sampleRate = 8000;  // sample rate for the waveform in Hz
+        this.frequency = 550;  // frequency of wave in Hz
+    }
 
-// Set the sample rate for the waveform in Hz
-MorseCWWave.prototype = {
-
-    constructor: MorseCWWave,
-
-    getSample: function() {
+    getSample() {
         // returns an array of floating point numbers representing the wave-form
         // data is suitable for XAudioJS
         // range is [-1, 1] (floating point)
@@ -52,9 +49,9 @@ MorseCWWave.prototype = {
         }
         console.log("Sample length: " + sample.length);
         return sample;
-    },
+    }
 
-    getPCMSample: function() {
+    getPCMSample() {
         // convert sample to 8-bit unsigned PCM format
         // returns array of integers (bytes) in range [128, -127]
         var pcmSample = [];
@@ -64,4 +61,4 @@ MorseCWWave.prototype = {
         }
         return pcmSample;
     }
-};
+}
