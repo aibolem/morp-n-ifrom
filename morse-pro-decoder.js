@@ -1,7 +1,12 @@
 // This code is © Copyright Stephen C. Phillips, 2013-2017.
 // Email: steve@scphillips.com
 
-var MorseDecoder = function(timeStep, wpm) {
+/*
+    Class to convert from timings to Morse code.
+    Pass in a MorsePro instance.
+*/
+var MorseDecoder = function(morsePro, timeStep, wpm) {
+    this.morsePro = morsePro;
     this.timeStep = timeStep;
     this.wpm = undefined;
     this.timings = [];
@@ -24,10 +29,12 @@ MorseDecoder.prototype = {
 
     constructor: MorseDecoder,
 
+    DITS_PER_WORD: 50,  // better if this was inherited from a more basic class...
+
     setWPM: function(wpm) {
         this.wpm = wpm;
-        this.ditDahThreshold = 2 * (60000 / Morse.DITS_PER_WORD) / (wpm * timeStep);
-        this.dahSpaceThreshold = 5 * (60000 / Morse.DITS_PER_WORD) / (wpm * timeStep);
+        this.ditDahThreshold = 2 * (60000 / this.DITS_PER_WORD) / (wpm * timeStep);
+        this.dahSpaceThreshold = 5 * (60000 / this.DITS_PER_WORD) / (wpm * timeStep);
         console.log("Decoder WPM: " + wpm);
         console.log("Decoder ditDahThreshold (ticks): " + this.ditDahThreshold);
         console.log("Decoder dahSpaceThreshold (ticks): " + this.dahSpaceThreshold);
@@ -59,7 +66,7 @@ MorseDecoder.prototype = {
             // Then we've reached the end of a character or word or a flush has been forced
             var u = this.unusedTimes;
             var m = this.timings2morse(this.unusedTimes);
-            var t = Morse.morse2text(m).message;  // will be '#' if there's an error
+            var t = morsePro.morse2text(m).message;  // will be '#' if there's an error
             this.timings = this.timings.concat(this.unusedTimes);
             this.morse += m;
             this.message += t;
