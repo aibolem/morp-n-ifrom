@@ -9,7 +9,7 @@ if (typeof(String.prototype.trim) === "undefined") {
     };
 }
 
-text2morseH = {
+var text2morseH = {
     'A': ".-",
     'B': "-...",
     'C': "-.-.",
@@ -60,8 +60,8 @@ text2morseH = {
     '=': "-...-",
     ' ': "/" //Not morse but helps translation
 };
-morse2textH = {};
-prosign2morseH = {
+var morse2textH = {};
+var prosign2morseH = {
     '<AA>': '.-.-',
     '<AR>': '.-.-.',
     '<AS>': '.-...',
@@ -77,8 +77,8 @@ prosign2morseH = {
     '<VE>': '...-.',
     '<SOS>': '...---...'
 };
-morsepro2textH = {};
-text2morseproH = {};
+var morsepro2textH = {};
+var text2morseproH = {};
 for (var text in text2morseH) {
     text2morseproH[text] = text2morseH[text];
     morse2textH[text2morseH[text]] = text;
