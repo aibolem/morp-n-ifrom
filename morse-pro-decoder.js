@@ -3,13 +3,13 @@
 
 /*jshint esversion: 6 */
 
+import * as Morse from 'morse-pro';
+
 /*
     Class to convert from timings to Morse code.
-    Pass in a MorsePro instance.
 */
 export default class MorseDecoder {
-    constructor(morsePro, timeStep, wpm) {
-        this.morsePro = morsePro;
+    constructor(timeStep, wpm) {
         this.timeStep = timeStep;
         this._wpm = undefined;
         this.timings = [];
@@ -67,8 +67,8 @@ export default class MorseDecoder {
         if (this.unusedTimes.length > 0) {
             // Then we've reached the end of a character or word or a flush has been forced
             var u = this.unusedTimes;
-            var m = this.timings2morse(this.unusedTimes);
-            var t = morsePro.morse2text(m).message;  // will be '#' if there's an error
+            var m = Morse.timings2morse(this.unusedTimes);
+            var t = Morse.morse2text(m).message;  // will be '#' if there's an error
             this.timings = this.timings.concat(this.unusedTimes);
             this.morse += m;
             this.message += t;
