@@ -49,6 +49,6 @@ var Base64 = {
 };
 Base64.init();
 
-export function getDataURI(data, type) {
+export default function getDataURI(data, type) {
     return 'data:' + type + ';base64,' + Base64.encode(data);
 }
