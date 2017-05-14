@@ -67,7 +67,7 @@ export default class RiffWave {
 
     getWAV() {
         var data = this.morseCWWave.getPCMSample();
-        this.header.sampleRate = morseCWWave.sampleRate;
+        this.header.sampleRate = this.morseCWWave.sampleRate;
 
         this.header.blockAlign = (this.header.numChannels * this.header.bitsPerSample) >> 3;
         this.header.byteRate = this.header.blockAlign * this.header.sampleRate;
