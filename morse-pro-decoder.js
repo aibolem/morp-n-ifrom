@@ -67,7 +67,7 @@ export default class MorseDecoder {
         if (this.unusedTimes.length > 0) {
             // Then we've reached the end of a character or word or a flush has been forced
             var u = this.unusedTimes;
-            var m = Morse.timings2morse(this.unusedTimes);
+            var m = this.timings2morse(this.unusedTimes);
             var t = Morse.morse2text(m).message;  // will be '#' if there's an error
             this.timings = this.timings.concat(this.unusedTimes);
             this.morse += m;
