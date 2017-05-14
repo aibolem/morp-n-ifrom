@@ -29,7 +29,7 @@
 
 import * as Morse from 'morse-pro';
 
-class MorseMessage {
+export default class MorseMessage {
     constructor() {
         this.input = "";
         this.output = "";
