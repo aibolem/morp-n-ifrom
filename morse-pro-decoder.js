@@ -31,8 +31,8 @@ export default class MorseDecoder {
 
     set wpm(wpm) {
         this._wpm = wpm;
-        this.ditDahThreshold = 2 * (60000 / this.DITS_PER_WORD) / (wpm * timeStep);
-        this.dahSpaceThreshold = 5 * (60000 / this.DITS_PER_WORD) / (wpm * timeStep);
+        this.ditDahThreshold = 2 * (60000 / this.DITS_PER_WORD) / (wpm * this.timeStep);
+        this.dahSpaceThreshold = 5 * (60000 / this.DITS_PER_WORD) / (wpm * this.timeStep);
         console.log("Decoder WPM: " + wpm);
         console.log("Decoder ditDahThreshold (ticks): " + this.ditDahThreshold);
         console.log("Decoder dahSpaceThreshold (ticks): " + this.dahSpaceThreshold);
