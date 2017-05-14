@@ -12,6 +12,7 @@ export default class MorseDecoder {
     constructor(timeStep, wpm) {
         this.timeStep = timeStep;
         this._wpm = undefined;
+        this.DITS_PER_WORD = 50;  // TODO: better if this was inherited from a more basic class... or made a const
         this.timings = [];
         this.unusedTimes = [];
         this.ditDahThreshold = undefined;
@@ -26,7 +27,6 @@ export default class MorseDecoder {
         if (typeof wpm !== "undefined") {
             this.wpm = wpm;
         }
-        this.DITS_PER_WORD = 50;  // TODO: better if this was inherited from a more basic class... or made a const
     }
 
     set wpm(wpm) {
