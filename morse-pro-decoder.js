@@ -24,7 +24,7 @@ export default class MorseDecoder {
         this.dahSpaces = [];
         this.spaces = [];
         if (typeof wpm !== "undefined") {
-            this.setWPM(wpm);
+            this.wpm = wpm;
         }
         this.DITS_PER_WORD = 50;  // TODO: better if this was inherited from a more basic class... or made a const
     }
