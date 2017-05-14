@@ -15,7 +15,7 @@ var Base64 = {
     encLookup: [],
 
     init: function() {
-        for (var i=0; i<4096; i++) {
+        for (var i = 0; i < 4096; i++) {
             this.encLookup[i] = this.chars[i >> 6] + this.chars[i & 0x3F];
         }
     },
@@ -24,8 +24,9 @@ var Base64 = {
         var len = src.length;
         var dst = '';
         var i = 0;
+        var n;
         while (len > 2) {
-            n = (src[i] << 16) | (src[i+1] << 8) | src[i+2];
+            n = (src[i] << 16) | (src[i + 1] << 8) | src[i + 2];
             dst += this.encLookup[n >> 12] + this.encLookup[n & 0xFFF];
             len -= 3;
             i += 3;
