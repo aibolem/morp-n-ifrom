@@ -1,46 +1,48 @@
 // This code is © Copyright Stephen C. Phillips, 2013-2017.
 // Email: steve@scphillips.com
 
+/*jshint esversion: 6 */
+
+import * as Morse from 'morse-pro';
+
 /*
     Class to convert from timings to Morse code.
-    Pass in a MorsePro instance.
 */
-var MorseDecoder = function(morsePro, timeStep, wpm) {
-    this.morsePro = morsePro;
-    this.timeStep = timeStep;
-    this.wpm = undefined;
-    this.timings = [];
-    this.unusedTimes = [];
-    this.ditDahThreshold = undefined;
-    this.dahSpaceThreshold = undefined;
-    this.morse = "";
-    this.message = "";
-    this.dits = [];
-    this.dahs = [];
-    this.ditSpaces = [];
-    this.dahSpaces = [];
-    this.spaces = [];
-    if (typeof wpm !== "undefined") {
-        this.setWPM(wpm);
+export default class MorseDecoder {
+    constructor(timeStep, wpm) {
+        this.timeStep = timeStep;
+        this._wpm = undefined;
+        this.DITS_PER_WORD = 50;  // TODO: better if this was inherited from a more basic class... or made a const
+        this.timings = [];
+        this.unusedTimes = [];
+        this.ditDahThreshold = undefined;
+        this.dahSpaceThreshold = undefined;
+        this.morse = "";
+        this.message = "";
+        this.dits = [];
+        this.dahs = [];
+        this.ditSpaces = [];
+        this.dahSpaces = [];
+        this.spaces = [];
+        if (typeof wpm !== "undefined") {
+            this.wpm = wpm;
+        }
     }
-};
 
-MorseDecoder.prototype = {
-
-    constructor: MorseDecoder,
-
-    DITS_PER_WORD: 50,  // better if this was inherited from a more basic class...
-
-    setWPM: function(wpm) {
-        this.wpm = wpm;
-        this.ditDahThreshold = 2 * (60000 / this.DITS_PER_WORD) / (wpm * timeStep);
-        this.dahSpaceThreshold = 5 * (60000 / this.DITS_PER_WORD) / (wpm * timeStep);
+    set wpm(wpm) {
+        this._wpm = wpm;
+        this.ditDahThreshold = 2 * (60000 / this.DITS_PER_WORD) / (wpm * this.timeStep);
+        this.dahSpaceThreshold = 5 * (60000 / this.DITS_PER_WORD) / (wpm * this.timeStep);
         console.log("Decoder WPM: " + wpm);
         console.log("Decoder ditDahThreshold (ticks): " + this.ditDahThreshold);
         console.log("Decoder dahSpaceThreshold (ticks): " + this.dahSpaceThreshold);
-    },
+    }
 
-    addTiming: function(duration) {
+    get wpm() {
+        return this._wpm;
+    }
+
+    addTiming(duration) {
         //console.log("Received: " + duration);
         if (Math.abs(duration) == 1) {
             // if the duration is very short, assume it is a mistake and add it to the previous one (if there is one)
@@ -54,19 +56,19 @@ MorseDecoder.prototype = {
             // if we have just received a character space or longer
             this.flush();
         }
-    },
+    }
 
     // Override this with your own function
-    messageCallback: function(data) {
+    messageCallback(data) {
         console.log("Decoded: {\n  timings: " + data.timings + "\n  morse: " + data.morse + "\n  message: " + data.message + "\n}");
-    },
+    }
 
-    flush: function() {
+    flush() {
         if (this.unusedTimes.length > 0) {
             // Then we've reached the end of a character or word or a flush has been forced
             var u = this.unusedTimes;
             var m = this.timings2morse(this.unusedTimes);
-            var t = morsePro.morse2text(m).message;  // will be '#' if there's an error
+            var t = Morse.morse2text(m).message;  // will be '#' if there's an error
             this.timings = this.timings.concat(this.unusedTimes);
             this.morse += m;
             this.message += t;
@@ -77,9 +79,9 @@ MorseDecoder.prototype = {
                 message: t
             });
         }
-    },
+    }
 
-    timings2morse: function(times) {
+    timings2morse(times) {
         var ditdah = "";
         var c;
         var d;
@@ -110,4 +112,4 @@ MorseDecoder.prototype = {
         }
         return ditdah;
     }
-};
+}

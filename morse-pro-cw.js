@@ -1,6 +1,8 @@
 // This code is © Copyright Stephen C. Phillips, 2013-2017.
 // Email: steve@scphillips.com
 
+/*jshint esversion: 6 */
+
 /*
     Class to convert create the on/off timings needed by e.g. sound generators.
     Timings are in milliseconds; "off" timings are negative.
@@ -8,40 +10,42 @@
 
     Usage:
 
-    var morsePro = new MorsePro();
-    var morseMessage = new MorseMessage(morsePro);
+    var morseMessage = new MorseMessage();
     var morseCW = new MorseCW(morseMessage);
     morseMessage.translate("abc");
-    morseCW.setWPM(25);  // set the speed to 25 wpm
-    morseCW.setFWPM(10);  // set the Farnsworth speed to 10 wpm
+    morseCW.wpm = 25;  // set the speed to 25 wpm
+    morseCW.fwpm = 10;  // set the Farnsworth speed to 10 wpm
     var timings = morseCW.getTimings();
 */
-var MorseCW = function(morseMessage) {
-    this.morseMessage = morseMessage;
-    this.wpm = 20;
-    this.fwpm = 20;
-    this.DITS_PER_WORD = 50;  // based on "PARIS "
-};
+export default class MorseCW {
+    constructor(morseMessage) {
+        this.morseMessage = morseMessage;
+        this._wpm = 20;
+        this._fwpm = 20;
+        this.DITS_PER_WORD = 50;  // based on "PARIS "  TODO: make const
+    }
 
-MorseCW.prototype = {
-
-    constructor: MorseCW,
-
-    setWPM: function(wpm) {
-        this.wpm = wpm;
-        if (wpm < this.fwpm) {
-            this.fwpm = wpm;
+    set wpm(wpm) {
+        this._wpm = wpm;
+        if (wpm < this._fwpm) {
+            this._fwpm = wpm;
         }
-        return this.fwpm;
-    },
+    }
 
-    setFWPM: function(fwpm) {
-        this.fwpm = fwpm;
-        if (fwpm > this.wpm) {
-            this.wpm = fwpm;
+    get wpm() {
+        return this._wpm;
+    }
+
+    set fwpm(fwpm) {
+        this._fwpm = fwpm;
+        if (fwpm > this._wpm) {
+            this._wpm = fwpm;
         }
-        return this.wpm;
-    },
+    }
+
+    get fwpm() {
+        return this._fwpm;
+    }
 
     /**
     * Convert a morse string into an array of millisecond timings.
@@ -52,8 +56,8 @@ MorseCW.prototype = {
     * wpm - the speed in words per minute ("PARIS " as one word)
     * farnsworth - the Farnsworth speed in words per minute (optional, defaults to wpm)
     */
-    getTimings: function() {
-        var dit = 60000 / (this.DITS_PER_WORD * this.wpm);  // 60000 is 1 minute in milliseconds
+    getTimings() {
+        var dit = 60000 / (this.DITS_PER_WORD * this._wpm);  // 60000 is 1 minute in milliseconds
         // "PARIS " is 31 units for the characters and 19 units for the inter-character spaces and inter-word space
         // One unit takes 1 * 60 / (50 * wpm)
         // The 31 units should take 31 * 60 / (50 * wpm)  seconds at wpm
@@ -65,9 +69,9 @@ MorseCW.prototype = {
         // Comparing that to  60 / (50 * wpm)  gives a ratio of (50.wpm - 31.fwpm) / 19.fwpm
         var SPACES_IN_PARIS = 19;
         // slow down the spaces by this ratio
-        var r = (this.DITS_PER_WORD * this.wpm - (this.DITS_PER_WORD - SPACES_IN_PARIS) * this.fwpm) / (SPACES_IN_PARIS * this.fwpm);
+        var r = (this.DITS_PER_WORD * this._wpm - (this.DITS_PER_WORD - SPACES_IN_PARIS) * this._fwpm) / (SPACES_IN_PARIS * this._fwpm);
         return this.getTimingsGeneral(dit, 3 * dit, dit, 3 * dit * r, 7 * dit * r);
-    },
+    }
 
     /**
     * Convert a morse string into an array of millisecond timings.
@@ -78,7 +82,7 @@ MorseCW.prototype = {
     * charSpace - the length of an inter-character space in milliseconds (normally 3 * dit)
     * wordSpace - the length of an inter-word space in milliseconds (normally 7 * dit)
     */
-    getTimingsGeneral: function(dit, dah, ditSpace, charSpace, wordSpace) {
+    getTimingsGeneral(dit, dah, ditSpace, charSpace, wordSpace) {
         console.log("Morse: " + this.morseMessage.morse);
 
         if (this.morseMessage.hasError) {
@@ -110,9 +114,9 @@ MorseCW.prototype = {
         }
         console.log("Timings: " + times);
         return times;
-    },
+    }
 
-    getDuration: function() {
+    getDuration() {
         var times = this.getTimings();
         var t = 0;
         for (var i = 0; i < times.length; i++) {
@@ -120,4 +124,4 @@ MorseCW.prototype = {
         }
         return t;
     }
-};
+}
