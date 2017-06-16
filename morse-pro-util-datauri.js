@@ -1,15 +1,18 @@
-// This code is © Copyright Stephen C. Phillips, 2013-2017.
-// Email: steve@scphillips.com
+/*
+* FastBase64 adapted from RIFFWAVE.js v0.03 - Audio encoder for HTML5 <audio> elements.
+* Copyleft 2011 by Pedro Ladaria <pedro.ladaria at Gmail dot com>
+* Public Domain
+*/
 
-/*jshint esversion: 6 */
+/*
+* Adaptation by Stephen C. Phillips, 2013-2017.
+* Email: steve@scphillips.com
+* Public Domain
+*/
+
+/* jshint esversion: 6 */
 
 var Base64 = {
-
-    /*
-    * FastBase64 adapted from RIFFWAVE.js v0.03 - Audio encoder for HTML5 <audio> elements.
-    * Copyleft 2011 by Pedro Ladaria <pedro.ladaria at Gmail dot com>
-    * Public Domain
-    */
 
     chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
     encLookup: [],

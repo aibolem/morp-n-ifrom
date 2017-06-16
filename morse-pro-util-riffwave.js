@@ -4,6 +4,12 @@
 * Public Domain
 */
 
+/*
+* Adaptation by Stephen C. Phillips, 2013-2017.
+* Email: steve@scphillips.com
+* Public Domain
+*/
+
 /*jshint esversion: 6 */
 
 /*
