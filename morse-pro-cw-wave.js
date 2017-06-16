@@ -1,7 +1,7 @@
 // This code is © Copyright Stephen C. Phillips, 2013-2017.
 // Email: steve@scphillips.com
 
-/*jshint esversion: 6 */
+/* jshint esversion: 6 */
 
 /*
     Class to create sine-wave samples of standard CW Morse.
