@@ -59,7 +59,7 @@ export default class MorsePlayerWAA {
 
         this.stop();
 
-        var timings = this.morseCWWave.morseCW.getTimings();
+        var timings = this.morseCWWave.getTimings();
         if (timings.length === 0) {
             return [];
         }
