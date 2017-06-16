@@ -4,27 +4,27 @@
 /*jshint esversion: 6 */
 
 /*
-    Class to create sine-wave samples.
-    Pass in a MorseCW instance (or something with a getTimings() method)
+    Class to create sine-wave samples of standard CW Morse.
 
     Usage:
 
-    var morseMessage = new MorseMessage();
-    var morseCW = new MorseCW(morseMessage);
-    var morseCWWave = new MorseCWWave(morseCW);
+    var morseCWWave = new MorseCWWave();
 
-    morseCW.wpm = 25;  // set the speed to 25 wpm
-    morseCW.fwpm = 10;  // set the Farnsworth speed to 10 wpm
+    morseCWWave.wpm = 25;  // set the speed to 25 wpm
+    morseCWWave.fwpm = 10;  // set the Farnsworth speed to 10 wpm
+
     morseCWWave.sampleRate = 8000;  // per second
     morseCWWave.frequency = 600;  // frequency in Hz
 
-    morseMessage.translate("abc");
+    morseCWWave.translate("abc");
     var sample = morseCWWave.getSample();
 */
 
-export default class MorseCWWave {
-    constructor(morseCW) {
-        this.morseCW = morseCW;
+import MorseCW from 'morse-pro-cw';
+
+export default class MorseCWWave extends MorseCW {
+    constructor() {
+        super();
         this.sampleRate = 8000;  // sample rate for the waveform in Hz
         this.frequency = 550;  // frequency of wave in Hz
     }
@@ -34,7 +34,7 @@ export default class MorseCWWave {
         // data is suitable for XAudioJS
         // range is [-1, 1] (floating point)
         var sample = [];
-        var timings = this.morseCW.getTimings();
+        var timings = this.getTimings();
         if (timings.length === 0) {
             return [];
         }
