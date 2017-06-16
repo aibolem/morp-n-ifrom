@@ -18,17 +18,15 @@
 
     Usage:
 
-    var morseMessage = new MorseMessage();
-    var morseCW = new MorseCW(morseMessage);
-    var morseCWWave = new MorseCWWave(morseCW);
+    var morseCWWave = new MorseCWWave();
     var riffWave = new RIFFWAVE(morseCWWave);
 
-    morseCW.wpm = 25;  // set the speed to 25 wpm
-    morseCW.fwpm = 10;  // set the Farnsworth speed to 10 wpm
+    morseCWWave.wpm = 25;  // set the speed to 25 wpm
+    morseCWWave.fwpm = 10;  // set the Farnsworth speed to 10 wpm
     morseCWWave.sampleRate = 8000;  // per second
     morseCWWave.frequency = 600;  // frequency in Hz
 
-    morseMessage.translate("abc");
+    morseCWWave.translate("abc");
     var wav = riffWave.getWAV();  // returns byte array of WAV file
 */
 

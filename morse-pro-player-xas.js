@@ -9,18 +9,15 @@
 
     Usage:
 
-    var morseMessage = new MorseMessage();
-    var morseCW = new MorseCW(morseMessage);
-    var morseCWWave = new MorseCWWave(morseCW);
-    var audioCtxClass = window.AudioContext || window.webkitAudioContext;
+    var morseCWWave = new MorseCWWave();
     var morsePlayerXAS = new MorsePlayerXAS(morseCWWave, XAudioServer);
 
-    morseCW.wpm = 25;  // set the speed to 25 wpm
-    morseCW.fwpm = 10;  // set the Farnsworth speed to 10 wpm
+    morseCWWave.wpm = 25;  // set the speed to 25 wpm
+    morseCWWave.fwpm = 10;  // set the Farnsworth speed to 10 wpm
     morseCWWave.sampleRate = 8000;  // per second
     morseCWWave.frequency = 600;  // frequency in Hz
 
-    morseMessage.translate("abc");
+    morseCWWave.translate("abc");
     morsePlayerXAS.play();
 */
 export default class MorsePlayerXAS {
