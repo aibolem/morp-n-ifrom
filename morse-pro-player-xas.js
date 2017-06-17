@@ -5,7 +5,7 @@
 
 /*
     Web browser sound player for older browsers, using XAudioJS by Grant Galitz (https://github.com/taisel/XAudioJS)
-    Pass in an instance of MorseCWWave and the XAudioServer class.
+    Pass in the XAudioServer class.
 
     Usage:
 

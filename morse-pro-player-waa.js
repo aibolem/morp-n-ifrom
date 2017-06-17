@@ -5,7 +5,7 @@
 
 /*
     Web browser sound player using Web Audio API.
-    Pass in an instance of MorseCWWave and window.AudioContext.
+    Pass in the window.AudioContext.
 
     Usage:
 
