@@ -10,19 +10,18 @@
     Usage:
 
     var morseCWWave = new MorseCWWave();
-    var morsePlayerXAS = new MorsePlayerXAS(morseCWWave, XAudioServer);
-
     morseCWWave.wpm = 25;  // set the speed to 25 wpm
     morseCWWave.fwpm = 10;  // set the Farnsworth speed to 10 wpm
     morseCWWave.sampleRate = 8000;  // per second
     morseCWWave.frequency = 600;  // frequency in Hz
-
     morseCWWave.translate("abc");
-    morsePlayerXAS.play();
+
+    var morsePlayerXAS = new MorsePlayerXAS(XAudioServer);
+    morsePlayerXAS.load(morseCWWave);
+    morsePlayerXAS.playFromStart();
 */
 export default class MorsePlayerXAS {
-    constructor(morseCWWave, xaudioServerClass) {
-        this.morseCWWave = morseCWWave;
+    constructor(xaudioServerClass) {
         this.xaudioServerClass = xaudioServerClass;
         this.isPlayingB = false;
         this.sample = [];
@@ -31,7 +30,8 @@ export default class MorsePlayerXAS {
         this.samplePos = undefined;
         this.noAudio = false;
         this.audioServer = undefined;
-        this.sampleRate = morseCWWave.sampleRate || 8000;  // Player's samplerate will not update with the wave ref
+        this.sampleRate = undefined;
+        this.sample = undefined;
 
         for (var i = 0; i < this.sampleRate; i += 1) {
             this.silence.push(0.0);
@@ -40,7 +40,7 @@ export default class MorsePlayerXAS {
         var that = this;  // needed so that the 3 closures defined here keep a reference to this object
 
         // XAudioJS callback to get more samples for buffer
-        function audioGenerator(samplesToGenerate) {
+        this.audioGenerator = function(samplesToGenerate) {
             if (samplesToGenerate === 0) {
                 return [];
             }
@@ -54,24 +54,12 @@ export default class MorsePlayerXAS {
                 that.isPlayingB = false;
                 return [];
             }
-        }
+        };
 
         // XAudioJS failure callback
-        function failureCallback() {
+        this.failureCallback = function() {
             that.noAudio = true;
-        }
-
-        console.log("Trying XAudioServer");
-
-        this.audioServer = new this.xaudioServerClass(
-            1,                      // number of channels
-            this.sampleRate,        // sample rate
-            this.sampleRate >> 2,   // buffer low point for underrun callback triggering
-            this.sampleRate << 1,   // internal ring buffer size
-            audioGenerator,         // audio refill callback triggered when samples remaining < buffer low point
-            this.volume,            // volume
-            failureCallback         // callback triggered when the browser is found to not support any audio API
-        );
+        };
 
         setInterval(
             function () {
@@ -86,12 +74,27 @@ export default class MorsePlayerXAS {
     stop() {
         this.isPlayingB = false;
         this.audioServer.changeVolume(0);
-        this.sample = [];
     }
 
-    play(message) {
+    load(morseCWWave) {
+        this.sampleRate = morseCWWave.sampleRate || 8000;
+        this.sample = morseCWWave.getSample().concat(this.silence);  // add on a second of silence to the end to keep IE quiet
+
+        console.log("Trying XAudioServer");
+        
+        this.audioServer = new this.xaudioServerClass(
+            1,                      // number of channels
+            this.sampleRate,        // sample rate
+            this.sampleRate >> 2,   // buffer low point for underrun callback triggering
+            this.sampleRate << 1,   // internal ring buffer size
+            this.audioGenerator,    // audio refill callback triggered when samples remaining < buffer low point
+            this.volume,            // volume
+            this.failureCallback    // callback triggered when the browser is found to not support any audio API
+        );
+    }
+
+    playFromStart() {
         this.stop();
-        this.sample = this.morseCWWave.getSample().concat(this.silence);  // add on a second of silence to the end to keep IE quiet
         this.isPlayingB = true;
         this.samplePos = 0;
         this.audioServer.changeVolume(this.volume);
