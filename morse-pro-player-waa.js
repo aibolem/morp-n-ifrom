@@ -69,8 +69,8 @@ export default class MorsePlayerWAA {
         this.isPlayingB = true;
 
         var cumT = this.audioCtx.currentTime;
-        for (var t = 0; t < timings.length; t += 1) {
-            var duration = timings[t] / 1000;
+        for (var t = 0; t < this.timings.length; t += 1) {
+            var duration = this.timings[t] / 1000;
             if (duration > 0) {
                 var oscillator = this.audioCtx.createOscillator();
                 oscillator.type = 'sine';
