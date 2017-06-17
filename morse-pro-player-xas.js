@@ -85,7 +85,7 @@ export default class MorsePlayerXAS {
         for (var i = 0; i < this.sampleRate; i += 1) {
             silence.push(0.0);
         }
-        this.sample = this.sample.concat(this.silence);  // add on a second of silence to the end to keep IE quiet
+        this.sample = this.sample.concat(silence);  // add on a second of silence to the end to keep IE quiet
 
         console.log("Trying XAudioServer");
 
