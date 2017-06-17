@@ -79,7 +79,7 @@ export default class MorsePlayerXAS {
     }
 
     load(morseCWWave) {
-        _load(morseCWWave.getSample(), morseCW.sampleRate);
+        this._load(morseCWWave.getSample(), morseCW.sampleRate);
     }
 
     _load(sample, sampleRate) {
