@@ -10,26 +10,26 @@
     Usage:
 
     var morseCWWave = new MorseCWWave();
-    var audioCtxClass = window.AudioContext || window.webkitAudioContext;
-    var morsePlayerWAA = new MorsePlayerWAA(morseCWWave, audioCtxClass);
-
     morseCWWave.wpm = 25;  // set the speed to 25 wpm
     morseCWWave.fwpm = 10;  // set the Farnsworth speed to 10 wpm
-    morseCWWave.sampleRate = 8000;  // per second
     morseCWWave.frequency = 600;  // frequency in Hz
-
     morseCWWave.translate("abc");
-    morsePlayerWAA.play();
+
+    var audioCtxClass = window.AudioContext || window.webkitAudioContext;
+    var morsePlayerWAA = new MorsePlayerWAA(audioCtxClass);
+    morsePlayerWAA.load(morseCWWave);
+    morsePlayerWAA.playFromStart();
 */
 export default class MorsePlayerWAA {
-    constructor(morseCWWave, audioContextClass) {
+    constructor(audioContextClass) {
         console.log("Trying Web Audio API (Oscillators)");
-        this.morseCWWave = morseCWWave;
         this.audioContextClass = audioContextClass;
         this.isPlayingB = false;
         this.volume = 1;  // not currently settable
         this.noAudio = true;
         this.audioCtx = this.getAudioContext();
+        this.timings = undefined;
+        this.frequency = undefined;
     }
 
     getAudioContext() {
@@ -50,27 +50,31 @@ export default class MorsePlayerWAA {
         this.audioCtx = this.getAudioContext();
     }
 
-    play() {
+    load(morseCWWave) {
+        this.timings = morseCWWave.getTimings();
+        this.frequency = morseCWWave.frequency;
+    }
+
+    playFromStart() {
         if (this.noAudio) {
             return;
         }
 
         this.stop();
 
-        var timings = this.morseCWWave.getTimings();
-        if (timings.length === 0) {
+        if (this.timings.length === 0) {
             return [];
         }
 
         this.isPlayingB = true;
 
         var cumT = this.audioCtx.currentTime;
-        for (var t = 0; t < timings.length; t += 1) {
-            var duration = timings[t] / 1000;
+        for (var t = 0; t < this.timings.length; t += 1) {
+            var duration = this.timings[t] / 1000;
             if (duration > 0) {
                 var oscillator = this.audioCtx.createOscillator();
                 oscillator.type = 'sine';
-                oscillator.frequency.value = this.morseCWWave.frequency;
+                oscillator.frequency.value = this.frequency;
                 oscillator.connect(this.audioCtx.destination);
                 oscillator.start(cumT);
                 oscillator.stop(cumT + duration);
