@@ -25,17 +25,12 @@ export default class MorsePlayerXAS {
         this.xaudioServerClass = xaudioServerClass;
         this.isPlayingB = false;
         this.sample = [];
-        this.silence = [];  // TODO should be const and not per instance
         this.volume = 1;  // not currently settable
         this.samplePos = undefined;
         this.noAudio = false;
         this.audioServer = undefined;
         this.sampleRate = undefined;
         this.sample = undefined;
-
-        for (var i = 0; i < this.sampleRate; i += 1) {
-            this.silence.push(0.0);
-        }
 
         var that = this;  // needed so that the 3 closures defined here keep a reference to this object
 
@@ -83,8 +78,14 @@ export default class MorsePlayerXAS {
     }
 
     _load(sample, sampleRate) {
-        this.sample = (sample || []).concat(this.silence);  // add on a second of silence to the end to keep IE quiet
         this.sampleRate = sampleRate || 8000;
+        this.sample = (sample || []);
+
+        var silence = [];
+        for (var i = 0; i < this.sampleRate; i += 1) {
+            silence.push(0.0);
+        }
+        this.sample = this.sample.concat(this.silence);  // add on a second of silence to the end to keep IE quiet
 
         console.log("Trying XAudioServer");
 
