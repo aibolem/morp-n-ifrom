@@ -80,18 +80,18 @@ export function getData(morseCWWave, bitsPerSample) {
     header.chunkSize = 36 + header.subChunk2Size;
 
     return header.chunkId.concat(
-        this.u32ToArray(header.chunkSize),
+        u32ToArray(header.chunkSize),
         header.format,
         header.subChunk1Id,
-        this.u32ToArray(header.subChunk1Size),
-        this.u16ToArray(header.audioFormat),
-        this.u16ToArray(header.numChannels),
-        this.u32ToArray(header.sampleRate),
-        this.u32ToArray(header.byteRate),
-        this.u16ToArray(header.blockAlign),
-        this.u16ToArray(header.bitsPerSample),
+        u32ToArray(header.subChunk1Size),
+        u16ToArray(header.audioFormat),
+        u16ToArray(header.numChannels),
+        u32ToArray(header.sampleRate),
+        u32ToArray(header.byteRate),
+        u16ToArray(header.blockAlign),
+        u16ToArray(header.bitsPerSample),
         header.subChunk2Id,
-        this.u32ToArray(header.subChunk2Size),
+        u32ToArray(header.subChunk2Size),
         (header.bitsPerSample == 16) ? split16bitArray(data) : data
     );
 }
