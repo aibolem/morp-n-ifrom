@@ -13,17 +13,20 @@
 /* jshint esversion: 6 */
 
 /*
-Usage:
+    Usage:
 
-var morseCWWave = new MorseCWWave();
-morseCWWave.wpm = 25;  // set the speed to 25 wpm
-morseCWWave.fwpm = 10;  // set the Farnsworth speed to 10 wpm
-morseCWWave.sampleRate = 8000;  // per second
-morseCWWave.frequency = 600;  // frequency in Hz
-morseCWWave.translate("abc");
+    import MorseCWWave from 'morse-pro-cw-wave';
+    import getDataURI from 'morse-pro-util-datauri';
+    import * as RiffWave from 'morse-pro-util-riffwave';
 
-var riffWave = new RiffWave();
-var audio = new Audio(getDataURI(riffWave.getWAV(morseCWWave), riffWave.getMIMEType())); // create an HTML5 audio element
+    var morseCWWave = new MorseCWWave();
+    morseCWWave.wpm = 25;  // set the speed to 25 wpm
+    morseCWWave.fwpm = 10;  // set the Farnsworth speed to 10 wpm
+    morseCWWave.sampleRate = 8000;  // per second
+    morseCWWave.frequency = 600;  // frequency in Hz
+    morseCWWave.translate("abc");
+
+    var audio = new Audio(getDataURI(RiffWave.getData(morseCWWave), RiffWave.getMIMEType())); // create an HTML5 audio element
 */
 var Base64 = {
 
