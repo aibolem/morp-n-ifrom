@@ -14,25 +14,22 @@
 
 /*
     Class to create RIFF WAVE file data.
-    Pass in a MorseCWWave instance.
 
     Usage:
 
     var morseCWWave = new MorseCWWave();
-    var riffWave = new RIFFWAVE(morseCWWave);
-
     morseCWWave.wpm = 25;  // set the speed to 25 wpm
     morseCWWave.fwpm = 10;  // set the Farnsworth speed to 10 wpm
     morseCWWave.sampleRate = 8000;  // per second
     morseCWWave.frequency = 600;  // frequency in Hz
-
     morseCWWave.translate("abc");
-    var wav = riffWave.getWAV();  // returns byte array of WAV file
+
+    var riffWave = new RiffWave();
+    var wav = riffWave.getWAV(morseCWWave);  // returns byte array of WAV file
 */
 
 export default class RiffWave {
-    constructor(morseCWWave) {
-        this.morseCWWave = morseCWWave;
+    constructor() {
         this.header = {                           // OFFS SIZE NOTES
             chunkId      : [0x52,0x49,0x46,0x46], // 0    4    "RIFF" = 0x52494646
             chunkSize    : 0,                     // 4    4    36+SubChunk2Size = 4+(8+SubChunk1Size)+(8+SubChunk2Size)
@@ -69,9 +66,9 @@ export default class RiffWave {
         return r;
     }
 
-    getWAV() {
-        var data = this.morseCWWave.getPCMSample();
-        this.header.sampleRate = this.morseCWWave.sampleRate;
+    getWAV(morseCWWave) {
+        var data = morseCWWave.getPCMSample();
+        this.header.sampleRate = morseCWWave.sampleRate;
 
         this.header.blockAlign = (this.header.numChannels * this.header.bitsPerSample) >> 3;
         this.header.byteRate = this.header.blockAlign * this.header.sampleRate;
