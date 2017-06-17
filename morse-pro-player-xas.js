@@ -69,6 +69,8 @@ export default class MorsePlayerXAS {
                 }
             }, 20
         );
+
+        this._load();  // create an xAudioServer so that we know if it works at all and what type it is
     }
 
     stop() {
@@ -77,18 +79,22 @@ export default class MorsePlayerXAS {
     }
 
     load(morseCWWave) {
-        this.sampleRate = morseCWWave.sampleRate || 8000;
-        this.sample = morseCWWave.getSample().concat(this.silence);  // add on a second of silence to the end to keep IE quiet
+        _load(morseCWWave.getSample(), morseCW.sampleRate);
+    }
+
+    _load(sample, sampleRate) {
+        this.sample = (sample || []).concat(this.silence);  // add on a second of silence to the end to keep IE quiet
+        this.sampleRate = sampleRate || 8000;
 
         console.log("Trying XAudioServer");
-        
+
         this.audioServer = new this.xaudioServerClass(
             1,                      // number of channels
             this.sampleRate,        // sample rate
             this.sampleRate >> 2,   // buffer low point for underrun callback triggering
             this.sampleRate << 1,   // internal ring buffer size
             this.audioGenerator,    // audio refill callback triggered when samples remaining < buffer low point
-            this.volume,            // volume
+            0,                      // volume
             this.failureCallback    // callback triggered when the browser is found to not support any audio API
         );
     }
