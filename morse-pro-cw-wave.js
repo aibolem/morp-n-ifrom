@@ -8,14 +8,13 @@
 
     Usage:
 
-    var morseCWWave = new MorseCWWave();
+    import MorseCWWave from 'morse-pro-cw-wave';
 
+    var morseCWWave = new MorseCWWave();
     morseCWWave.wpm = 25;  // set the speed to 25 wpm
     morseCWWave.fwpm = 10;  // set the Farnsworth speed to 10 wpm
-
     morseCWWave.sampleRate = 8000;  // per second
     morseCWWave.frequency = 600;  // frequency in Hz
-
     morseCWWave.translate("abc");
     var sample = morseCWWave.getSample();
 */

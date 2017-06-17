@@ -9,6 +9,8 @@
 
     Usage:
 
+    import MorseCW from 'morse-pro-cw';
+
     var morseCW = new MorseCW();
     morseCW.translate("abc");
     morseCW.wpm = 25;  // set the speed to 25 wpm

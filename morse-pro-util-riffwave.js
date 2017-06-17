@@ -17,6 +17,9 @@
 
     Usage:
 
+    import MorseCWWave from 'morse-pro-cw-wave';
+    import * as RiffWave from 'morse-pro-util-riffwave';
+
     var morseCWWave = new MorseCWWave();
     morseCWWave.wpm = 25;  // set the speed to 25 wpm
     morseCWWave.fwpm = 10;  // set the Farnsworth speed to 10 wpm
@@ -24,7 +27,6 @@
     morseCWWave.frequency = 600;  // frequency in Hz
     morseCWWave.translate("abc");
 
-    var riffWave = new RiffWave();
     var wav = RiffWave.getData(morseCWWave);  // returns byte array of WAV file
 */
 

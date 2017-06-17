@@ -10,6 +10,8 @@
 
     Usage:
 
+    import MorseMessage from 'morse-pro-message';
+
     var morseMessage = new MorseMessage();
     morseMessage.useProsigns = true;
     var input;

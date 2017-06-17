@@ -9,6 +9,9 @@
 
     Usage:
 
+    import MorseCWWave from 'morse-pro-cw-wave';
+    import MorsePlayerWAA from 'morse-pro-player-waa';
+
     var morseCWWave = new MorseCWWave();
     morseCWWave.wpm = 25;  // set the speed to 25 wpm
     morseCWWave.fwpm = 10;  // set the Farnsworth speed to 10 wpm
