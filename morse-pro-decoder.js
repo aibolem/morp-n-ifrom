@@ -52,6 +52,9 @@ export default class MorseDecoder {
     */
     addTiming(duration) {
         //console.log("Received: " + duration);)
+        if (duration === 0) {
+            return;
+        }
         if (this.unusedTimes.length > 0) {
             var last = this.unusedTimes[this.unusedTimes.length - 1];
             if (duration * last > 0) {
