@@ -10,7 +10,7 @@ import * as Morse from 'morse-pro';
     If you need to xhange the wpm pr timestep then make a new MorseDecoder.
 */
 export default class MorseDecoder {
-    constructor(timeStep, wpm) {
+    constructor(timeStep, wpm, messageCallback) {
         this.timeStep = timeStep;  // granularity of expected measurements in ms (tick size)
         this._wpm = undefined;
         this.DITS_PER_WORD = 50;  // TODO: better if this was inherited from a more basic class... or made a const
@@ -28,6 +28,13 @@ export default class MorseDecoder {
         this.spaces = [];
         if (typeof wpm !== "undefined") {
             this.wpm = wpm;
+        }
+        if (typeof messageCallback !== "undefined") {
+            this.messageCallback = messageCallback;
+        } else {
+            this.messageCallback = function(data) {
+                console.log("Decoded: {\n  timings: " + data.timings + "\n  morse: " + data.morse + "\n  message: " + data.message + "\n}");
+            };
         }
     }
 
@@ -74,11 +81,6 @@ export default class MorseDecoder {
             // if we have just received a character space or longer and there is something to flush before it
             this.flush();
         }
-    }
-
-    // Override this with your own function
-    messageCallback(data) {
-        console.log("Decoded: {\n  timings: " + data.timings + "\n  morse: " + data.morse + "\n  message: " + data.message + "\n}");
     }
 
     flush() {
