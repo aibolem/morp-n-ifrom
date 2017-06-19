@@ -44,12 +44,23 @@ export default class MorseDecoder {
         return this._wpm;
     }
 
+    /*
+    Add a timing in milleseconds to the list of recorded timings.
+    The duration should be positive for a dit or dah and negative for a space.
+    If the duration is 1 or -1 it is assumed to be noise and is added to the previous duration.
+    If a duration is the same sign as the previous one then they are combined.
+    */
     addTiming(duration) {
-        //console.log("Received: " + duration);
-        if (Math.abs(duration) == 1) {
-            // if the duration is very short, assume it is a mistake and add it to the previous one (if there is one)
-            if (this.unusedTimes.length > 0) {
-                var last = this.unusedTimes.pop();
+        //console.log("Received: " + duration);)
+        if (this.unusedTimes.length > 0) {
+            var last = this.unusedTimes[this.unusedTimes.length - 1];
+            if (duration * last > 0) {
+                // if the sign of the duration is the same as the previous one then add it on
+                this.unusedTimes.pop();
+                duration = last + duration;
+            } else if (Math.abs(duration) <= this.noiseThreshold) {
+                // if the duration is very short, assume it is a mistake and add it to the previous one
+                this.unusedTimes.pop();
                 duration = last - duration;  // take care of the sign change
             }
         }
