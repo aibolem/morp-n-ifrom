@@ -67,9 +67,12 @@ export default class MorseDecoder {
                 duration = last - duration;  // take care of the sign change
             }
         }
+
         this.unusedTimes.push(duration);
-        if (-duration > this.ditDahThreshold) {
-            // if we have just received a character space or longer
+
+        if (-duration > this.ditDahThreshold && this.unusedTimes.length > 1) {
+            // if we have just received a character space or longer and there is something to flush before it
+            // TODO: still missing a bit of quiet...
             this.flush();
         }
     }
@@ -80,21 +83,26 @@ export default class MorseDecoder {
     }
 
     flush() {
-        if (this.unusedTimes.length > 0) {
-            // Then we've reached the end of a character or word or a flush has been forced
-            var u = this.unusedTimes;
-            var m = this.timings2morse(this.unusedTimes);
-            var t = Morse.morse2text(m).message;  // will be '#' if there's an error
-            this.timings = this.timings.concat(this.unusedTimes);
-            this.morse += m;
-            this.message += t;
-            this.unusedTimes = [];
-            this.messageCallback({
-                timings: u,
-                morse: m,
-                message: t
-            });
+        if (this.unusedTimes.length === 0) {
+            return;
         }
+        // Then we've reached the end of a character or word or a flush has been forced
+        var last = this.unusedTimes[this.unusedTimes.length - 1];
+        if (last < 0) {
+            this.unusedTimes.pop();
+        }
+        var u = this.unusedTimes;
+        var m = this.timings2morse(this.unusedTimes);
+        var t = Morse.morse2text(m).message;  // will be '#' if there's an error
+        this.timings = this.timings.concat(this.unusedTimes);
+        this.morse += m;
+        this.message += t;
+        this.unusedTimes = [last];  // put the space back on the end in case there is more quiet to come
+        this.messageCallback({
+            timings: u,
+            morse: m,
+            message: t
+        });
     }
 
     timings2morse(times) {
