@@ -10,7 +10,7 @@ const DITS_PER_WORD = 50;  // TODO: work out where to define this properly
 
 export default class MorseKeyer {
     constructor(signalCallback, audioContextClass, frequency, wpm, fwpm) {
-        this.callback = signalCallback;
+        this.signalCallback = signalCallback;
         this.frequency = frequency;  // tone frequency in Hz
         this.wpm = wpm || 20;
         this.fwpm = fwpm || 20;  // TODO: not used yet
@@ -29,15 +29,15 @@ export default class MorseKeyer {
             }
             var input = that.signalCallback();
             if (input === 1) {
+                that.playTone(true);
                 that.decoder.addTiming(that.ditLen);
                 that.decoder.addTiming(-that.ditLen);
-                that.playTone(true);
             } else if (input === 0) {
                 that.decoder.addTiming(-2 * that.ditLen);
             } else if (input === -1) {
+                that.playTone(false);
                 that.decoder.addTiming(3 * that.ditLen);
                 that.decoder.addTiming(-that.ditLen);
-                that.playTone(false);
                 that.skipNext = true;
             }
         };
@@ -52,10 +52,7 @@ export default class MorseKeyer {
     }
 
     playTone(isDit) {
-        var duration = this.ditLen;
-        if (!isDit) {
-            duration = 3 * this.ditLen;
-        }
+        var duration = isDit ? this.ditLen : 3 * this.ditLen;
         this.player.load([duration], this.frequency);
         this.player.playFromStart();
     }
