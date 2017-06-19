@@ -7,16 +7,18 @@ import * as Morse from 'morse-pro';
 
 /*
     Class to convert from timings to Morse code.
+    If you need to xhange the wpm pr timestep then make a new MorseDecoder.
 */
 export default class MorseDecoder {
     constructor(timeStep, wpm) {
-        this.timeStep = timeStep;
+        this.timeStep = timeStep;  // granularity of expected measurements in ms (tick size)
         this._wpm = undefined;
         this.DITS_PER_WORD = 50;  // TODO: better if this was inherited from a more basic class... or made a const
         this.timings = [];
         this.unusedTimes = [];
-        this.ditDahThreshold = undefined;
-        this.dahSpaceThreshold = undefined;
+        this.ditDahThreshold = undefined;  // boundary in ticks between a measurements being judged a dit or dah (float)
+        this.dahSpaceThreshold = undefined;  // boundary in ticks between a measurements being judged a space between characters or a word space (float)
+        this.noiseThreshold = 1;  // a duration <= noiseThreshold is assumed to be an error
         this.morse = "";
         this.message = "";
         this.dits = [];
