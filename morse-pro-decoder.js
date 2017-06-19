@@ -45,9 +45,9 @@ export default class MorseDecoder {
     }
 
     /*
-    Add a timing in milleseconds to the list of recorded timings.
+    Add a timing in ticks to the list of recorded timings.
     The duration should be positive for a dit or dah and negative for a space.
-    If the duration is 1 or -1 it is assumed to be noise and is added to the previous duration.
+    If the duration is <= noiseThreshold it is assumed to be noise and is added to the previous duration.
     If a duration is the same sign as the previous one then they are combined.
     */
     addTiming(duration) {
@@ -72,7 +72,6 @@ export default class MorseDecoder {
 
         if (-duration > this.ditDahThreshold && this.unusedTimes.length > 1) {
             // if we have just received a character space or longer and there is something to flush before it
-            // TODO: still missing a bit of quiet...
             this.flush();
         }
     }

@@ -15,7 +15,7 @@ export default class MorseKeyer {
         this.wpm = wpm || 20;
         this.fwpm = fwpm || 20;  // TODO: not used yet
 
-        this.ditLen = (60000 / wpm) / DITS_PER_WORD;  // duration of dir in ms
+        this.ditLen = (60000 / wpm) / DITS_PER_WORD;  // duration of dit in ms
         this.tick = 2 * this.ditLen;
 
         this.player = new MorsePlayerWAA(audioContextClass);
@@ -30,14 +30,14 @@ export default class MorseKeyer {
             var input = that.signalCallback();
             if (input === 1) {
                 that.playTone(true);
-                that.decoder.addTiming(that.ditLen);
-                that.decoder.addTiming(-that.ditLen);
+                that.decoder.addTiming(1);
+                that.decoder.addTiming(-1);
             } else if (input === 0) {
-                that.decoder.addTiming(-2 * that.ditLen);
+                that.decoder.addTiming(-2);
             } else if (input === -1) {
                 that.playTone(false);
-                that.decoder.addTiming(3 * that.ditLen);
-                that.decoder.addTiming(-that.ditLen);
+                that.decoder.addTiming(3);
+                that.decoder.addTiming(-1);
                 that.skipNext = true;
             }
         };
