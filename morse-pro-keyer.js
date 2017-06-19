@@ -8,9 +8,20 @@ import MorsePlayerWAA from 'morse-pro-player-waa';
 
 const DITS_PER_WORD = 50;  // TODO: work out where to define this properly
 
+/*
+    The Morse keyer tests for input on a timer, plays the apprpriate tone and passes the data to a decorer.
+    Arguments:
+        - signalCallback: a function which should return [1, 0, -1] depending if a dit, space or dah is detected
+        - messageCallback: a function which receives a dictionary with keys 'message', 'timings' and 'morse' for each decoded part (see MorseDecoder)
+        - audioContextClass: e.g. window.AudioContext
+        - frequency: the frequency in Hz for the tone
+        - wpm: speed of the keyer
+        - fwpm: not used
+*/
 export default class MorseKeyer {
-    constructor(signalCallback, audioContextClass, frequency, wpm, fwpm) {
+    constructor(signalCallback, messageCallback, audioContextClass, frequency, wpm, fwpm) {
         this.signalCallback = signalCallback;
+        this.messageCallback = messageCallback;
         this.frequency = frequency;  // tone frequency in Hz
         this.wpm = wpm || 20;
         this.fwpm = fwpm || 20;  // TODO: not used yet
@@ -19,7 +30,7 @@ export default class MorseKeyer {
         this.tick = 2 * this.ditLen;
 
         this.player = new MorsePlayerWAA(audioContextClass);
-        this.decoder = new MorseDecoder(this.ditLen, this.wpm);
+        this.decoder = new MorseDecoder(this.ditLen, this.wpm, messageCallback);
         this.decoder.noiseThreshold = 0;
 
         var that = this;
