@@ -20,6 +20,7 @@ export default class MorseKeyer {
 
         this.player = new MorsePlayerWAA(audioContextClass);
         this.decoder = new MorseDecoder(this.ditLen, this.wpm);
+        this.decoder.noiseThreshold = 0;
 
         var that = this;
         this.check = function() {
