@@ -43,6 +43,7 @@ export default class MorseKeyer {
             } else {
                 if (that.lastTime) {
                     that.decoder.addTiming(-( (new Date()).getTime() - that.lastTime ));
+                    that.lastTime = 0;
                 }
                 if (input & 1) {
                     that.playTone(true);
