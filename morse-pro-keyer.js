@@ -36,6 +36,7 @@ export default class MorseKeyer {
         var that = this;
         this.check = function() {
             var input = that.signalCallback();
+            console.log("Keyer input: " + input);
             if (input === 0) {
                 that.lastTime = (new Date()).getTime();
                 that.stop();
