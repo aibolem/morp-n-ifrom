@@ -27,22 +27,21 @@ export default class MorseKeyer {
 
         this.ditLen = (60000 / wpm) / DITS_PER_WORD;  // duration of dit in ms
         this.tick = 2 * this.ditLen;
+        this.playing = false;
 
         this.player = new MorsePlayerWAA(audioContextClass);
         this.decoder = new MorseDecoder(1, this.wpm, messageCallback);
         this.decoder.noiseThreshold = 0;
 
-        this.date = new Date();
-
         var that = this;
         this.check = function() {
             var input = that.signalCallback();
             if (input === 0) {
-                that.lastTime = that.date.getTime();
+                that.lastTime = (new Date()).getTime();
                 that.stop();
             } else {
                 if (that.lastTime) {
-                    that.decoder.addTiming(-(that.date.getTime() - that.lastTime));
+                    that.decoder.addTiming(-( (new Date()).getTime() - that.lastTime ));
                 }
                 if (input & 1) {
                     that.playTone(true);
