@@ -38,8 +38,15 @@ export default class MorseKeyer {
             var input = that.signalCallback();
             console.log("Keyer input: " + input);
             if (input === 0) {
-                that.lastTime = (new Date()).getTime();
-                that.stop();
+                if (that.playing) {
+                    that.lastTime = (new Date()).getTime();  // time marking the end of the last data that was last pushed to decoder
+                    that.playing = false;
+                    that.timer = setTimeout(that.check, 2 * that.ditLen);  // wait to see if character is complete
+                } else {
+                    that.decoder.addTiming(-2 * that.ditLen);
+                    that.lastTime = (new Date()).getTime();
+                    that.stop();
+                }
             } else {
                 if (that.lastTime) {
                     that.decoder.addTiming(-( (new Date()).getTime() - that.lastTime ));
