@@ -32,15 +32,17 @@ export default class MorseKeyer {
         this.decoder = new MorseDecoder(1, this.wpm, messageCallback);
         this.decoder.noiseThreshold = 0;
 
+        this.date = new Date();
+
         var that = this;
         this.check = function() {
             var input = that.signalCallback();
             if (input === 0) {
-                that.lastTime = getTime();
+                that.lastTime = that.date.getTime();
                 that.stop();
             } else {
                 if (that.lastTime) {
-                    that.decoder.addTiming(-(getTime() - that.lastTime));
+                    that.decoder.addTiming(-(that.date.getTime() - that.lastTime));
                 }
                 if (input & 1) {
                     that.playTone(true);
