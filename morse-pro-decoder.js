@@ -58,7 +58,7 @@ export default class MorseDecoder {
     If a duration is the same sign as the previous one then they are combined.
     */
     addTiming(duration) {
-        //console.log("Received: " + duration);)
+        console.log("Received: " + duration);
         if (duration === 0) {
             return;
         }
