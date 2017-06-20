@@ -12,7 +12,7 @@ const DITS_PER_WORD = 50;  // TODO: work out where to define this properly
     The Morse keyer tests for input on a timer, plays the apprpriate tone and passes the data to a decorer.
     Arguments:
         - signalCallback: a function which should return {0, 1, 2, 3} from the vitual "paddle" depending if nothing, a dit, a dah or both is detected
-                            This implementation just plays dits if both switches are detexted.
+                            This implementation just plays dits if both switches are detected.
         - messageCallback: a function which receives a dictionary with keys 'message', 'timings' and 'morse' for each decoded part (see MorseDecoder)
         - audioContextClass: e.g. window.AudioContext
         - frequency: the frequency in Hz for the sidetone

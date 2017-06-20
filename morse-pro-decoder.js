@@ -12,7 +12,7 @@ import * as Morse from 'morse-pro';
 export default class MorseDecoder {
     constructor(timeStep, wpm, messageCallback) {
         this.timeStep = timeStep;  // granularity of expected measurements in ms (tick size)
-        this._wpm = undefined;
+        this._wpm = undefined;  // TODO: add fwpm as well
         this.DITS_PER_WORD = 50;  // TODO: better if this was inherited from a more basic class... or made a const
         this.timings = [];
         this.unusedTimes = [];
