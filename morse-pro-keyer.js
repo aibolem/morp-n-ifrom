@@ -47,12 +47,12 @@ export default class MorseKeyer {
                     that.playTone(true);
                     that.decoder.addTiming(1 * that.ditLen);
                     that.decoder.addTiming(-1 * that.ditLen);
-                    that.timer = setTimeout(that.check, 2 * that.ditLen);
+                    that.timer = setTimeout(that.check, 1 * that.ditLen);
                 } else if (input & 2) {
                     that.playTone(false);
                     that.decoder.addTiming(3 * that.ditLen);
                     that.decoder.addTiming(-1 * that.ditLen);
-                    that.timer = setTimeout(that.check, 4 * that.ditLen);
+                    that.timer = setTimeout(that.check, 1 * that.ditLen);
                 }
             }
         };
