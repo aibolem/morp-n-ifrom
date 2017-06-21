@@ -11,16 +11,17 @@ const DITS_PER_WORD = 50;  // TODO: work out where to define this properly
 /*
     The Morse keyer tests for input on a timer, plays the apprpriate tone and passes the data to a decorer.
     Arguments:
-        - signalCallback: a function which should return {0, 1, 2, 3} from the vitual "paddle" depending if nothing, a dit, a dah or both is detected
+        - keyCallback: a function which should return {0, 1, 2, 3} from the vitual "paddle" depending if nothing, a dit, a dah or both is detected
                             This implementation just plays dits if both switches are detected.
         - messageCallback: a function which receives a dictionary with keys 'message', 'timings' and 'morse' for each decoded part (see MorseDecoder)
+                            Its use here will result in a single character being returned each time.
         - audioContextClass: e.g. window.AudioContext
         - frequency: the frequency in Hz for the sidetone
         - wpm: speed of the keyer
 */
 export default class MorseKeyer {
-    constructor(signalCallback, messageCallback, audioContextClass, frequency, wpm) {
-        this.signalCallback = signalCallback;
+    constructor(keyCallback, messageCallback, audioContextClass, frequency, wpm) {
+        this.keyCallback = keyCallback;
         this.messageCallback = messageCallback;
         this.frequency = frequency;
         this.wpm = wpm || 20;
@@ -35,32 +36,30 @@ export default class MorseKeyer {
 
         var that = this;
         this.check = function() {
-            var input = that.signalCallback();
-            console.log("Keyer input: " + input);
+            var input = that.keyCallback();
+            // console.log("Keyer input: " + input);
+            if (that.lastTime) {
+                that.decoder.addTiming(-( (new Date()).getTime() - that.lastTime ));
+            }
             if (input === 0) {
-                if (that.playing) {
-                    that.lastTime = (new Date()).getTime();  // time marking the end of the last data that was last pushed to decoder
-                    that.playing = false;
-                    that.timer = setTimeout(that.check, 2 * that.ditLen);  // wait to see if character is complete
+                that.playing = false;  // make it interupterable
+                that.lastTime = (new Date()).getTime();  // time marking the end of the last data that was last pushed to decoder
+                if (that.spaceCounter < 3) {
+                    that.spaceCounter++;
+                    that.timer = setTimeout(that.check, 2 * that.ditLen);  // keep pushing up to 3 dah-spaces to complete character or word
                 } else {
-                    that.decoder.addTiming(-2 * that.ditLen);
-                    that.lastTime = (new Date()).getTime();
                     that.stop();
                 }
             } else {
-                if (that.lastTime) {
-                    that.decoder.addTiming(-( (new Date()).getTime() - that.lastTime ));
-                    that.lastTime = 0;
-                }
                 if (input & 1) {
                     that.playTone(true);
                     that.decoder.addTiming(1 * that.ditLen);
-                    that.decoder.addTiming(-1 * that.ditLen);
-                    that.timer = setTimeout(that.check, 2 * that.ditLen);
+                    that.lastTime = (new Date()).getTime() + (1 * that.ditLen);
+                    that.timer = setTimeout(that.check, 2 * that.ditLen);  // check key state again after the dit and after a dit-space
                 } else if (input & 2) {
                     that.playTone(false);
                     that.decoder.addTiming(3 * that.ditLen);
-                    that.decoder.addTiming(-1 * that.ditLen);
+                    that.lastTime = (new Date()).getTime() + (3 * that.ditLen);
                     that.timer = setTimeout(that.check, 4 * that.ditLen);
                 }
             }
@@ -72,6 +71,9 @@ export default class MorseKeyer {
             return;
         } else {
             this.playing = true;
+            this.spaceCounter = 0;
+            this.lastTime = 0;  // removes extended pauses
+            clearTimeout(this.timer);
             this.check();
         }
     }
