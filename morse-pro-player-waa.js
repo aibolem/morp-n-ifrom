@@ -20,7 +20,7 @@
 
     var audioCtxClass = window.AudioContext || window.webkitAudioContext;
     var morsePlayerWAA = new MorsePlayerWAA(audioCtxClass);
-    morsePlayerWAA.load(morseCWWave.getTimings(), morseCWWave.frequency);
+    morsePlayerWAA.loadCWWave(morseCWWave);
     morsePlayerWAA.playFromStart();
 */
 export default class MorsePlayerWAA {
@@ -51,6 +51,10 @@ export default class MorsePlayerWAA {
         this.isPlayingB = false;
         this.audioCtx.close();
         this.audioCtx = this.getAudioContext();
+    }
+
+    loadCWWave(cwWave) {
+        this.load(cwWave.getTimings(), cwWave.frequency);
     }
 
     load(timings, frequency) {

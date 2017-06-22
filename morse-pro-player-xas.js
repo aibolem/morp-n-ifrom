@@ -11,6 +11,7 @@
 
     import MorseCWWave from 'morse-pro-cw-wave';
     import MorsePlayerXAS from 'morse-pro-player-xas';
+    // make sure XAudioJS is loaded
 
     var morseCWWave = new MorseCWWave();
     morseCWWave.wpm = 25;  // set the speed to 25 wpm
@@ -68,7 +69,7 @@ export default class MorsePlayerXAS {
             }, 20
         );
 
-        this._load();  // create an xAudioServer so that we know if it works at all and what type it is
+        this.load();  // create an xAudioServer so that we know if it works at all and what type it is
     }
 
     stop() {
@@ -76,11 +77,11 @@ export default class MorsePlayerXAS {
         this.audioServer.changeVolume(0);
     }
 
-    load(morseCWWave) {
-        this._load(morseCWWave.getSample(), morseCWWave.sampleRate);
+    loadCWWave(cwWave) {
+        this.load(cwWave.getSample(), cwWave.sampleRate);
     }
 
-    _load(sample, sampleRate) {
+    load(sample, sampleRate) {
         this.sampleRate = sampleRate || 8000;
         this.sample = (sample || []);
 
