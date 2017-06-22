@@ -98,9 +98,9 @@ export default class MorseDecoder {
             return;
         }
 
-        // If we haven't got enough for a space on the end then pop it off and replace afterwards
+        // If last element is quiet but it is not enough for a space character then pop it off and replace afterwards
         var last = this.unusedTimes[this.unusedTimes.length - 1];
-        if (-last < this.dahSpaceThreshold) {
+        if ((last < 0) && (-last < this.dahSpaceThreshold)) {
             this.unusedTimes.pop();
         }
 
