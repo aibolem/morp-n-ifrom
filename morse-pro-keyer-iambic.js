@@ -9,22 +9,23 @@ import MorsePlayerWAA from 'morse-pro-player-waa';
 const DITS_PER_WORD = 50;  // TODO: work out where to define this properly
 
 /*
-    The Morse keyer tests for input on a timer, plays the apprpriate tone and passes the data to a decorer.
+    The Morse iambic keyer tests for input on a timer, plays the apprpriate tone and passes the data to a decorer.
     Arguments:
         - keyCallback: a function which should return {0, 1, 2, 3} from the vitual "paddle" depending if nothing, a dit, a dah or both is detected
-                            This implementation will play dits if both keys are detected.
+                            This implementation will alternate between dit and dah if both keys are detected.
         - messageCallback: a function which receives a dictionary with keys 'message', 'timings' and 'morse' for each decoded part (see MorseDecoder)
                             Its use here will result in a single character being returned each time.
         - audioContextClass: e.g. window.AudioContext
         - frequency: the frequency in Hz for the sidetone
         - wpm: speed of the keyer (defaults to 20)
 */
-export default class MorseKeyer {
+export default class MorseIambicKeyer {
     constructor(keyCallback, messageCallback, audioContextClass, frequency, wpm) {
         this.keyCallback = keyCallback;
         this.messageCallback = messageCallback;
         this.frequency = frequency;
         this.wpm = wpm || 20;
+        this.ditGoesFirst = true;  // if the initial signal is 3 then alternate but play a dit first
 
         this.ditLen = (60000 / wpm) / DITS_PER_WORD;  // duration of dit in ms
         this.playing = false;
@@ -44,6 +45,7 @@ export default class MorseKeyer {
             if (input === 0) {
                 // If no keypress is detected then continue pushing chunks of silence to the decoder to complete the character and add a space
                 that.playing = false;  // make the keyer interupterable so that the next character can start
+                that.lastWasDit = undefined;
                 that.lastTime = (new Date()).getTime();  // time marking the end of the last data that was last pushed to decoder
                 if (that.spaceCounter < 3) {
                     that.spaceCounter++;
@@ -52,11 +54,20 @@ export default class MorseKeyer {
                     that.stop();
                 }
                 return;
-            } else if (input & 1) {
+            } else if (input === 1) {
                 dit = true;
             } else if (input === 2) {
                 dit = false;
+            } else if (input === 3) {
+                if (that.lastWasDit === true) {
+                    dit = false;
+                } else if (that.lastWasDit === false) {
+                    dit = true;
+                } else {
+                    dit = that.ditGoesFirst;
+                }
             }
+            that.lastWasDit = dit;
             that.playTone(dit);
             if (dit) {
                 that.decoder.addTiming(1 * that.ditLen);
@@ -79,6 +90,7 @@ export default class MorseKeyer {
             return;
         } else {
             this.playing = true;
+            this.lastWasDit = undefined;
             this.spaceCounter = 0;
             this.lastTime = 0;  // removes extended pauses
             clearTimeout(this.timer);
