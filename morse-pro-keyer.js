@@ -1,4 +1,4 @@
-// This code is © Copyright Stephen C. Phillips, 2013-2017.
+// This code is © Copyright Stephen C. Phillips, 2017.
 // Email: steve@scphillips.com
 
 /* jshint esversion: 6 */
@@ -17,7 +17,7 @@ const DITS_PER_WORD = 50;  // TODO: work out where to define this properly
                             Its use here will result in a single character being returned each time.
         - audioContextClass: e.g. window.AudioContext
         - frequency: the frequency in Hz for the sidetone
-        - wpm: speed of the keyer
+        - wpm: speed of the keyer (defaults to 20)
 */
 export default class MorseKeyer {
     constructor(keyCallback, messageCallback, audioContextClass, frequency, wpm) {
@@ -27,7 +27,6 @@ export default class MorseKeyer {
         this.wpm = wpm || 20;
 
         this.ditLen = (60000 / wpm) / DITS_PER_WORD;  // duration of dit in ms
-        this.tick = 2 * this.ditLen;
         this.playing = false;
 
         this.player = new MorsePlayerWAA(audioContextClass);
@@ -37,12 +36,13 @@ export default class MorseKeyer {
         var that = this;
         this.check = function() {
             var input = that.keyCallback();
-            // console.log("Keyer input: " + input);
             if (that.lastTime) {
+                // record the amount of silence since the last time we were here
                 that.decoder.addTiming(-( (new Date()).getTime() - that.lastTime ));
             }
             if (input === 0) {
-                that.playing = false;  // make it interupterable
+                // If no keypress is detected then continue pushing chunks of silence to the decoder to complete the character and add a space
+                that.playing = false;  // make the keyer interupterable so that the next character can start
                 that.lastTime = (new Date()).getTime();  // time marking the end of the last data that was last pushed to decoder
                 if (that.spaceCounter < 3) {
                     that.spaceCounter++;
@@ -66,8 +66,12 @@ export default class MorseKeyer {
         };
     }
 
+    /*
+        Call this method when a key-press (or equivalent) is detected
+    */
     start() {
         if (this.playing) {
+            // If the keyer is already playing then ignore a new start.
             return;
         } else {
             this.playing = true;
@@ -78,11 +82,17 @@ export default class MorseKeyer {
         }
     }
 
+    /*
+        This method can be called externally to stop the keyer but is also used internally when no key-press is detected.
+    */
     stop() {
         this.playing = false;
         clearTimeout(this.timer);
     }
 
+    /*
+        Play a dit or dah sidetone.
+    */
     playTone(isDit) {
         var duration = isDit ? this.ditLen : 3 * this.ditLen;
         this.player.load([duration], this.frequency);
