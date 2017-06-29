@@ -7,17 +7,35 @@ import * as Morse from 'morse-pro';
 
 /*
     Class to convert from timings to Morse code.
-    If you need to xhange the wpm pr timestep then make a new MorseDecoder.
+    If you need to change the wpm then make a new MorseDecoder.
+
+    Arguments:
+        wpm                 The speed of the Morse in words per minute
+        messageCallback     Function to call each time a character is decoded (optional, defaults to console logging)
+                            The function receives a dictionary with keys "timings", "morse" and "message"
+
+    Usage:
+
+    var messageCallback = function(data) {
+        console.log(data);
+    };
+    var decoder = new MorseDecoder(10, messageCallback);
+    var t;
+    while (decoder_is_operating) {
+        // get some timing "t" from a sensor, make it +ve for noise and -ve for silence
+        decoder.addTiming(t);
+    }
+    decoder.flush();  // make sure all the data is pushed through the decoder
+
 */
 export default class MorseDecoder {
-    constructor(timeStep, wpm, messageCallback) {
-        this.timeStep = timeStep;  // granularity of expected measurements in ms (tick size)
+    constructor(wpm, messageCallback) {
         this._wpm = undefined;  // TODO: add fwpm as well
         this.DITS_PER_WORD = 50;  // TODO: better if this was inherited from a more basic class... or made a const
         this.timings = [];
         this.unusedTimes = [];
-        this.ditDahThreshold = undefined;  // boundary in ticks between a measurements being judged a dit or dah (float)
-        this.dahSpaceThreshold = undefined;  // boundary in ticks between a measurements being judged a space between characters or a word space (float)
+        this.ditDahThreshold = undefined;  // boundary in ms between a measurements being judged a dit or dah (float)
+        this.dahSpaceThreshold = undefined;  // boundary in ms between a measurements being judged a space between characters or a word space (float)
         this.noiseThreshold = 1;  // a duration <= noiseThreshold is assumed to be an error
         this.morse = "";
         this.message = "";
@@ -40,11 +58,12 @@ export default class MorseDecoder {
 
     set wpm(wpm) {
         this._wpm = wpm;
-        this.ditDahThreshold = 2 * (60000 / this.DITS_PER_WORD) / (wpm * this.timeStep);
-        this.dahSpaceThreshold = 5 * (60000 / this.DITS_PER_WORD) / (wpm * this.timeStep);
+        var dit = (60000 / this.DITS_PER_WORD) / wpm;
+        this.ditDahThreshold = 2 * dit;
+        this.dahSpaceThreshold = 5 * dit;
         console.log("Decoder WPM: " + wpm);
-        console.log("Decoder ditDahThreshold (ticks): " + this.ditDahThreshold);
-        console.log("Decoder dahSpaceThreshold (ticks): " + this.dahSpaceThreshold);
+        console.log("Decoder ditDahThreshold (ms): " + this.ditDahThreshold);
+        console.log("Decoder dahSpaceThreshold (ms): " + this.dahSpaceThreshold);
     }
 
     get wpm() {
@@ -52,7 +71,7 @@ export default class MorseDecoder {
     }
 
     /*
-    Add a timing in ticks to the list of recorded timings.
+    Add a timing in ms to the list of recorded timings.
     The duration should be positive for a dit or dah and negative for a space.
     If the duration is <= noiseThreshold it is assumed to be noise and is added to the previous duration.
     If a duration is the same sign as the previous one then they are combined.
