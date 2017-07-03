@@ -30,12 +30,15 @@ import * as Morse from 'morse-pro';
 */
 export default class MorseDecoder {
     constructor(wpm, messageCallback) {
-        this._wpm = undefined;  // TODO: add fwpm as well
+        this._wpm = undefined;
+        this._fwpm = undefined;  // farnsworth speed
         this.DITS_PER_WORD = 50;  // TODO: better if this was inherited from a more basic class... or made a const
         this.timings = [];
         this.unusedTimes = [];
-        this.ditDahThreshold = undefined;  // boundary in ms between a measurements being judged a dit or dah (float)
-        this.dahSpaceThreshold = undefined;  // boundary in ms between a measurements being judged a space between characters or a word space (float)
+        this.ditLen = undefined;
+        this.fDitLen = undefined;
+        this.ditDahThreshold = undefined;
+        this.dahSpaceThreshold = undefined;
         this.noiseThreshold = 1;  // a duration <= noiseThreshold is assumed to be an error
         this.morse = "";
         this.message = "";
@@ -58,16 +61,35 @@ export default class MorseDecoder {
 
     set wpm(wpm) {
         this._wpm = wpm;
-        var dit = (60000 / this.DITS_PER_WORD) / wpm;
-        this.ditDahThreshold = 2 * dit;
-        this.dahSpaceThreshold = 5 * dit;
-        console.log("Decoder WPM: " + wpm);
-        console.log("Decoder ditDahThreshold (ms): " + this.ditDahThreshold);
-        console.log("Decoder dahSpaceThreshold (ms): " + this.dahSpaceThreshold);
+        if (this._fwpm === undefined || this._fwpm > wpm) {
+            this._fwpm = this._wpm;
+        }
+
+        var SPACES_IN_PARIS = 19;
+        var r = (this.DITS_PER_WORD * this._wpm - (this.DITS_PER_WORD - SPACES_IN_PARIS) * this._fwpm) / (SPACES_IN_PARIS * this._fwpm);  // ratio for farnsworth
+
+        this.ditLen = (60000 / this.DITS_PER_WORD) / wpm;
+        this.fDitLen = r * this.ditLen;
+        this.ditDahThreshold = ((1 * this.ditLen) + (3 * this.ditLen)) / 2;
+        this.dahSpaceThreshold = ((3 * this.fDitLen) + (7 * this.fDitLen)) / 2;
+
+        console.log("Decoder speed (WPM) / Farnsworth speed (WPM): " + wpm + " / " + this._fwpm);
+        console.log("Dit length (ms) / Farnsworth dit length (ms): " + this.ditLen + " / " + this.fDitLen);
     }
 
     get wpm() {
         return this._wpm;
+    }
+
+    set fwpm(fwpm) {
+        this._fwpm = fwpm;
+        if (this._wpm === undefined || this._wpm < fwpm) {
+            this.wpm = fwpm;
+        }
+    }
+
+    get fwpm() {
+        return this._fwpm;
     }
 
     /*
@@ -145,10 +167,11 @@ export default class MorseDecoder {
         var ditdah = "";
         var c;
         var d;
+
         for (var i = 0; i < times.length; i++) {
             d = times[i];
             if (d > 0) {
-                if (d < this.ditDahThreshold) {
+                if (d < ditDahThreshold) {
                     c = ".";
                     this.dits.push(d);
                 } else {
@@ -157,10 +180,10 @@ export default class MorseDecoder {
                 }
             } else {
                 d = -d;
-                if (d < this.ditDahThreshold) {
-                    c = "";
+                if (d < ditDahThreshold) {
+                    c = "";  // the space between elements of a character uses normal timing
                     this.ditSpaces.push(d);
-                } else if (d < this.dahSpaceThreshold) {
+                } else if (d < dahSpaceThreshold) {
                     c = " ";
                     this.dahSpaces.push(d);
                 } else {
