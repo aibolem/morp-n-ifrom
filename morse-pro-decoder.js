@@ -34,6 +34,7 @@ export default class MorseDecoder {
         this._fwpm = undefined;  // farnsworth speed
         this.DITS_PER_WORD = 50;  // TODO: better if this was inherited from a more basic class... or made a const
         this.timings = [];
+        this.characters = [];
         this.unusedTimes = [];
         this.ditLen = undefined;
         this.fDitLen = undefined;
@@ -42,11 +43,6 @@ export default class MorseDecoder {
         this.noiseThreshold = 1;  // a duration <= noiseThreshold is assumed to be an error
         this.morse = "";
         this.message = "";
-        this.dits = [];
-        this.dahs = [];
-        this.ditSpaces = [];
-        this.dahSpaces = [];
-        this.spaces = [];
         if (typeof wpm !== "undefined") {
             this.wpm = wpm;
         }
@@ -148,7 +144,6 @@ export default class MorseDecoder {
         var u = this.unusedTimes;
         var m = this.timings2morse(this.unusedTimes);
         var t = Morse.morse2text(m).message;  // will be '#' if there's an error
-        this.timings = this.timings.concat(this.unusedTimes);
         this.morse += m;
         this.message += t;
         if (last < 0) {
@@ -171,28 +166,60 @@ export default class MorseDecoder {
         for (var i = 0; i < times.length; i++) {
             d = times[i];
             if (d > 0) {
-                if (d < ditDahThreshold) {
+                if (d < this.ditDahThreshold) {
                     c = ".";
-                    this.dits.push(d);
                 } else {
                     c = "-";
-                    this.dahs.push(d);
                 }
             } else {
                 d = -d;
-                if (d < ditDahThreshold) {
-                    c = "";  // the space between elements of a character uses normal timing
-                    this.ditSpaces.push(d);
-                } else if (d < dahSpaceThreshold) {
+                if (d < this.ditDahThreshold) {
+                    c = "";
+                } else if (d < this.dahSpaceThreshold) {
                     c = " ";
-                    this.dahSpaces.push(d);
                 } else {
                     c = "/";
-                    this.spaces.push(d);
                 }
             }
+            this.addDecode(d, c);
             ditdah = ditdah + c;
         }
         return ditdah;
     }
+
+    addDecode(duration, character) {
+        this.timings.push(duration);
+        this.characters.push(character);
+    }
+
+    getTimings(character) {
+        var ret = [];
+        for (var i = 0; i < this.timings.length; i++) {
+            if (this.characters[i] === character) {
+                ret.push(this.timings[i]);
+            }
+        }
+        return ret;
+    }
+
+    get dits() {
+        return this.getTimings('.');
+    }
+
+    get dahs() {
+        return this.getTimings('-');
+    }
+
+    get ditSpaces() {
+        return this.getTimings('');
+    }
+
+    get dahSpaces() {
+        return this.getTimings(' ');
+    }
+
+    get spaces() {
+        return this.getTimings('/');
+    }
+
 }
