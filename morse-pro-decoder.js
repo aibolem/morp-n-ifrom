@@ -4,6 +4,7 @@
 /* jshint esversion: 6 */
 
 import * as Morse from 'morse-pro';
+import * as WPM from 'morse-pro-wpm';
 
 /*
     Class to convert from timings to Morse code.
@@ -31,7 +32,6 @@ import * as Morse from 'morse-pro';
 */
 export default class MorseDecoder {
     constructor(wpm = 15, fwpm = wpm) {
-        this.DITS_PER_WORD = 50;  // TODO: better if this was inherited from a more basic class... or made a const
         this._wpm = undefined;
         this._fwpm = undefined;  // farnsworth speed
         this.wpm = wpm;
@@ -51,16 +51,14 @@ export default class MorseDecoder {
             this._fwpm = this._wpm;
         }
 
-        var SPACES_IN_PARIS = 19;
-        var r = (this.DITS_PER_WORD * this._wpm - (this.DITS_PER_WORD - SPACES_IN_PARIS) * this._fwpm) / (SPACES_IN_PARIS * this._fwpm);  // ratio for farnsworth
+        this.ditLen = WPM.ditLength(this._wpm);
+        this.fDitLen = WPM.fDitLength(this._wpm, this._fwpm);
 
-        this.ditLen = (60000 / this.DITS_PER_WORD) / wpm;
-        this.fDitLen = r * this.ditLen;
         this.ditDahThreshold = ((1 * this.ditLen) + (3 * this.ditLen)) / 2;
         this.dahSpaceThreshold = ((3 * this.fDitLen) + (7 * this.fDitLen)) / 2;
 
-        console.log("Decoder speed (WPM) / Farnsworth speed (WPM): " + this._wpm + " / " + this._fwpm);
-        console.log("Dit length (ms) / Farnsworth dit length (ms): " + this.ditLen + " / " + this.fDitLen);
+        // console.log("Decoder speed (WPM) / Farnsworth speed (WPM): " + this._wpm + " / " + this._fwpm);
+        // console.log("Dit length (ms) / Farnsworth dit length (ms): " + this.ditLen + " / " + this.fDitLen);
     }
 
     get wpm() {

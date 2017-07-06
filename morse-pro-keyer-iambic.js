@@ -3,10 +3,9 @@
 
 /* jshint esversion: 6 */
 
+import * as WPM from 'morse-pro-wpm';
 import MorseDecoder from 'morse-pro-decoder';
 import MorsePlayerWAA from 'morse-pro-player-waa';
-
-const DITS_PER_WORD = 50;  // TODO: work out where to define this properly
 
 /*
     The Morse iambic keyer tests for input on a timer, plays the apprpriate tone and passes the data to a decorer.
@@ -27,7 +26,7 @@ export default class MorseIambicKeyer {
         this.wpm = wpm || 20;
         this.ditGoesFirst = true;  // if the initial signal is 3 then alternate but play a dit first
 
-        this.ditLen = (60000 / wpm) / DITS_PER_WORD;  // duration of dit in ms
+        this.ditLen = WPM.ditLength(wpm);  // duration of dit in ms
         this.playing = false;
 
         this.player = new MorsePlayerWAA(audioContextClass);

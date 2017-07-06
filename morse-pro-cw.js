@@ -18,6 +18,7 @@
     var timings = morseCW.getTimings();
 */
 
+import * as WPM from 'morse-pro-wpm';
 import MorseMessage from 'morse-pro-message';
 
 export default class MorseCW extends MorseMessage {
@@ -25,7 +26,6 @@ export default class MorseCW extends MorseMessage {
         super();
         this._wpm = 20;
         this._fwpm = 20;
-        this.DITS_PER_WORD = 50;  // based on "PARIS "  TODO: make const
     }
 
     set wpm(wpm) {
@@ -54,31 +54,16 @@ export default class MorseCW extends MorseMessage {
     * Convert a morse string into an array of millisecond timings.
     * With the Farnsworth method, the morse characters are played at one
     * speed and the spaces between characters at a slower speed.
-    *
-    * morse - the morse code string
-    * wpm - the speed in words per minute ("PARIS " as one word)
-    * farnsworth - the Farnsworth speed in words per minute (optional, defaults to wpm)
     */
     getTimings() {
-        var dit = 60000 / (this.DITS_PER_WORD * this._wpm);  // 60000 is 1 minute in milliseconds
-        // "PARIS " is 31 units for the characters and 19 units for the inter-character spaces and inter-word space
-        // One unit takes 1 * 60 / (50 * wpm)
-        // The 31 units should take 31 * 60 / (50 * wpm)  seconds at wpm
-        // PARIS should take 50 * 60 / (50 * fpm) to transmit at fpm, or 60 / fwpm  seconds at fwpm
-        // Keeping the time for the characters constant,
-        // The spaces need to take: (60 / fwpm) - [31 * 60 / (50 * wpm)] seconds in total
-        // The spaces are 4 inter-character spaces of 3 units and 1 inter-word space of 7 units. Their ratio must be maintained.
-        // A space unit is: [(60 / fwpm) - [31 * 60 / (50 * wpm)]] / 19 seconds
-        // Comparing that to  60 / (50 * wpm)  gives a ratio of (50.wpm - 31.fwpm) / 19.fwpm
-        var SPACES_IN_PARIS = 19;
+        var dit = WPM.ditLength(this._wpm);
+        var r = WPM.ratio(this._wpm, this._fwpm);
         // slow down the spaces by this ratio
-        var r = (this.DITS_PER_WORD * this._wpm - (this.DITS_PER_WORD - SPACES_IN_PARIS) * this._fwpm) / (SPACES_IN_PARIS * this._fwpm);
         return this.getTimingsGeneral(dit, 3 * dit, dit, 3 * dit * r, 7 * dit * r);
     }
 
     /**
     * Convert a morse string into an array of millisecond timings.
-    * morse - the morse code string
     * dit - the length of a dit in milliseconds
     * dah - the length of a dah in milliseconds (normally 3 * dit)
     * ditSpace - the length of an intra-character space in milliseconds (1 * dit)
