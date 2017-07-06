@@ -12,25 +12,25 @@ import MorsePlayerWAA from 'morse-pro-player-waa';
     Arguments:
         - keyCallback: a function which should return {0, 1, 2, 3} from the vitual "paddle" depending if nothing, a dit, a dah or both is detected
                             This implementation will play dits if both keys are detected.
+        - wpm: speed of the keyer (defaults to 20)
+        - frequency: the frequency in Hz for the sidetone (defaults to 550 Hz)
         - messageCallback: a function which receives a dictionary with keys 'message', 'timings' and 'morse' for each decoded part (see MorseDecoder)
                             Its use here will result in a single character being returned each time.
         - audioContextClass: e.g. window.AudioContext
-        - frequency: the frequency in Hz for the sidetone
-        - wpm: speed of the keyer (defaults to 20)
 */
 export default class MorseKeyer {
-    constructor(keyCallback, messageCallback, audioContextClass, frequency, wpm) {
+    constructor(keyCallback, wpm = 20, frequency = 550, messageCallback = undefined, audioContextClass = undefined) {
         this.keyCallback = keyCallback;
-        this.messageCallback = messageCallback;
+        this.wpm = wpm;
         this.frequency = frequency;
-        this.wpm = wpm || 20;
+
+        this.player = new MorsePlayerWAA(audioContextClass);
+        this.decoder = new MorseDecoder(this.wpm);
+        this.decoder.messageCallback = messageCallback;
+        this.decoder.noiseThreshold = 0;
 
         this.ditLen = WPM.ditLength(wpm);  // duration of dit in ms
         this.playing = false;
-
-        this.player = new MorsePlayerWAA(audioContextClass);
-        this.decoder = new MorseDecoder(this.wpm, messageCallback);
-        this.decoder.noiseThreshold = 0;
 
         var that = this;
         this.check = function() {

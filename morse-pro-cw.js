@@ -13,8 +13,6 @@
 
     var morseCW = new MorseCW();
     morseCW.translate("abc");
-    morseCW.wpm = 25;  // set the speed to 25 wpm
-    morseCW.fwpm = 10;  // set the Farnsworth speed to 10 wpm
     var timings = morseCW.getTimings();
 */
 
@@ -22,10 +20,10 @@ import * as WPM from 'morse-pro-wpm';
 import MorseMessage from 'morse-pro-message';
 
 export default class MorseCW extends MorseMessage {
-    constructor() {
-        super();
-        this._wpm = 20;
-        this._fwpm = 20;
+    constructor(useProsigns, wpm = 20, fwpm = wpm) {
+        super(useProsigns);
+        this.wpm = wpm;
+        this.fwpm = fwpm;
     }
 
     set wpm(wpm) {

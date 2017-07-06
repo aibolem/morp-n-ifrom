@@ -11,10 +11,6 @@
     import MorseCWWave from 'morse-pro-cw-wave';
 
     var morseCWWave = new MorseCWWave();
-    morseCWWave.wpm = 25;  // set the speed to 25 wpm
-    morseCWWave.fwpm = 10;  // set the Farnsworth speed to 10 wpm
-    morseCWWave.sampleRate = 8000;  // per second
-    morseCWWave.frequency = 600;  // frequency in Hz
     morseCWWave.translate("abc");
     var sample = morseCWWave.getSample();
 */
@@ -22,10 +18,10 @@
 import MorseCW from 'morse-pro-cw';
 
 export default class MorseCWWave extends MorseCW {
-    constructor() {
-        super();
-        this.sampleRate = 8000;  // sample rate for the waveform in Hz
-        this.frequency = 550;  // frequency of wave in Hz
+    constructor(useProsigns, wpm, fwpm, frequency = 550, sampleRate = 8000) {
+        super(useProsigns, wpm, fwpm);
+        this.frequency = frequency;  // frequency of wave in Hz
+        this.sampleRate = sampleRate;  // sample rate for the waveform in Hz
     }
 
     getSample() {

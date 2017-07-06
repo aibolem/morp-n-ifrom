@@ -13,20 +13,16 @@
     import MorsePlayerWAA from 'morse-pro-player-waa';
 
     var morseCWWave = new MorseCWWave();
-    morseCWWave.wpm = 25;  // set the speed to 25 wpm
-    morseCWWave.fwpm = 10;  // set the Farnsworth speed to 10 wpm
-    morseCWWave.frequency = 600;  // frequency in Hz
     morseCWWave.translate("abc");
 
-    var audioCtxClass = window.AudioContext || window.webkitAudioContext;
-    var morsePlayerWAA = new MorsePlayerWAA(audioCtxClass);
+    var morsePlayerWAA = new MorsePlayerWAA();
     morsePlayerWAA.loadCWWave(morseCWWave);
     morsePlayerWAA.playFromStart();
 */
 export default class MorsePlayerWAA {
-    constructor(audioContextClass) {
+    constructor(audioContextClass = undefined) {
         console.log("Trying Web Audio API (Oscillators)");
-        this.audioContextClass = audioContextClass;
+        this.audioContextClass = audioContextClass || window.AudioContext || window.webkitAudioContext;
         this.isPlayingB = false;
         this.volume = 1;  // not currently settable
         this.noAudio = true;

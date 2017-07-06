@@ -13,7 +13,6 @@
     import MorseMessage from 'morse-pro-message';
 
     var morseMessage = new MorseMessage();
-    morseMessage.useProsigns = true;
     var input;
     var output;
     try {
@@ -32,12 +31,12 @@
 import * as Morse from 'morse-pro';
 
 export default class MorseMessage {
-    constructor() {
+    constructor(useProsigns = true) {
+        this.useProsigns = useProsigns;
         this.input = "";
         this.output = "";
         this.morse = "";
         this.message = "";
-        this.useProsigns = true;
         this.inputWasMorse = undefined;
         this.hasError = undefined;
     }
