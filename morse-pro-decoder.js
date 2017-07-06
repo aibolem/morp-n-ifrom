@@ -17,9 +17,10 @@ import * as Morse from 'morse-pro';
     Usage:
 
     var messageCallback = function(data) {
-        console.log(data);
-    };
+        console.log("Decoded: {\n  timings: " + data.timings + "\n  morse: " + data.morse + "\n  message: " + data.message + "\n}");
+    }
     var decoder = new MorseDecoder(10, messageCallback);
+    decoder.messageCallback = messageCallback;
     var t;
     while (decoder_is_operating) {
         // get some timing "t" from a sensor, make it +ve for noise and -ve for silence
@@ -29,30 +30,19 @@ import * as Morse from 'morse-pro';
 
 */
 export default class MorseDecoder {
-    constructor(wpm, messageCallback) {
+    constructor(wpm = 15, fwpm = wpm) {
+        this.DITS_PER_WORD = 50;  // TODO: better if this was inherited from a more basic class... or made a const
         this._wpm = undefined;
         this._fwpm = undefined;  // farnsworth speed
-        this.DITS_PER_WORD = 50;  // TODO: better if this was inherited from a more basic class... or made a const
+        this.wpm = wpm;
+        this.fwpm = fwpm;
+        this.messageCallback = undefined;
         this.timings = [];
         this.characters = [];
         this.unusedTimes = [];
-        this.ditLen = undefined;
-        this.fDitLen = undefined;
-        this.ditDahThreshold = undefined;
-        this.dahSpaceThreshold = undefined;
         this.noiseThreshold = 1;  // a duration <= noiseThreshold is assumed to be an error
         this.morse = "";
         this.message = "";
-        if (typeof wpm !== "undefined") {
-            this.wpm = wpm;
-        }
-        if (typeof messageCallback !== "undefined") {
-            this.messageCallback = messageCallback;
-        } else {
-            this.messageCallback = function(data) {
-                console.log("Decoded: {\n  timings: " + data.timings + "\n  morse: " + data.morse + "\n  message: " + data.message + "\n}");
-            };
-        }
     }
 
     set wpm(wpm) {
@@ -69,7 +59,7 @@ export default class MorseDecoder {
         this.ditDahThreshold = ((1 * this.ditLen) + (3 * this.ditLen)) / 2;
         this.dahSpaceThreshold = ((3 * this.fDitLen) + (7 * this.fDitLen)) / 2;
 
-        console.log("Decoder speed (WPM) / Farnsworth speed (WPM): " + wpm + " / " + this._fwpm);
+        console.log("Decoder speed (WPM) / Farnsworth speed (WPM): " + this._wpm + " / " + this._fwpm);
         console.log("Dit length (ms) / Farnsworth dit length (ms): " + this.ditLen + " / " + this.fDitLen);
     }
 
@@ -151,11 +141,13 @@ export default class MorseDecoder {
         } else {
             this.unusedTimes = [];
         }
-        this.messageCallback({
-            timings: u,
-            morse: m,
-            message: t
-        });
+        if (this.messageCallback !== undefined) {
+            this.messageCallback({
+                timings: u,
+                morse: m,
+                message: t
+            });
+        }
     }
 
     timings2morse(times) {
