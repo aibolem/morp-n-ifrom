@@ -8,7 +8,7 @@ import MorseDecoder from 'morse-pro-decoder';
 import MorsePlayerWAA from 'morse-pro-player-waa';
 
 /*
-    The Morse keyer tests for input on a timer, plays the apprpriate tone and passes the data to a decorer.
+    The Morse keyer tests for input on a timer, plays the appropriate tone and passes the data to a decoder.
     Arguments:
         - keyCallback: a function which should return {0, 1, 2, 3} from the vitual "paddle" depending if nothing, a dit, a dah or both is detected
                             This implementation will play dits if both keys are detected.
@@ -31,42 +31,49 @@ export default class MorseKeyer {
 
         this.ditLen = WPM.ditLength(wpm);  // duration of dit in ms
         this.playing = false;
+    }
 
-        var that = this;
-        this.check = function() {
-            var input = that.keyCallback();
-            var dit;
-            if (that.lastTime) {
-                // record the amount of silence since the last time we were here
-                that.decoder.addTiming(-( (new Date()).getTime() - that.lastTime ));
-            }
-            if (input === 0) {
-                // If no keypress is detected then continue pushing chunks of silence to the decoder to complete the character and add a space
-                that.playing = false;  // make the keyer interupterable so that the next character can start
-                that.lastTime = (new Date()).getTime();  // time marking the end of the last data that was last pushed to decoder
-                if (that.spaceCounter < 3) {
-                    that.spaceCounter++;
-                    that.timer = setTimeout(that.check, 2 * that.ditLen);  // keep pushing up to 3 dah-spaces to complete character or word
-                } else {
-                    that.stop();
-                }
-                return;
-            } else if (input & 1) {
-                dit = true;
-            } else if (input === 2) {
-                dit = false;
-            }
-            that.playTone(dit);
-            if (dit) {
-                that.decoder.addTiming(1 * that.ditLen);
-                that.lastTime = (new Date()).getTime() + (1 * that.ditLen);
-                that.timer = setTimeout(that.check, 2 * that.ditLen);  // check key state again after the dit and after a dit-space
+    check() {
+        var input = this.keyCallback();
+        var dit;
+        if (this.lastTime) {
+            // record the amount of silence since the last time we were here
+            this.decoder.addTiming(-( (new Date()).getTime() - this.lastTime ));
+        }
+        if (input === 0) {
+            // If no keypress is detected then continue pushing chunks of silence to the decoder to complete the character and add a space
+            this.playing = false;  // make the keyer interupterable so this the next character can start
+            this.lastTime = (new Date()).getTime();  // time marking the end of the last data this was last pushed to decoder
+            if (this.spaceCounter < 3) {
+                this.spaceCounter++;
+                this.timer = setTimeout(this.check.bind(this), 2 * this.ditLen);  // keep pushing up to 3 dah-spaces to complete character or word
             } else {
-                that.decoder.addTiming(3 * that.ditLen);
-                that.lastTime = (new Date()).getTime() + (3 * that.ditLen);
-                that.timer = setTimeout(that.check, 4 * that.ditLen);
+                this.stop();
             }
-        };
+            return input;
+        }
+        dit = this.ditOrDah(input);
+        this.playTone(dit);
+        if (dit) {
+            this.decoder.addTiming(1 * this.ditLen);
+            this.lastTime = (new Date()).getTime() + (1 * this.ditLen);
+            this.timer = setTimeout(this.check.bind(this), 2 * this.ditLen);  // check key state again after the dit and after a dit-space
+        } else {
+            this.decoder.addTiming(3 * this.ditLen);
+            this.lastTime = (new Date()).getTime() + (3 * this.ditLen);
+            this.timer = setTimeout(this.check.bind(this), 4 * this.ditLen);
+        }
+        return input;
+    }
+
+    ditOrDah(input) {
+        var dit;
+        if (input & 1) {
+            dit = true;
+        } else if (input === 2) {
+            dit = false;
+        }
+        return dit;
     }
 
     /*
