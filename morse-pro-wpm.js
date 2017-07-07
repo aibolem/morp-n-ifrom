@@ -15,7 +15,7 @@ export function wpm(ditLen) {
     return (MS_IN_MINUTE / DITS_PER_WORD) / ditLen;
 }
 
-export function fDitLength(wpm, fwpm) {
+export function fditLength(wpm, fwpm) {
     return ditLength(wpm) * ratio(wpm, fwpm);
 }
 
