@@ -30,11 +30,14 @@ import MorseDecoder from 'morse-pro-decoder';
 
 */
 export default class MorseAdaptiveDecoder extends MorseDecoder {
-    constructor(wpm, fwpm, bufferSize = 30) {
-        super(wpm, fwpm);
+    constructor(wpm, fwpm, bufferSize = 30, messageCallback = undefined, speedCallback = undefined) {
+        super(wpm, fwpm, messageCallback, speedCallback);
         this.bufferSize = bufferSize;
+        this.speedCallbackRateLimiter = 10;  // set this to only call speedCallback every n decodes
+        this._speedCallbackCount = 0;
         this.ditLengths = [];
         this.fditLengths = [];
+        this.lockSpeed = false;
     }
 
     addDecode(duration, character) {
@@ -67,6 +70,8 @@ export default class MorseAdaptiveDecoder extends MorseDecoder {
         this.ditLengths = this.ditLengths.slice(-this.bufferSize);
         this.fditLengths = this.fditLengths.slice(-this.bufferSize);
 
+        if (this.lockSpeed) { return; }
+
         var sum = 0;
         var denom = 0;
         var fSum = 0;
@@ -92,6 +97,12 @@ export default class MorseAdaptiveDecoder extends MorseDecoder {
         }
         if (denom) {
             this.ditLen = sum / denom;
+        }
+
+        // TODO: do we need rate limiter here?
+        if (this.speedCallback !== undefined && ++this._speedCallbackCount === this.speedCallbackRateLimiter) {
+            this.speedCallback({wpm: this.wpm, fwpm: this.fwpm});
+            this._speedCallbackCount = 0;
         }
     }
 }

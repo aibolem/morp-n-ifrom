@@ -31,29 +31,35 @@ import * as WPM from 'morse-pro-wpm';
 
 */
 export default class MorseDecoder {
-    constructor(wpm = 15, fwpm = wpm) {
+    constructor(wpm = 20, fwpm = wpm, messageCallback = undefined, speedCallback = undefined) {
         this._wpm = undefined;
         this._fwpm = undefined;  // farnsworth speed
         this._ditLen = undefined;
         this._fditLen = undefined;
+        this.defaults = {
+            wpm: 20,
+            fwpm: 20
+        };
         this.wpm = wpm;
         this.fwpm = fwpm;
-        this.messageCallback = undefined;
-        this.timings = [];
-        this.characters = [];
+        this.messageCallback = messageCallback;
+        this.speedCallback = speedCallback;  // set this to a function to receive a dictionary with wpm and fwpm set when the speed changes
+        this.timings = [];  // all the ms timings received, all +ve
+        this.characters = [];  // all the decoded characters ('.', '-', etc)
         this.unusedTimes = [];
         this.noiseThreshold = 1;  // a duration <= noiseThreshold is assumed to be an error
-        this.morse = "";
-        this.message = "";
+        this.morse = "";  // string of morse
+        this.message = "";  // string of decoded message
     }
 
     updateThresholds() {
         this._ditDahThreshold = ((1 * this._ditLen) + (3 * this._ditLen)) / 2;
         this._dahSpaceThreshold = ((3 * this._fditLen) + (7 * this._fditLen)) / 2;
-        // console.log(this._wpm + " / " + this._fwpm);
     }
 
     set wpm(wpm) {
+        if (isNaN(wpm)) { wpm = this.defaults.wpm; }
+        wpm = Math.max(wpm, 1);
         this._wpm = wpm;
         if (this._fwpm === undefined || this._fwpm > wpm) {
             this._fwpm = this._wpm;
@@ -61,6 +67,9 @@ export default class MorseDecoder {
         this._ditLen = WPM.ditLength(this._wpm);
         this._fditLen = WPM.fditLength(this._wpm, this._fwpm);
         this.updateThresholds();
+        if (this.speedCallback !== undefined) {
+            this.speedCallback({wpm: this.wpm, fwpm: this.fwpm});
+        }
     }
 
     get wpm() {
@@ -68,6 +77,8 @@ export default class MorseDecoder {
     }
 
     set fwpm(fwpm) {
+        if (isNaN(fwpm)) { fwpm = this.defaults.fwpm; }
+        fwpm = Math.max(fwpm, 1);
         this._fwpm = fwpm;
         if (this._wpm === undefined || this._wpm < fwpm) {
             this.wpm = fwpm;
@@ -75,6 +86,9 @@ export default class MorseDecoder {
         this._ditLen = WPM.ditLength(this._wpm);
         this._fditLen = WPM.fditLength(this._wpm, this._fwpm);
         this.updateThresholds();
+        if (this.speedCallback !== undefined) {
+            this.speedCallback({wpm: this.wpm, fwpm: this.fwpm});
+        }
     }
 
     get fwpm() {
