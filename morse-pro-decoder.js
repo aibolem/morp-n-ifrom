@@ -58,7 +58,7 @@ export default class MorseDecoder {
     }
 
     set wpm(wpm) {
-        if (isNaN(wpm)) { wpm = this.defaults.wpm; }
+        if (isNaN(wpm)) wpm = this.defaults.wpm;
         wpm = Math.max(wpm, 1);
         this._wpm = wpm;
         if (this._fwpm === undefined || this._fwpm > wpm) {
@@ -77,7 +77,7 @@ export default class MorseDecoder {
     }
 
     set fwpm(fwpm) {
-        if (isNaN(fwpm)) { fwpm = this.defaults.fwpm; }
+        if (isNaN(fwpm)) fwpm = this.defaults.fwpm;
         fwpm = Math.max(fwpm, 1);
         this._fwpm = fwpm;
         if (this._wpm === undefined || this._wpm < fwpm) {

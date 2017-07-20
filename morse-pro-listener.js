@@ -62,7 +62,7 @@ export default class MorseListener {
     }
 
     set volumeFilterMin(v) {
-        if (isNaN(v)) { v = this.defaults.volumeFilterMin; }
+        if (isNaN(v)) v = this.defaults.volumeFilterMin;
         // v is in dB and therefore -ve
         v = Math.min(0, v);
         this.analyserNode.minDecibels = v;
@@ -77,7 +77,7 @@ export default class MorseListener {
     }
 
     set volumeFilterMax(v) {
-        if (isNaN(v)) { v = this.defaults.volumeFilterMax; }
+        if (isNaN(v)) v = this.defaults.volumeFilterMax;
         // v is in dB and therefore -ve
         v = Math.min(0, v);
         this.analyserNode.maxDecibels = v;
@@ -92,7 +92,7 @@ export default class MorseListener {
     }
 
     set frequencyFilterMin(f) {
-        if (isNaN(f)) { f = this.defaults.frequencyFilterMin; }
+        if (isNaN(f)) f = this.defaults.frequencyFilterMin;
         f = Math.min(Math.max(f, 0), this.maxFreq);
         this._filterBinLow = Math.min(Math.max(Math.round(f / this.freqStep), 1), this.freqBins);  // at least 1 to avoid DC component
         this._filterBinHigh = Math.max(this._filterBinLow, this._filterBinHigh);  // high must be at least low
@@ -106,7 +106,7 @@ export default class MorseListener {
     }
 
     set frequencyFilterMax(f) {
-        if (isNaN(f)) { f = this.defaults.frequencyFilterMin; }
+        if (isNaN(f)) f = this.defaults.frequencyFilterMin;
         f = Math.min(Math.max(f, 0), this.maxFreq);
         this._filterBinHigh = Math.min(Math.max(Math.round(f / this.freqStep), 1), this.freqBins);  // at least 1 to avoid DC component
         this._filterBinLow = Math.min(this._filterBinHigh, this._filterBinLow);  // low must be at most high
@@ -127,7 +127,7 @@ export default class MorseListener {
 
     set volumeThreshold(v) {
         // threshold used to determine if an anlysed region has sufficient sound to be "on"
-        if (isNaN(v)) { v = this.defaults.volumeThreshold; }
+        if (isNaN(v)) v = this.defaults.volumeThreshold;
         this._volumeThreshold = Math.min(Math.max(Math.round(v), 0), 255);
         if (this.volumeThresholdCallback !== undefined) {
             this.volumeThresholdCallback(this._volumeThreshold);
