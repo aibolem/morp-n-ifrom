@@ -20,15 +20,15 @@ export default class MorseListener {
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
         this.audioContext = new window.AudioContext() || new window.webkitAudioContext();
 
-        this.spectrogramCallback = spectrogramCallback;
-        this.frequencyFilterCallback = frequencyFilterCallback;
-        this.volumeFilterCallback = volumeFilterCallback;
-        this.volumeThresholdCallback = volumeThresholdCallback;
-        this.micSuccessCallback = micSuccessCallback;
-        this.micErrorCallback = micErrorCallback;
-        this.fileLoadCallback = fileLoadCallback;
-        this.fileErrorCallback = fileErrorCallback;
-        this.EOFCallback = EOFCallback;
+        if (spectrogramCallback !== undefined) this.spectrogramCallback = spectrogramCallback;
+        if (frequencyFilterCallback !== undefined) this.frequencyFilterCallback = frequencyFilterCallback;
+        if (volumeFilterCallback !== undefined) this.volumeFilterCallback = volumeFilterCallback;
+        if (volumeThresholdCallback !== undefined) this.volumeThresholdCallback = volumeThresholdCallback;
+        if (micSuccessCallback !== undefined) this.micSuccessCallback = micSuccessCallback;
+        if (micErrorCallback !== undefined) this.micErrorCallback = micErrorCallback;
+        if (fileLoadCallback !== undefined) this.fileLoadCallback = fileLoadCallback;
+        if (fileErrorCallback !== undefined) this.fileErrorCallback = fileErrorCallback;
+        if (EOFCallback !== undefined) this.EOFCallback = EOFCallback;
 
         this.fftSize = fftSize;
         // basic parameters from the sample rate
@@ -67,9 +67,7 @@ export default class MorseListener {
         v = Math.min(0, v);
         this.analyserNode.minDecibels = v;
         this.analyserNode.maxDecibels = Math.max(this.analyserNode.maxDecibels, v);
-        if (this.volumeFilterCallback !== undefined) {
-            this.volumeFilterCallback({min: this.analyserNode.minDecibels, max: this.analyserNode.maxDecibels});
-        }
+        this.volumeFilterCallback({min: this.analyserNode.minDecibels, max: this.analyserNode.maxDecibels});
     }
 
     get volumeFilterMin() {
@@ -82,9 +80,7 @@ export default class MorseListener {
         v = Math.min(0, v);
         this.analyserNode.maxDecibels = v;
         this.analyserNode.minDecibels = Math.min(this.analyserNode.minDecibels, v);
-        if (this.volumeFilterCallback !== undefined) {
-            this.volumeFilterCallback({min: this.analyserNode.minDecibels, max: this.analyserNode.maxDecibels});
-        }
+        this.volumeFilterCallback({min: this.analyserNode.minDecibels, max: this.analyserNode.maxDecibels});
     }
 
     get volumeFilterMax() {
@@ -96,9 +92,7 @@ export default class MorseListener {
         f = Math.min(Math.max(f, 0), this.maxFreq);
         this._filterBinLow = Math.min(Math.max(Math.round(f / this.freqStep), 1), this.freqBins);  // at least 1 to avoid DC component
         this._filterBinHigh = Math.max(this._filterBinLow, this._filterBinHigh);  // high must be at least low
-        if (this.frequencyFilterCallback !== undefined) {
-            this.frequencyFilterCallback({min: this.frequencyFilterMin, max: this.frequencyFilterMax});
-        }
+        this.frequencyFilterCallback({min: this.frequencyFilterMin, max: this.frequencyFilterMax});
     }
 
     get frequencyFilterMin() {
@@ -110,9 +104,7 @@ export default class MorseListener {
         f = Math.min(Math.max(f, 0), this.maxFreq);
         this._filterBinHigh = Math.min(Math.max(Math.round(f / this.freqStep), 1), this.freqBins);  // at least 1 to avoid DC component
         this._filterBinLow = Math.min(this._filterBinHigh, this._filterBinLow);  // low must be at most high
-        if (this.frequencyFilterCallback !== undefined) {
-            this.frequencyFilterCallback({min: this.frequencyFilterMin, max: this.frequencyFilterMax});
-        }
+        this.frequencyFilterCallback({min: this.frequencyFilterMin, max: this.frequencyFilterMax});
     }
 
     get frequencyFilterMax() {
@@ -129,9 +121,7 @@ export default class MorseListener {
         // threshold used to determine if an anlysed region has sufficient sound to be "on"
         if (isNaN(v)) v = this.defaults.volumeThreshold;
         this._volumeThreshold = Math.min(Math.max(Math.round(v), 0), 255);
-        if (this.volumeThresholdCallback !== undefined) {
-            this.volumeThresholdCallback(this._volumeThreshold);
-        }
+        this.volumeThresholdCallback(this._volumeThreshold);
     }
 
     get volumeThreshold() {
@@ -165,15 +155,11 @@ export default class MorseListener {
                 // connect nodes but don't connect mic to audio output to avoid feedback
                 this.sourceNode.connect(this.analyserNode);
                 this.jsNode.connect(this.audioContext.destination);
-                if (this.micSuccessCallback !== undefined) {
-                    this.micSuccessCallback();
-                }
+                this.micSuccessCallback();
             }.bind(this),
             function(error) {
                 this.input = undefined;
-                if (this.micErrorCallback !== undefined) {
-                    this.micErrorCallback(error);
-                }
+                this.micErrorCallback(error);
             }.bind(this)
         );
     }
@@ -184,15 +170,11 @@ export default class MorseListener {
             arrayBuffer,
             function(audioBuffer) {
                 this.fileAudioBuffer = audioBuffer;
-                if (this.fileLoadCallback !== undefined) {
-                    this.fileLoadCallback(audioBuffer);
-                }
+                this.fileLoadCallback(audioBuffer);
             }.bind(this),
             function(error) {
                 this.fileAudioBuffer = undefined;
-                if (this.fileErrorCallback !== undefined) {
-                    this.fileErrorCallback(error);
-                }
+                this.fileErrorCallback(error);
             }.bind(this)
         );
     }
@@ -204,9 +186,7 @@ export default class MorseListener {
         this.sourceNode.buffer = this.fileAudioBuffer;
         this.sourceNode.onended = function() {
             this.stop();
-            if (this.EOFCallback !== undefined) {
-                this.EOFCallback();
-            }
+            this.EOFCallback();
         }.bind(this);
         // connect nodes
         this.jsNode.connect(this.audioContext.destination);
@@ -250,17 +230,15 @@ export default class MorseListener {
         var isOn = filterRegionVolume >= this._volumeThreshold;
         this.recordOnOrOff(isOn);
 
-        if (this.spectrogramCallback !== undefined) {
-            this.spectrogramCallback({
-                frequencyData: this.frequencyData,
-                frequencyStep: this.freqStep,
-                timeStep: this.timeStep,
-                filterBinLow: this._filterBinLow,
-                filterBinHigh: this._filterBinHigh,
-                filterRegionVolume: filterRegionVolume,
-                isOn: isOn
-            });
-        }
+        this.spectrogramCallback({
+            frequencyData: this.frequencyData,
+            frequencyStep: this.freqStep,
+            timeStep: this.timeStep,
+            filterBinLow: this._filterBinLow,
+            filterBinHigh: this._filterBinHigh,
+            filterRegionVolume: filterRegionVolume,
+            isOn: isOn
+        });
     }
 
     // Called each tick with whether the sound is judged to be on or off.
@@ -297,4 +275,15 @@ export default class MorseListener {
     flush(on = this.lastSoundWasOn) {
         this.decoder.addTiming((on ? 1 : -1) * this.ticks * this.timeStep);
     }
+
+    // empty callbacks to avoid errors
+    spectrogramCallback() { }
+    frequencyFilterCallback() { }
+    volumeFilterCallback() { }
+    volumeThresholdCallback() { }
+    micSuccessCallback() { }
+    micErrorCallback() { }
+    fileLoadCallback() { }
+    fileErrorCallback() { }
+    EOFCallback() { }
 }

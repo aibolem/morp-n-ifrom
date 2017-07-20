@@ -42,8 +42,8 @@ export default class MorseDecoder {
         };
         this.wpm = wpm;
         this.fwpm = fwpm;
-        this.messageCallback = messageCallback;
-        this.speedCallback = speedCallback;  // set this to a function to receive a dictionary with wpm and fwpm set when the speed changes
+        if (messageCallback !== undefined) this.messageCallback = messageCallback;
+        if (speedCallback !== undefined) this.speedCallback = speedCallback;  // function receives dictionary with wpm and fwpm set when the speed changes
         this.timings = [];  // all the ms timings received, all +ve
         this.characters = [];  // all the decoded characters ('.', '-', etc)
         this.unusedTimes = [];
@@ -67,9 +67,7 @@ export default class MorseDecoder {
         this._ditLen = WPM.ditLength(this._wpm);
         this._fditLen = WPM.fditLength(this._wpm, this._fwpm);
         this.updateThresholds();
-        if (this.speedCallback !== undefined) {
-            this.speedCallback({wpm: this.wpm, fwpm: this.fwpm});
-        }
+        this.speedCallback({wpm: this.wpm, fwpm: this.fwpm});
     }
 
     get wpm() {
@@ -86,9 +84,7 @@ export default class MorseDecoder {
         this._ditLen = WPM.ditLength(this._wpm);
         this._fditLen = WPM.fditLength(this._wpm, this._fwpm);
         this.updateThresholds();
-        if (this.speedCallback !== undefined) {
-            this.speedCallback({wpm: this.wpm, fwpm: this.fwpm});
-        }
+        this.speedCallback({wpm: this.wpm, fwpm: this.fwpm});
     }
 
     get fwpm() {
@@ -186,13 +182,11 @@ export default class MorseDecoder {
         } else {
             this.unusedTimes = [];
         }
-        if (this.messageCallback !== undefined) {
-            this.messageCallback({
-                timings: u,
-                morse: m,
-                message: t
-            });
-        }
+        this.messageCallback({
+            timings: u,
+            morse: m,
+            message: t
+        });
     }
 
     timings2morse(times) {
@@ -259,4 +253,6 @@ export default class MorseDecoder {
         return this.getTimings('/');
     }
 
+    messageCallback() { }
+    speedCallback() { }
 }
