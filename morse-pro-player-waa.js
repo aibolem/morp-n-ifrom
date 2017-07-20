@@ -19,45 +19,43 @@
     morsePlayerWAA.playFromStart();
 */
 export default class MorsePlayerWAA {
-    constructor(audioContextClass = undefined) {
+    constructor() {
         console.log("Trying Web Audio API (Oscillators)");
-        this.audioContextClass = audioContextClass || window.AudioContext || window.webkitAudioContext;
+        this.audioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (this.audioContextClass === undefined) {
+            this.noAudio = true;
+            throw (new Error("No AudioContext class defined"));
+        }
         this.isPlayingB = false;
-        this.noAudio = true;
-        this.audioCtx = this.getAudioContext();
-        this.volume = 1;
+        this.noAudio = false;
+        this._volume = 1;
         this.timings = undefined;
         this.frequency = undefined;
     }
 
-    getAudioContext() {
-        this.noAudio = true;
-        var ctx;
-        if (this.audioContextClass === undefined) {
-            throw (new Error("No AudioContext class defined"));
-        } else {
-            ctx = new this.audioContextClass();
-            this.splitterNode = ctx.createGain();  // this is here to attach other nodes to in subclass
-            this.gainNode = ctx.createGain();  // this is actually used for volume
-            this.splitterNode.connect(this.gainNode);
-            this.gainNode.connect(ctx.destination);
-            this.noAudio = false;
-        }
-        return ctx;
+    initialiseAudioNodes() {
+        this.audioContext = new this.audioContextClass();
+        this.splitterNode = this.audioContext.createGain();  // this is here to attach other nodes to in subclass
+        this.gainNode = this.audioContext.createGain();  // this is actually used for volume
+        this.splitterNode.connect(this.gainNode);
+        this.gainNode.connect(this.audioContext.destination);
+        this.gainNode.gain.value = this._volume;
     }
 
     set volume(v) {
+        this._volume = v;
         this.gainNode.gain.value = v;
     }
 
     get volume() {
-        return this.gainNode.gain.value;
+        return this._volume;
     }
 
     stop() {
-        this.isPlayingB = false;
-        this.audioCtx.close();
-        this.audioCtx = this.getAudioContext();
+        if (this.isPlayingB) {
+            this.isPlayingB = false;
+            this.audioContext.close();
+        }
     }
 
     loadCWWave(cwWave) {
@@ -80,13 +78,14 @@ export default class MorsePlayerWAA {
             return [];
         }
 
+        this.initialiseAudioNodes();
         this.isPlayingB = true;
 
-        var cumT = this.audioCtx.currentTime;
+        var cumT = this.audioContext.currentTime;
         for (var t = 0; t < this.timings.length; t += 1) {
             var duration = this.timings[t] / 1000;
             if (duration > 0) {
-                var oscillator = this.audioCtx.createOscillator();
+                var oscillator = this.audioContext.createOscillator();
                 oscillator.type = 'sine';
                 oscillator.frequency.value = this.frequency;
                 oscillator.connect(this.splitterNode);

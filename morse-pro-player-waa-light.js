@@ -20,6 +20,7 @@
     var morsePlayerWAALight = new MorsePlayerWAALight();
     morsePlayerWAALight.soundOnCallback = lightOn;
     morsePlayerWAALight.soundOffCallback = lightOff;
+    morsePlayerWAALight.soundStoppedCallback = soundStopped;
     morsePlayerWAALight.volume = 0;
     morsePlayerWAALight.loadCWWave(morseCWWave);
     morsePlayerWAA.playFromStart();
@@ -28,18 +29,26 @@
 import MorsePlayerWAA from 'morse-pro-player-waa';
 
 export default class MorsePlayerWAALight extends MorsePlayerWAA {
-    constructor(audioContextClass = undefined) {
-        super(audioContextClass);
+    constructor(soundOnCallback, soundOffCallback, soundStoppedCallback) {
+        super();
+        if (soundOnCallback !== undefined) this.soundOnCallback = soundOnCallback;
+        if (soundOffCallback !== undefined) this.soundOffCallback = soundOffCallback;
+        if (soundStoppedCallback !== undefined) this.soundStoppedCallback = soundStoppedCallback;
         this.wasOn = false;
+        this.offCount = 0;
     }
 
-    getAudioContext() {
-        var ctx = super.getAudioContext();
-        this.jsNode = ctx.createScriptProcessor(256, 1, 1);
-        this.jsNode.connect(ctx.destination);  // otherwise Chrome ignores it
+    initialiseAudioNodes() {
+        super.initialiseAudioNodes();
+        this.jsNode = this.audioContext.createScriptProcessor(256, 1, 1);
+        this.jsNode.connect(this.audioContext.destination);  // otherwise Chrome ignores it
         this.jsNode.onaudioprocess = this.processSound.bind(this);
         this.splitterNode.connect(this.jsNode);
-        return ctx;
+    }
+
+    playFromStart() {
+        this.offCount = 0;
+        super.playFromStart();
     }
 
     processSound(event) {
@@ -52,11 +61,21 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
         if (on && !this.wasOn) {
             this.soundOnCallback();
         } else if (!on && this.wasOn) {
-            this.soundOffCallback();
+            this.off();
         }
         this.wasOn = on;
     }
 
+    off() {
+        this.offCount++;
+        this.soundOffCallback();
+        if (this.offCount * 2 === this.timings.length + 1) {
+            this.soundStoppedCallback();
+        }
+    }
+
+    // empty callbacks in case user does not define any
     soundOnCallback() { }
     soundOffCallback() { }
+    soundStoppedCallback() { }
 }
