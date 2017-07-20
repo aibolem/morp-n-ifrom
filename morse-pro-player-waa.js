@@ -5,7 +5,6 @@
 
 /*
     Web browser sound player using Web Audio API.
-    Pass in the window.AudioContext.
 
     Usage:
 
@@ -24,9 +23,9 @@ export default class MorsePlayerWAA {
         console.log("Trying Web Audio API (Oscillators)");
         this.audioContextClass = audioContextClass || window.AudioContext || window.webkitAudioContext;
         this.isPlayingB = false;
-        this.volume = 1;  // not currently settable
         this.noAudio = true;
         this.audioCtx = this.getAudioContext();
+        this.volume = 1;
         this.timings = undefined;
         this.frequency = undefined;
     }
@@ -38,9 +37,21 @@ export default class MorsePlayerWAA {
             throw (new Error("No AudioContext class defined"));
         } else {
             ctx = new this.audioContextClass();
+            this.splitterNode = ctx.createGain();  // this is here to attach other nodes to in subclass
+            this.gainNode = ctx.createGain();  // this is actually used for volume
+            this.splitterNode.connect(this.gainNode);
+            this.gainNode.connect(ctx.destination);
             this.noAudio = false;
         }
         return ctx;
+    }
+
+    set volume(v) {
+        this.gainNode.gain.value = v;
+    }
+
+    get volume() {
+        return this.gainNode.gain.value;
     }
 
     stop() {
@@ -78,7 +89,7 @@ export default class MorsePlayerWAA {
                 var oscillator = this.audioCtx.createOscillator();
                 oscillator.type = 'sine';
                 oscillator.frequency.value = this.frequency;
-                oscillator.connect(this.audioCtx.destination);
+                oscillator.connect(this.splitterNode);
                 oscillator.start(cumT);
                 oscillator.stop(cumT + duration);
                 cumT += duration;
