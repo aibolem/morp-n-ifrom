@@ -15,8 +15,8 @@ import MorsePlayerWAA from 'morse-pro-player-waa';
     Arguments: see MorseKeyer
 */
 export default class MorseIambicKeyer extends MorseKeyer {
-    constructor(keyCallback, wpm, frequency, messageCallback, audioContextClass) {
-        super(keyCallback, wpm, frequency, messageCallback, audioContextClass);
+    constructor(keyCallback, wpm, frequency, messageCallback) {
+        super(keyCallback, wpm, frequency, messageCallback);
         this.ditGoesFirst = true;  // if the initial signal is 3 then alternate but play a dit first
     }
 

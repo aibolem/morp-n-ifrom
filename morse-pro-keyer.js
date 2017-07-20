@@ -16,15 +16,14 @@ import MorsePlayerWAA from 'morse-pro-player-waa';
         - frequency: the frequency in Hz for the sidetone (defaults to 550 Hz)
         - messageCallback: a function which receives a dictionary with keys 'message', 'timings' and 'morse' for each decoded part (see MorseDecoder)
                             Its use here will result in a single character being returned each time.
-        - audioContextClass: e.g. window.AudioContext
 */
 export default class MorseKeyer {
-    constructor(keyCallback, wpm = 20, frequency = 550, messageCallback = undefined, audioContextClass = undefined) {
+    constructor(keyCallback, wpm = 20, frequency = 550, messageCallback = undefined) {
         this.keyCallback = keyCallback;
         this.wpm = wpm;
         this.frequency = frequency;
 
-        this.player = new MorsePlayerWAA(audioContextClass);
+        this.player = new MorsePlayerWAA();
         this.decoder = new MorseDecoder(this.wpm);
         this.decoder.messageCallback = messageCallback;
         this.decoder.noiseThreshold = 0;
