@@ -13,14 +13,20 @@ import MorseDecoder from 'morse-pro-decoder';
         wpm             See MorseDecoder
         fwpm            See MorseDecoder
         bufferSize      Size of the buffer to average over (defaults to 30)
+        messageCallback See MorseDecoder
+        speedCallback   See MorseDecoder; the speed is changed automatically by this class so the callback is more use.
 
     Usage:
 
     var messageCallback = function(data) {
         console.log(data);
     };
+    var speedCallback = function(s) {
+        console.log('Speed is now: ' + s.wpm + ' WPM');
+    };
     var decoder = new MorseAdaptiveDecoder(10);
     decoder.messageCallback = messageCallback;
+    decoder.speedCallback = speedCallback;
     var t;
     while (decoder_is_operating) {
         // get some timing "t" from a sensor, make it +ve for noise and -ve for silence

@@ -10,8 +10,13 @@ import * as WPM from 'morse-pro-wpm';
     Class to convert from timings to Morse code.
 
     Arguments:
-        wpm                 The speed of the Morse in words per minute (defaults to 15)
-        fwpm                The Farnsworth speed of the Morse in words per minute (defaults to wpm)
+        wpm                 The speed of the Morse in words per minute (defaults to 15).
+        fwpm                The Farnsworth speed of the Morse in words per minute (defaults to wpm).
+        messageCallback     Callback executed when decoder buffer is flushed (every character). [optional]
+                            Returns dictionary with keys 'timings', 'morse' and 'message'
+        speedCallback       Callback executed if the wpm or fwpm speed changes. [optional]
+                            The speed in this class doesn't change by itself, but e.g. the fwpm can change if wpm is changed.
+                            Returned dictionary has keys 'fwpm' and 'wpm'.
 
     Usage:
 

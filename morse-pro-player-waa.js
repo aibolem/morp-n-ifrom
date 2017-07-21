@@ -58,6 +58,7 @@ export default class MorsePlayerWAA {
         }
     }
 
+    // Convenience method to help playing directly from a MorseCWWave instance.
     loadCWWave(cwWave) {
         this.load(cwWave.getTimings(), cwWave.frequency);
     }

@@ -3,6 +3,48 @@
 
 /* jshint esversion: 6 */
 
+/*
+    A class to 'listen' for Morse code from the microphone or an audio file, filter the sound and pass timings to a decoder to convert to text.
+
+    Arguments:
+        fftSize                     Size of the discrete Fourier transform to use. Must be a power of 2 >= 256 (defaults to 256).
+                                    A smaller fftSize gives better time resolution but worse frequency resolution.
+        volumeFilterMin             Sound less than this volume is ignored (in dB, defaults to -60).
+        volumeFilterMax             Sound greater than this volume is ignored (in dB, defaults to -30).
+        frequencyFilterMin          Sound less than this frequency is ignored (in Hz, defaults to 550).
+        frequencyFilterMax          Sound greater than this frequency is ignored (in Hz, defaults to 550).
+        volumeThreshold             If the volume is greater than this then the signal is taken as "on" (part of a dit or dah) (0-255, defaults to 220).
+        decoder                     An instance of a configured decoder class.
+        spectrogramCallback         Called every time fftSize samples are read. Returns a dictionary with keys:
+                                    {
+                                        frequencyData: output of the DFT (the real values including DC component)
+                                        frequencyStep: frequency resolution in Hz
+                                        timeStep: time resolution in Hz
+                                        filterBinLow: index of the lowest frequency bin being analysed
+                                        filterBinHigh: index of the highest frequency bin being analysed
+                                        filterRegionVolume: volume in the analysed region
+                                        isOn: whether the analysis detected a signal or not
+                                    }
+        frequencyFilterCallback     Called when the frequency filter parameters change. Returns a dictionary:
+                                    {
+                                        min: lowest frequency in Hz
+                                        max: highest frequency in Hz
+                                    }
+                                    The frequencies may well be different to that which is set as they are quantised.
+        volumeFilterCallback        Called when the volume filter parameters change. Returns a dictionary:
+                                    {
+                                        min: low volume (in dB)
+                                        max: high volume (in dB)
+                                    }
+                                    If the set volumes are not numeric or out of range then the callback will return in range numbers.
+        volumeThresholdCallback     Called when the volume filter threshold changes. Returns a single number.
+        micSuccessCallback          Called when the microphone has successfully been connected.
+        micErrorCallback            Called (with the error as an argument) if there is an error connecting to the microphone.
+        fileLoadCallback            Called when a file has successfully been loaded (and decoded). Returns the audioBuffer object.
+        fileErrorCallback           Called (with the error as an argument) if there is an error in decoding a file.
+        EOFCallback                 Called when the playback of a file ends.
+*/
+
 export default class MorseListener {
     constructor(
             fftSize,

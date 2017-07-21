@@ -74,7 +74,8 @@ export default class MorseMessage {
         return this.output;
     }
 
-    // Clear all the errors from the morse and message
+    // Clear all the errors from the morse and message.
+    // Useful if you want to play the sound even though it didn't translate.
     clearError() {
         if (this.inputWasMorse) {
             this.morse = this.morse.replace(/#/g, "");  // leave in the bad Morse

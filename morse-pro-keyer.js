@@ -9,12 +9,13 @@ import MorsePlayerWAA from 'morse-pro-player-waa';
 
 /*
     The Morse keyer tests for input on a timer, plays the appropriate tone and passes the data to a decoder.
+
     Arguments:
-        - keyCallback: a function which should return {0, 1, 2, 3} from the vitual "paddle" depending if nothing, a dit, a dah or both is detected
+        keyCallback         A function which should return {0, 1, 2, 3} from the vitual "paddle" depending if nothing, a dit, a dah or both is detected.
                             This implementation will play dits if both keys are detected.
-        - wpm: speed of the keyer (defaults to 20)
-        - frequency: the frequency in Hz for the sidetone (defaults to 550 Hz)
-        - messageCallback: a function which receives a dictionary with keys 'message', 'timings' and 'morse' for each decoded part (see MorseDecoder)
+        wpm                 Speed of the keyer (defaults to 20 WPM).
+        frequency           The frequency in Hz for the sidetone (defaults to 550 Hz).
+        messageCallback     A function which receives a dictionary with keys 'message', 'timings' and 'morse' for each decoded part (see MorseDecoder).
                             Its use here will result in a single character being returned each time.
 */
 export default class MorseKeyer {

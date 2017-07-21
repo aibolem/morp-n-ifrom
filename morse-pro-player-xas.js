@@ -73,6 +73,7 @@ export default class MorsePlayerXAS {
         this.audioServer.changeVolume(0);
     }
 
+    // Convenience method to help playing directly from a MorseCWWave instance.
     loadCWWave(cwWave) {
         this.load(cwWave.getSample(), cwWave.sampleRate);
     }

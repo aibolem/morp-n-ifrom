@@ -3,6 +3,10 @@
 
 /* jshint esversion: 6 */
 
+/*
+    Useful constants and functions for computing the speed of Morse code.
+*/
+
 const DITS_PER_WORD = 50;  // dits in "PARIS "
 const SPACES_IN_PARIS = 19;  // 5x 3-dit inter-character spaces + 1x 7-dit space
 const MS_IN_MINUTE = 60000;  // number of milliseconds in 1 minute

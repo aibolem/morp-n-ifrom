@@ -5,7 +5,7 @@
 
 /*
     Web browser sound player using Web Audio API.
-    Extends MorsePlayerWAA to provide callbacks when the sound goes on or off.
+    Extends MorsePlayerWAA to provide callbacks when the sound goes on or off and when the sound ends.
     Can be used to turn a light on or off in time with the Morse sound.
     The callbacks have an error of +/- 2.6ms
 
