@@ -112,11 +112,7 @@ var tidyText = function(text) {
     return text;
 };
 
-export function text2morse(text, useProsigns) {
-    if (typeof useProsigns === "undefined") {
-        useProsigns = true;
-    }
-
+export function text2morse(text, useProsigns = true) {
     text = tidyText(text);
     var ret = {
         morse: "",
@@ -187,11 +183,7 @@ var tidyMorse = function(morse) {
     return morse;
 };
 
-export function morse2text(morse, useProsigns) {
-    if (typeof useProsigns === "undefined") {
-        useProsigns = true;
-    }
-
+export function morse2text(morse, useProsigns = true) {
     morse = tidyMorse(morse);
     var ret = {
         morse: "",
