@@ -12,7 +12,7 @@ See the Licence for the specific language governing permissions and limitations 
 /* jshint esversion: 6 */
 
 /*
-    Class to convert create the on/off timings needed by e.g. sound generators.
+    Class to create the on/off timings needed by e.g. sound generators.
     Timings are in milliseconds; "off" timings are negative.
 
     Usage:
