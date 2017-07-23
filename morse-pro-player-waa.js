@@ -9,8 +9,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-/* jshint esversion: 6 */
-
 /*
     Web browser sound player using Web Audio API.
 
@@ -26,6 +24,7 @@ See the Licence for the specific language governing permissions and limitations 
     morsePlayerWAA.loadCWWave(morseCWWave);
     morsePlayerWAA.playFromStart();
 */
+
 export default class MorsePlayerWAA {
     constructor() {
         console.log("Trying Web Audio API (Oscillators)");

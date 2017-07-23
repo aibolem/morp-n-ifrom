@@ -9,7 +9,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-/* jshint esversion: 6 */
+import MorsePlayerWAA from 'morse-pro-player-waa';
 
 /*
     Web browser sound player using Web Audio API.
@@ -33,8 +33,6 @@ See the Licence for the specific language governing permissions and limitations 
     morsePlayerWAALight.loadCWWave(morseCWWave);
     morsePlayerWAA.playFromStart();
 */
-
-import MorsePlayerWAA from 'morse-pro-player-waa';
 
 export default class MorsePlayerWAALight extends MorsePlayerWAA {
     constructor(soundOnCallback, soundOffCallback, soundStoppedCallback) {

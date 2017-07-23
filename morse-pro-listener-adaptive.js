@@ -9,13 +9,15 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-/* jshint esversion: 6 */
-
 import MorseListener from 'morse-pro-listener';
 
 /*
-    bufferDuration      How long in ms to look back to find the frequency with the maximum volume
+    Extension of the MorseListener class which automatically adapts to the dominant frequency.
+
+    Additional arguments:
+        bufferDuration      How long in ms to look back to find the frequency with the maximum volume
 */
+
 export default class MorseAdaptiveListener extends MorseListener {
     constructor(
             fftSize,

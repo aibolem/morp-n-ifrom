@@ -9,8 +9,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-/* jshint esversion: 6 */
-
 import * as Morse from 'morse-pro';
 import * as WPM from 'morse-pro-wpm';
 
@@ -43,6 +41,7 @@ import * as WPM from 'morse-pro-wpm';
     decoder.flush();  // make sure all the data is pushed through the decoder
 
 */
+
 export default class MorseDecoder {
     constructor(wpm = 20, fwpm = wpm, messageCallback = undefined, speedCallback = undefined) {
         this._wpm = undefined;

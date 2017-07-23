@@ -9,8 +9,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-/* jshint esversion: 6 */
-
 import * as WPM from 'morse-pro-wpm';
 import MorseDecoder from 'morse-pro-decoder';
 import MorsePlayerWAA from 'morse-pro-player-waa';
@@ -26,6 +24,7 @@ import MorsePlayerWAA from 'morse-pro-player-waa';
         messageCallback     A function which receives a dictionary with keys 'message', 'timings' and 'morse' for each decoded part (see MorseDecoder).
                             Its use here will result in a single character being returned each time.
 */
+
 export default class MorseKeyer {
     constructor(keyCallback, wpm = 20, frequency = 550, messageCallback = undefined) {
         this.keyCallback = keyCallback;

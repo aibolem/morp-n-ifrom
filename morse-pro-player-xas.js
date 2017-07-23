@@ -9,8 +9,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-/* jshint esversion: 6 */
-
 /*
     Web browser sound player for older browsers, using XAudioJS by Grant Galitz (https://github.com/taisel/XAudioJS)
     Pass in the XAudioServer class.
@@ -28,6 +26,7 @@ See the Licence for the specific language governing permissions and limitations 
     morsePlayerXAS.load(morseCWWave);
     morsePlayerXAS.playFromStart();
 */
+
 export default class MorsePlayerXAS {
     constructor(xaudioServerClass) {
         this.xaudioServerClass = xaudioServerClass;

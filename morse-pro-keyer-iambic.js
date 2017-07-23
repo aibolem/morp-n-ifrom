@@ -9,8 +9,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-/* jshint esversion: 6 */
-
 import * as WPM from 'morse-pro-wpm';
 import MorseDecoder from 'morse-pro-decoder';
 import MorseKeyer from 'morse-pro-keyer';
@@ -22,6 +20,7 @@ import MorsePlayerWAA from 'morse-pro-player-waa';
     Set 'ditGoesFirst' to define whether to play dit or dah first.
     Arguments: see MorseKeyer
 */
+
 export default class MorseIambicKeyer extends MorseKeyer {
     constructor(keyCallback, wpm, frequency, messageCallback) {
         super(keyCallback, wpm, frequency, messageCallback);

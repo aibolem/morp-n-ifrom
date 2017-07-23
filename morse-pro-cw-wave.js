@@ -9,7 +9,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-/* jshint esversion: 6 */
+import MorseCW from 'morse-pro-cw';
 
 /*
     Class to create sine-wave samples of standard CW Morse.
@@ -22,8 +22,6 @@ See the Licence for the specific language governing permissions and limitations 
     morseCWWave.translate("abc");
     var sample = morseCWWave.getSample();
 */
-
-import MorseCW from 'morse-pro-cw';
 
 export default class MorseCWWave extends MorseCW {
     constructor(useProsigns, wpm, fwpm, frequency = 550, sampleRate = 8000) {

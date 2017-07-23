@@ -10,8 +10,6 @@
 * Public Domain
 */
 
-/*jshint esversion: 6 */
-
 /*
     Utility to create RIFF WAVE file data.
 

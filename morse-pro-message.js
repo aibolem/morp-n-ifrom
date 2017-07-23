@@ -9,7 +9,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-/* jshint esversion: 6 */
+import * as Morse from 'morse-pro';
 
 /*
     Class for conveniently translating to and from Morse code.
@@ -35,8 +35,6 @@ See the Licence for the specific language governing permissions and limitations 
     }
 
 */
-
-import * as Morse from 'morse-pro';
 
 export default class MorseMessage {
     constructor(useProsigns = true) {

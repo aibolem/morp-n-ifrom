@@ -9,7 +9,8 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-/* jshint esversion: 6 */
+import * as WPM from 'morse-pro-wpm';
+import MorseMessage from 'morse-pro-message';
 
 /*
     Class to create the on/off timings needed by e.g. sound generators.
@@ -23,9 +24,6 @@ See the Licence for the specific language governing permissions and limitations 
     morseCW.translate("abc");
     var timings = morseCW.getTimings();
 */
-
-import * as WPM from 'morse-pro-wpm';
-import MorseMessage from 'morse-pro-message';
 
 export default class MorseCW extends MorseMessage {
     constructor(useProsigns, wpm = 20, fwpm = wpm) {

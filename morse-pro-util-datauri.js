@@ -10,8 +10,6 @@
 * Public Domain
 */
 
-/* jshint esversion: 6 */
-
 /*
     Usage:
 
@@ -24,6 +22,7 @@
 
     var audio = new Audio(getDataURI(RiffWave.getData(morseCWWave), RiffWave.getMIMEType())); // create an HTML5 audio element
 */
+
 var Base64 = {
 
     chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",

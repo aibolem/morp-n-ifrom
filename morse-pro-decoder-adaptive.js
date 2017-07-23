@@ -9,8 +9,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-/* jshint esversion: 6 */
-
 import * as WPM from 'morse-pro-wpm';
 import MorseDecoder from 'morse-pro-decoder';
 
@@ -43,6 +41,7 @@ import MorseDecoder from 'morse-pro-decoder';
     decoder.flush();  // make sure all the data is pushed through the decoder
 
 */
+
 export default class MorseAdaptiveDecoder extends MorseDecoder {
     constructor(wpm, fwpm, bufferSize = 30, messageCallback = undefined, speedCallback = undefined) {
         super(wpm, fwpm, messageCallback, speedCallback);
