@@ -19,7 +19,7 @@
     },
     "directories": {
         "lib": "src",
-        "doc": "doc",
+        "doc": "doc"
     },
     "devDependencies": {
       "esdoc": "^0.5.2"
