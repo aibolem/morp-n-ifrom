@@ -16,11 +16,11 @@ See the Licence for the specific language governing permissions and limitations 
 export default class MorseListener {
     /**
      * @param {number} fftSize - Size of the discrete Fourier transform to use. Must be a power of 2 >= 256 (defaults to 256). A smaller fftSize gives better time resolution but worse frequency resolution.
-     * @param {number} volumeFilterMin - Sound less than this volume is ignored (in dB, defaults to -60).
-     * @param {number} volumeFilterMax - Sound greater than this volume is ignored (in dB, defaults to -30).
-     * @param {number} frequencyFilterMin - Sound less than this frequency is ignored (in Hz, defaults to 550).
-     * @param {number} frequencyFilterMax - Sound greater than this frequency is ignored (in Hz, defaults to 550).
-     * @param {number} volumeThreshold - If the volume is greater than this then the signal is taken as "on" (part of a dit or dah) (0-255, defaults to 220).
+     * @param {number} [volumeFilterMin=-60] - Sound less than this volume (in dB) is ignored.
+     * @param {number} [volumeFilterMax=-30] - Sound greater than this volume (in dB) is ignored.
+     * @param {number} [frequencyFilterMin=550] - Sound less than this frequency (in Hz) is ignored.
+     * @param {number} [frequencyFilterMax=550] - Sound greater than this frequency (in Hz) is ignored.
+     * @param {number} [volumeThreshold=220] - If the volume is greater than this then the signal is taken as "on" (part of a dit or dah) (range 0-255).
      * @param {Object} decoder - An instance of a configured decoder class.
      * @param {function()} spectrogramCallback - Called every time fftSize samples are read.
                                         Returns a dictionary:
@@ -179,7 +179,7 @@ export default class MorseListener {
     }
 
     /**
-     * @private
+     * @access: private
      */
     initialiseAudioNodes() {
         // set up a javascript node (BUFFER_SIZE, NUM_INPUTS, NUM_OUTPUTS)
@@ -267,7 +267,7 @@ export default class MorseListener {
 
     /**
      * This ScriptProcessorNode is called when it is full, we then actually look at the data in the analyserNode node to measure the volume in the frequency band of interest. We don't actually use the input or output of the ScriptProcesorNode.
-     * @private
+     * @access: private
      */
     processSound() {
         // get the data from the analyserNode node and put into frequencyData
@@ -297,7 +297,7 @@ export default class MorseListener {
 
     /**
      * Called each tick with whether the sound is judged to be on or off. If a change from on to off or off to on is detected then the number of ticks of the segment is passed to the decoder.
-     * @private
+     * @access: private
      */
     recordOnOrOff(soundIsOn) {
         if (this.notStarted) {

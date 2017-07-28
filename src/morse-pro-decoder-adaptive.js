@@ -34,7 +34,7 @@ import MorseDecoder from 'morse-pro-decoder';
  */
 export default class MorseAdaptiveDecoder extends MorseDecoder {
     /**
-     * @param {number} bufferSize - Size of the buffer to average over (defaults to 30)
+     * @param {number} [bufferSize=30] - Size of the buffer to average over
      */
     constructor(wpm, fwpm, bufferSize = 30, messageCallback = undefined, speedCallback = undefined) {
         super(wpm, fwpm, messageCallback, speedCallback);
@@ -46,6 +46,7 @@ export default class MorseAdaptiveDecoder extends MorseDecoder {
 
     /**
      * @override
+     * @access private
      */
     addDecode(duration, character) {
         super.addDecode(duration, character);

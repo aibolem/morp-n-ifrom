@@ -43,6 +43,7 @@ var split16bitArray = function(data) {
  * Convert PCM data to WAV file data.
  * @param {Object} morseCWWave - a MorseCWWave instance
  * @param {number} bitsPerSample - number of bits to use per sample (8 or 16), default is 8
+ * @return {number[]}
  */
 export function getData(morseCWWave, bitsPerSample = 8) {
     var data = morseCWWave.getPCMSample();

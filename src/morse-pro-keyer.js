@@ -40,9 +40,9 @@ import MorsePlayerWAA from 'morse-pro-player-waa';
 export default class MorseKeyer {
     /**
      * @param {function(): number} keyCallback - A function which should return 0, 1, 2, or 3 from the vitual "paddle" depending if nothing, a dit, a dah or both is detected. This implementation will play dits if both keys are detected.
-     * @param {number} wpm - Speed of the keyer (defaults to 20 WPM).
-     * @param {number} frequency - The frequency in Hz for the sidetone (defaults to 550 Hz).
-     * @param {function({message: string, timings: number[], morse: string})} messageCallback - A function which receives a dictionary with keys 'message', 'timings' and 'morse' for each decoded part (see MorseDecoder). Its use here will result in a single character being returned each time.
+     * @param {number} [wpm=20] - Speed of the keyer.
+     * @param {number} [frequency=550] - The frequency in Hz for the sidetone.
+     * @param {function(dict: {message: string, timings: number[], morse: string})} messageCallback - A function which receives a dictionary with keys 'message', 'timings' and 'morse' for each decoded part (see MorseDecoder). Its use here will result in a single character being returned each time.
      */
     constructor(keyCallback, wpm = 20, frequency = 550, messageCallback = undefined) {
         this.keyCallback = keyCallback;
@@ -59,7 +59,7 @@ export default class MorseKeyer {
     }
 
     /**
-     * @private
+     * @access: private
      */
     check() {
         var input = this.keyCallback();
@@ -95,7 +95,7 @@ export default class MorseKeyer {
     }
 
     /**
-     * @private
+     * @access: private
      */
     ditOrDah(input) {
         var dit;
@@ -108,7 +108,7 @@ export default class MorseKeyer {
     }
 
     /**
-     * Call this method when an initial key-press (or equivalent) is detected
+     * Call this method when an initial key-press (or equivalent) is detected.
      */
     start() {
         if (this.playing) {
@@ -133,7 +133,7 @@ export default class MorseKeyer {
 
     /**
      * Play a dit or dah sidetone.
-     * @private
+     * @access: private
      */
     playTone(isDit) {
         var duration = isDit ? this.ditLen : 3 * this.ditLen;

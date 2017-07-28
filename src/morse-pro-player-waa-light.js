@@ -46,7 +46,7 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
     }
 
     /**
-     * @private
+     * @access: private
      * @override
      */
     initialiseAudioNodes() {
@@ -66,7 +66,7 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
     }
 
     /**
-     * @private
+     * @access: private
      */
     processSound(event) {
         var input = event.inputBuffer.getChannelData(0);
@@ -84,7 +84,7 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
     }
 
     /**
-     * @private
+     * @access: private
      * @override
      */
     off() {

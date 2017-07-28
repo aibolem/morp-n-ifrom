@@ -37,7 +37,7 @@ export default class MorsePlayerWAA {
     }
 
     /**
-     * @private
+     * @access: private
      */
     initialiseAudioNodes() {
         this.audioContext = new this.audioContextClass();

@@ -34,7 +34,7 @@ import * as Morse from 'morse-pro';
  */
 export default class MorseMessage {
     /**
-     * @param {boolean} whether or not to include prosigns in the translations
+     * @param {boolean} [prosigns=true] - whether or not to include prosigns in the translations
      */
     constructor(useProsigns = true) {
         this.useProsigns = useProsigns;

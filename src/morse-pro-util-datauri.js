@@ -62,6 +62,11 @@ var Base64 = {
 };
 Base64.init();
 
+/**
+ * @param {number[]} data - list of bytes to encode
+ * @param {string} type - MIME-type of the data
+ * @return {string}
+ */
 export default function getDataURI(data, type) {
     return 'data:' + type + ';base64,' + Base64.encode(data);
 }

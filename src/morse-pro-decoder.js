@@ -32,10 +32,10 @@ import * as WPM from 'morse-pro-wpm';
  */
 export default class MorseDecoder {
     /**
-     * @param {number} wpm - The speed of the Morse in words per minute (defaults to 20).
-     * @param {number} fwpm - The Farnsworth speed of the Morse in words per minute (defaults to wpm).
-     * @param {number} messageCallback - [optional] Callback executed when decoder buffer is flushed (every character). Returns dictionary with keys 'timings', 'morse' and 'message'
-     * @param {number} speedCallback - [optional] Callback executed if the wpm or fwpm speed changes. The speed in this class doesn't change by itself, but e.g. the fwpm can change if wpm is changed. Returned dictionary has keys 'fwpm' and 'wpm'.
+     * @param {number} [wpm=20] - The speed of the Morse in words per minute.
+     * @param {number} [fwpm=wpm] - The Farnsworth speed of the Morse in words per minute.
+     * @param {number} [messageCallback] - Callback executed when decoder buffer is flushed (every character). Returns dictionary with keys 'timings', 'morse' and 'message'
+     * @param {number} [speedCallback] - Callback executed if the wpm or fwpm speed changes. The speed in this class doesn't change by itself, but e.g. the fwpm can change if wpm is changed. Returned dictionary has keys 'fwpm' and 'wpm'.
     */
     constructor(wpm = 20, fwpm = wpm, messageCallback = undefined, speedCallback = undefined) {
         this._wpm = undefined;
@@ -59,7 +59,7 @@ export default class MorseDecoder {
     }
 
     /**
-     * @private
+     * @access private
      */
     updateThresholds() {
         this._ditDahThreshold = ((1 * this._ditLen) + (3 * this._ditLen)) / 2;
@@ -200,7 +200,7 @@ export default class MorseDecoder {
     }
 
     /**
-     * @private
+     * @access private
      */
     timings2morse(times) {
         var ditdah = "";
@@ -232,7 +232,7 @@ export default class MorseDecoder {
     }
 
     /**
-     * @private
+     * @access private
      */
     addDecode(duration, character) {
         this.timings.push(duration);
@@ -240,7 +240,7 @@ export default class MorseDecoder {
     }
 
     /**
-     * @private
+     * @access private
      */
     getTimings(character) {
         var ret = [];
@@ -260,18 +260,34 @@ export default class MorseDecoder {
         return this.getTimings('.');
     }
 
+    /**
+     * Get the millisecond timings of all durations determined to be dahs
+     * @return {number[]}
+     */
     get dahs() {
         return this.getTimings('-');
     }
 
+    /**
+     * Get the millisecond timings of all durations determined to be dit-spaces
+     * @return {number[]}
+     */
     get ditSpaces() {
         return this.getTimings('');
     }
 
+    /**
+     * Get the millisecond timings of all durations determined to be dah-spaces
+     * @return {number[]}
+     */
     get dahSpaces() {
         return this.getTimings(' ');
     }
 
+    /**
+     * Get the millisecond timings of all durations determined to be spaces
+     * @return {number[]}
+     */
     get spaces() {
         return this.getTimings('/');
     }
