@@ -12,20 +12,20 @@ See the Licence for the specific language governing permissions and limitations 
 import * as WPM from 'morse-pro-wpm';
 import MorseMessage from 'morse-pro-message';
 
-/*
-    Class to create the on/off timings needed by e.g. sound generators.
-    Timings are in milliseconds; "off" timings are negative.
-
-    Usage:
-
-    import MorseCW from 'morse-pro-cw';
-
-    var morseCW = new MorseCW();
-    morseCW.translate("abc");
-    var timings = morseCW.getTimings();
-*/
-
+/**
+ * Class to create the on/off timings needed by e.g. sound generators. Timings are in milliseconds; "off" timings are negative.
+ *
+ * @example
+ * import MorseCW from 'morse-pro-cw';
+ * var morseCW = new MorseCW();
+ * morseCW.translate("abc");
+ * var timings = morseCW.getTimings();
+ */
 export default class MorseCW extends MorseMessage {
+    /**
+     * @param {number} wpm - the speed in words per minute using PARIS as the standard word
+     * @param {number} fwpm - the Farnsworth speed in words per minute (defaults to wpm)
+     */
     constructor(useProsigns, wpm = 20, fwpm = wpm) {
         super(useProsigns);
         this.wpm = wpm;
@@ -55,10 +55,10 @@ export default class MorseCW extends MorseMessage {
     }
 
     /**
-    * Convert a morse string into an array of millisecond timings.
-    * With the Farnsworth method, the morse characters are played at one
-    * speed and the spaces between characters at a slower speed.
-    */
+     * Convert a morse string into an array of millisecond timings.
+     * With the Farnsworth method, the morse characters are played at one
+     * speed and the spaces between characters at a slower speed.
+     */
     getTimings() {
         var dit = WPM.ditLength(this._wpm);
         var r = WPM.ratio(this._wpm, this._fwpm);
@@ -67,13 +67,15 @@ export default class MorseCW extends MorseMessage {
     }
 
     /**
-    * Convert a morse string into an array of millisecond timings.
-    * dit - the length of a dit in milliseconds
-    * dah - the length of a dah in milliseconds (normally 3 * dit)
-    * ditSpace - the length of an intra-character space in milliseconds (1 * dit)
-    * charSpace - the length of an inter-character space in milliseconds (normally 3 * dit)
-    * wordSpace - the length of an inter-word space in milliseconds (normally 7 * dit)
-    */
+     * Convert a morse string into an array of millisecond timings.
+     * @param {number} dit - the length of a dit in milliseconds
+     * @param {number} dah - the length of a dah in milliseconds (normally 3 * dit)
+     * @param {number} ditSpace - the length of an intra-character space in milliseconds (1 * dit)
+     * @param {number} charSpace - the length of an inter-character space in milliseconds (normally 3 * dit)
+     * @param {number} wordSpace - the length of an inter-word space in milliseconds (normally 7 * dit)
+     *
+     * @TODO make a class method?
+     */
     getTimingsGeneral(dit, dah, ditSpace, charSpace, wordSpace) {
         console.log("Morse: " + this.morse);
 
@@ -108,6 +110,9 @@ export default class MorseCW extends MorseMessage {
         return times;
     }
 
+    /**
+     * Get the total duration of the message in ms
+     */
     getDuration() {
         var times = this.getTimings();
         var t = 0;
