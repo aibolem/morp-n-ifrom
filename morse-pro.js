@@ -12,11 +12,6 @@ See the Licence for the specific language governing permissions and limitations 
 /**
  * Basic methods to translate Morse code.
  */
-     text2ditdah(text, useProsigns)      Pass in a textual message and prosign Boolean; returns Morse in the form 'Dit-dah dah-dah'.
-    morse2text(morse, useProsigns)      Pass in Morse using the characters [.-/| ] and prosign Boolean. Returns dictionary the same as text2morse().
-    looksLikeMorse(input)               Pass in text; returns a Boolean, true if it is most likely Morse code.
-*/
-
 if (typeof(String.prototype.trim) === "undefined") {
     String.prototype.trim = function() {
         return String(this).replace(/^\s+|\s+$/g, '');
