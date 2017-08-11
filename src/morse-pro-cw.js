@@ -84,10 +84,10 @@ export default class MorseCW extends MorseMessage {
      * @TODO make a class method?
      */
     getTimingsGeneral(dit, dah, ditSpace, charSpace, wordSpace) {
-        console.log("Morse: " + this.morse);
+        //console.log("Morse: " + this.morse);
 
         if (this.hasError) {
-            console.log("Error in message: cannot compute timings");
+            console.log("Error in message, cannot compute timings: " + this.morse);
             return [];  // TODO: or throw exception?
         }
         var morse = this.morse.replace(/ \/ /g, '/');  // this means that a space is only used for inter-character
@@ -113,7 +113,7 @@ export default class MorseCW extends MorseMessage {
         if (times[times.length - 1] == -ditSpace) {
             times.pop();  // take off the last ditSpace
         }
-        console.log("Timings: " + times);
+        //console.log("Timings: " + times);
         return times;
     }
 
