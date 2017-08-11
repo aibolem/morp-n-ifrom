@@ -28,13 +28,14 @@
     "url": "https://github.com/scp93ch/morse-pro/issues"
   },
   "directories": {
-    "lib": "src",
+    "lib": "lib",
     "doc": "doc"
   },
   "files": [
-      "src"
+    "lib"
   ],
   "devDependencies": {
+    "babel-cli": "^6.24.1",
     "babel-preset-es2015": "^6.24.1",
     "babel-register": "^6.24.1",
     "esdoc": "^0.5.2",
@@ -45,6 +46,10 @@
     "destination": "./doc"
   },
   "scripts": {
-    "test": "mocha --require babel-register"
+    "clean": "rm -rf lib",
+    "prebuild": "npm run clean -s",
+    "build": "babel src -d lib",
+    "test": "mocha --require babel-register",
+    "prepublish": "npm run build"
   }
 }
