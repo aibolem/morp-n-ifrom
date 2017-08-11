@@ -9,8 +9,8 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-import * as WPM from 'morse-pro-wpm';
-import MorseMessage from 'morse-pro-message';
+import * as WPM from './morse-pro-wpm';
+import MorseMessage from './morse-pro-message';
 
 /**
  * Class to create the on/off timings needed by e.g. sound generators. Timings are in milliseconds; "off" timings are negative.
