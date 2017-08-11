@@ -32,7 +32,7 @@ describe('morse-pro-cw', function() {
 
     describe('getTimings()', function() {
         var tests = [
-            {morse: '.- . / .', wpm: 20, fwpm: 20, timings:  [60, -60, 180, -180, 60, -420, 60]},
+            {morse: '.- . / .', wpm: 20, fwpm: 20, timings: [60, -60, 180, -180, 60, -420, 60]},
             {morse: '.- . / .', wpm: 20, fwpm: 15, timings: [60, -60, 180, -338, 60, -788, 60]},
             {morse: '.- . / .', wpm: 10, fwpm: 10, timings: [120, -120, 360, -360, 120, -840, 120]}
         ];
