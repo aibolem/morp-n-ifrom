@@ -13,7 +13,7 @@ import MorsePlayerWAA from './morse-pro-player-waa';
 
 /**
  * Web browser sound player using Web Audio API.
- * Extends MorsePlayerWAA to provide callbacks when the sound goes on or off and when the sound ends.
+ * Extends MorsePlayerWAA to provide callbacks when the sound goes on or off and when the sequence ends.
  * Can be used to turn a light on or off in time with the Morse sound.
  * The callbacks have an error of +/- 2.6ms
  *
@@ -36,25 +36,33 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
      * @param {function()} soundOffCallback - function to call when a beep stops.
      * @param {function()} soundStoppedCallback - function to call when the sequence stops.
      */
-    constructor(soundOnCallback, soundOffCallback, soundStoppedCallback) {
-        super();
+    constructor(soundStoppedCallback, soundOnCallback, soundOffCallback, sequenceEndCallback) {
+        super(soundStoppedCallback);
         if (soundOnCallback !== undefined) this.soundOnCallback = soundOnCallback;
         if (soundOffCallback !== undefined) this.soundOffCallback = soundOffCallback;
-        if (soundStoppedCallback !== undefined) this.soundStoppedCallback = soundStoppedCallback;
+        if (sequenceEndCallback !== undefined) this.sequenceEndCallback = sequenceEndCallback;
         this.wasOn = false;
-        this.offCount = 0;
+        this.count = 0;
     }
 
     /**
      * @access: private
      * @override
      */
-    initialiseAudioNodes() {
-        super.initialiseAudioNodes();
+    _initialiseAudioNodes() {
+        super._initialiseAudioNodes();
         this.jsNode = this.audioContext.createScriptProcessor(256, 1, 1);
         this.jsNode.connect(this.audioContext.destination);  // otherwise Chrome ignores it
-        this.jsNode.onaudioprocess = this.processSound.bind(this);
+        this.jsNode.onaudioprocess = this._processSound.bind(this);
         this.splitterNode.connect(this.jsNode);
+    }
+
+    /**
+     * @override
+     */
+    load(timings, frequency) {
+        this._timings = timings;
+        super.load(timings, frequency);
     }
 
     /**
@@ -68,7 +76,7 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
     /**
      * @access: private
      */
-    processSound(event) {
+    _processSound(event) {
         var input = event.inputBuffer.getChannelData(0);
         var sum = 0;
         for (var i = 0; i < input.length; i++) {
@@ -76,9 +84,9 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
         }
         var on = (sum > 128);  // is more than half the buffer non-zero?
         if (on && !this.wasOn) {
-            this.soundOnCallback();
+            this._on();
         } else if (!on && this.wasOn) {
-            this.off();
+            this._off();
         }
         this.wasOn = on;
     }
@@ -87,16 +95,26 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
      * @access: private
      * @override
      */
-    off() {
-        this.offCount++;
-        this.soundOffCallback();
-        if (this.offCount * 2 === this.timings.length + 1) {
-            this.soundStoppedCallback();
+    _on() {
+        this.soundOnCallback(this._timings[this.count]);
+        this.count++;
+    }
+
+    /**
+     * @access: private
+     * @override
+     */
+    _off() {
+        this.soundOffCallback(this._timings[this.count]);
+        this.count++;
+        this.count %= this._timings.length;
+        if (this.count === 0) {
+            this.sequenceEndCallback();
         }
     }
 
     // empty callbacks in case user does not define any
     soundOnCallback() { }
     soundOffCallback() { }
-    soundStoppedCallback() { }
+    sequenceEndCallback() { }
 }

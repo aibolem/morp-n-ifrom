@@ -28,7 +28,7 @@ export default class MorsePlayerXAS {
      */
     constructor(xaudioServerClass) {
         this.xaudioServerClass = xaudioServerClass;
-        this.isPlayingB = false;
+        this._isPlaying = false;
         this.sample = [];
         this.volume = 1;  // not currently settable
         this.samplePos = undefined;
@@ -51,7 +51,7 @@ export default class MorsePlayerXAS {
                 that.samplePos += samplesToGenerate;
                 return ret;
             } else {
-                that.isPlayingB = false;
+                that._isPlaying = false;
                 return [];
             }
         };
@@ -64,7 +64,7 @@ export default class MorsePlayerXAS {
         setInterval(
             function () {
                 // Runs the check to see if we need to give more audio data to the lib
-                if (that.isPlayingB) {
+                if (that._isPlaying) {
                     that.audioServer.executeCallback();
                 }
             }, 20
@@ -74,7 +74,7 @@ export default class MorsePlayerXAS {
     }
 
     stop() {
-        this.isPlayingB = false;
+        this._isPlaying = false;
         this.audioServer.changeVolume(0);
     }
 
@@ -111,7 +111,7 @@ export default class MorsePlayerXAS {
 
     playFromStart() {
         this.stop();
-        this.isPlayingB = true;
+        this._isPlaying = true;
         this.samplePos = 0;
         this.audioServer.changeVolume(this.volume);
     }
@@ -120,11 +120,11 @@ export default class MorsePlayerXAS {
         return this.noAudio;
     }
 
-    isPlaying() {
-        return this.isPlayingB;
+    get isPlaying() {
+        return this._isPlaying;
     }
 
-    getAudioType() {
+    get audioType() {
         return this.audioServer.audioType;
         // 3: Audio element using media stream worker
         // 2: Flash

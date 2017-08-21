@@ -61,36 +61,39 @@ export default class MorseCW extends MorseMessage {
     }
 
     /**
-     * Convert a morse string into an array of millisecond timings.
+     * Return an array of millisecond timings.
      * With the Farnsworth method, the morse characters are played at one
      * speed and the spaces between characters at a slower speed.
+     * @param {string} [padding=''] - space to add to the end (either ' ' or '/'), useful if you want the sound to be able to loop
      * @return {number[]}
      */
-    getTimings() {
+    getTimings(padding = '') {
         var dit = WPM.ditLength(this._wpm);
         var r = WPM.ratio(this._wpm, this._fwpm);
         // slow down the spaces by this ratio
-        return this.getTimingsGeneral(dit, 3 * dit, dit, 3 * dit * r, 7 * dit * r);
+        return MorseCW.getTimingsGeneral(dit, 3 * dit, dit, 3 * dit * r, 7 * dit * r, this.morse, padding);
     }
 
     /**
-     * Convert a morse string into an array of millisecond timings.
+     * Return an array of millisecond timings.
+     * Each sound and space has a duration. The durations of the spaces are distinguished by being negative.
      * @param {number} dit - the length of a dit in milliseconds
      * @param {number} dah - the length of a dah in milliseconds (normally 3 * dit)
      * @param {number} ditSpace - the length of an intra-character space in milliseconds (1 * dit)
      * @param {number} charSpace - the length of an inter-character space in milliseconds (normally 3 * dit)
      * @param {number} wordSpace - the length of an inter-word space in milliseconds (normally 7 * dit)
+     * @param {string} morse - the morse code string (matching [.-/ ]*)
+     * @param {string} [padding=''] - space to add to the end (either ' ' or '/'), useful if you want the sound to be able to loop
      * @return {number[]}
-     * @TODO make a class method?
      */
-    getTimingsGeneral(dit, dah, ditSpace, charSpace, wordSpace) {
+    static getTimingsGeneral(dit, dah, ditSpace, charSpace, wordSpace, morse, padding = '') {
         //console.log("Morse: " + this.morse);
 
         if (this.hasError) {
             console.log("Error in message, cannot compute timings: " + this.morse);
             return [];  // TODO: or throw exception?
         }
-        var morse = this.morse.replace(/ \/ /g, '/');  // this means that a space is only used for inter-character
+        morse = morse.replace(/ \/ /g, '/');  // this means that a space is only used for inter-character
         var times = [];
         var c;
         for (var i = 0; i < morse.length; i++) {
@@ -113,6 +116,13 @@ export default class MorseCW extends MorseMessage {
         if (times[times.length - 1] == -ditSpace) {
             times.pop();  // take off the last ditSpace
         }
+
+        if (padding === ' ') {
+            times.push(-charSpace);
+        } else if (padding === '/') {
+            times.push(-wordSpace);
+        }
+
         //console.log("Timings: " + times);
         return times;
     }
