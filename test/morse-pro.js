@@ -55,6 +55,8 @@ describe('morse-pro', function() {
             {args: ['.-.-.-.-.-.-'], expected: {morse: '#.-.-.-.-.-.-#', message: '#', hasError: true}},
             {args: [' ...'], expected: {morse: '...', message: 'S', hasError: false}},
             {args: ['... '], expected: {morse: '...', message: 'S', hasError: false}},
+            {args: ['/ ...'], expected: {morse: '...', message: 'S', hasError: false}},
+            {args: ['... /'], expected: {morse: '...', message: 'S', hasError: false}},
             {args: ['... ...'], expected: {morse: '... ...', message: 'SS', hasError: false}},
             {args: ['...  ...'], expected: {morse: '... ...', message: 'SS', hasError: false}},
             {args: ['... / ...'], expected: {morse: '... / ...', message: 'S S', hasError: false}},

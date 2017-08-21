@@ -186,10 +186,8 @@ var tidyMorse = function(morse) {
     morse = morse.replace(/\//g, " / "); // make sure word separators are spaced out
     morse = morse.replace(/\s+/g, " "); // squash multiple spaces into single spaces
     morse = morse.replace(/(\/ )+\//g, "/"); // squash multiple word separators
-    //morse = morse.replace(/^ \/ /, "");  // remove initial word separators
-    //morse = morse.replace(/ \/ $/, "");  // remove trailing word separators
-    morse = morse.replace(/^\s+/, "");
-    morse = morse.replace(/\s+$/, "");
+    morse = morse.replace(/^[\s\/]+/, "");  // remove iniial whitespace
+    morse = morse.replace(/[\s\/]+$/, "");  // remove trailing whitespace
     morse = morse.replace(/_/g, "-"); // unify the dash character
     return morse;
 };
