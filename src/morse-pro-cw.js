@@ -120,7 +120,7 @@ export default class MorseCW extends MorseMessage {
         if (padding === ' ') {
             times.push(-charSpace);
         } else if (padding === '/') {
-            times.push(-wordSpace);
+            times.push(-wordSpace * 3);  // TODO: fix this hack
         }
 
         //console.log("Timings: " + times);

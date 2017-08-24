@@ -22,7 +22,9 @@ See the Licence for the specific language governing permissions and limitations 
  * morsePlayerWAA.playFromStart();
  */
 export default class MorsePlayerWAA {
-    constructor(soundStoppedCallback) {
+    constructor(sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback) {
+        if (sequenceStartCallback !== undefined) this.sequenceStartCallback = sequenceStartCallback;
+        if (sequenceEndingCallback !== undefined) this.sequenceEndingCallback = sequenceEndingCallback;
         if (soundStoppedCallback !== undefined) this.soundStoppedCallback = soundStoppedCallback;
         this._noAudio = false;
         console.log("Trying Web Audio API (Oscillators)");
@@ -40,8 +42,9 @@ export default class MorsePlayerWAA {
         this._isPaused = false;
         this._volume = 1;
         this._lookAheadTime = 0.1;  // seconds
-        this._timerInterval = 50;  // milliseconds
+        this._timerInterval = 0.05;  // seconds
         this._timer = undefined;
+        this._stopTimer = undefined;
     }
 
     /**
@@ -68,12 +71,14 @@ export default class MorsePlayerWAA {
     /**
      * Convenience method to help playing directly from a MorseCWWave instance.
      * @param {Object} cwWave - a MorseCWWave instance
+     * @param {Boolean} append - if true then the data will be added to the end of the existing data
      */
     loadCWWave(cwWave) {
-        this.load(cwWave.getTimings('/'), cwWave.frequency);
+        this.load(cwWave.getTimings('/'));
+        this.frequency = cwWave.frequency;
     }
 
-    load(timings, frequency) {
+    load(timings) {
         // console.log('Timings: ' + timings);
         this._cTimings = [0];
         this.isNote = [];
@@ -82,7 +87,10 @@ export default class MorsePlayerWAA {
             this.isNote[i] = timings[i] > 0;
         }
         this.sequenceLength = this.isNote.length;
-        this.frequency = frequency;
+    }
+
+    loadNext(timings) {
+        this.upNext = timings;
     }
 
     playFromStart() {
@@ -93,7 +101,7 @@ export default class MorsePlayerWAA {
         this.stop();
 
         this._initialiseAudioNodes();
-        this.nextNote = 0;
+        this._nextNote = 0;
         this._isPlaying = true;
         this._isPaused = true;  // to make play() work
         this.play();
@@ -108,12 +116,14 @@ export default class MorsePlayerWAA {
             //  if we're not actually paused then ignore this
             return;
         }
-        this._isPaused = false;
-        this.timeBase = this.audioContext.currentTime - this._cTimings[this.nextNote] + 0.2;  // add a bit on to make sure we get the first note
+        clearInterval(this._stopTimer);  // if we were going to send a soundStoppedCallback then don't
+        clearInterval(this._startTimer);  // ditto
         clearInterval(this._timer);
+        this._isPaused = false;
+        this.timeBase = this.audioContext.currentTime - this._cTimings[this._nextNote] + 0.2;  // add a bit on to make sure we get the first note
         this._timer = setInterval(function () {
             this._scheduleNotes();
-        }.bind(this), this._timerInterval);
+        }.bind(this), 1000 * this._timerInterval);
     }
 
     pause() {
@@ -123,6 +133,14 @@ export default class MorsePlayerWAA {
         }
         this._isPaused = true;
         clearInterval(this._timer);
+
+        // ensure that the next note that is scheduled is a beep, not a pause (to help sync with vibration patterns)
+        if (!this.isNote[this._nextNote]) {
+            this._nextNote++;
+            if (this.loop) {
+                this._nextNote %= this.sequenceLength;
+            }
+        }
     }
 
     stop() {
@@ -134,6 +152,7 @@ export default class MorsePlayerWAA {
             this.soundStoppedCallback();
         }
     }
+
     /**
      * Schedule the next few notes up to now + lookAheadTime.
      * @access: private
@@ -141,29 +160,48 @@ export default class MorsePlayerWAA {
     _scheduleNotes() {
         var now = this.audioContext.currentTime;
         //console.log('Scheduling:');
-        while (this.nextNote < this.sequenceLength && (this._cTimings[this.nextNote] < now - this.timeBase + this._lookAheadTime)) {
-            //console.log(this.nextNote + ' at ' + this._cTimings[this.nextNote] + ' for ' + (this._cTimings[this.nextNote + 1] - this._cTimings[this.nextNote]) + ' ' +  this.isNote[this.nextNote]);
-            if (this.isNote[this.nextNote]) {
+        while (this._nextNote < this.sequenceLength && (this._cTimings[this._nextNote] < now - this.timeBase + this._lookAheadTime)) {
+            //console.log(this._nextNote + ' at ' + this._cTimings[this._nextNote] + ' for ' + (this._cTimings[this._nextNote + 1] - this._cTimings[this._nextNote]) + ' ' +  this.isNote[this._nextNote]);
+            if (this._nextNote === 0 && !this.sequenceStartCallbackFired) {
+                // when scheduling the first note, schedule a callback as well
+                this._startTimer = setTimeout(function() {
+                    this.sequenceStartCallback();
+                }.bind(this), 1000 * (this.timeBase - now + this._cTimings[this._nextNote]));
+                this.sequenceStartCallbackFired = true;
+                this.sequenceEndingCallbackFired = false;
+            }
+            if (this.isNote[this._nextNote]) {
                 var oscillator = this.audioContext.createOscillator();
                 oscillator.type = 'sine';
                 oscillator.frequency.value = this.frequency;
                 oscillator.connect(this.splitterNode);
-                oscillator.start(this.timeBase + this._cTimings[this.nextNote]);
-                oscillator.stop(this.timeBase + this._cTimings[this.nextNote + 1]);
+                oscillator.start(this.timeBase + this._cTimings[this._nextNote]);
+                oscillator.stop(this.timeBase + this._cTimings[this._nextNote + 1]);
             }
-            this.nextNote++;
-            if (this.loop && this.nextNote === this.sequenceLength) {
-                this.timeBase += this._cTimings[this.nextNote];
-                this.nextNote = 0;
+            this._nextNote++;
+            if (this._nextNote === this.sequenceLength) {
+                if (this.loop || this.upNext !== undefined) {
+                    this.timeBase += this._cTimings[this._nextNote];
+                    this._nextNote = 0;
+                    if (this.upNext !== undefined) {
+                        this.load(this.upNext);
+                        this.upNext = undefined;
+                    }
+                }
             }
         }
-        if (this.nextNote === this.sequenceLength) {
+        if (this._nextNote === this.sequenceLength) {
             // then all notes have been scheduled and we are not looping
             clearInterval(this._timer);
-            // stop() at now + lookAheadTime + length of last note (milliseconds)
-            setTimeout(function() {
+            // schedule stop() at now + lookAheadTime + length of last note (milliseconds)
+            this._stopTimer = setTimeout(function() {
                 this.stop();
             }.bind(this), 1000 * (this._lookAheadTime + this._cTimings[this.sequenceLength] - this._cTimings[this.sequenceLength - 1]));
+        } else if (now - this.timeBase + this._timerInterval + this._lookAheadTime > this._cTimings[this.sequenceLength - 1] && !this.sequenceEndingCallbackFired) {
+            // then we are going to schedule the last note in the sequence next time
+            this.sequenceEndingCallback();
+            this.sequenceStartCallbackFired = false;
+            this.sequenceEndingCallbackFired = true;
         }
     }
 
@@ -179,6 +217,10 @@ export default class MorsePlayerWAA {
         return this._isPaused;
     }
 
+    get nextNote() {
+        return this._nextNote;
+    }
+
     get audioType() {
         return 4;
         // 4: Web Audio API using oscillators
@@ -190,5 +232,7 @@ export default class MorsePlayerWAA {
     }
 
     // empty callbacks in case user does not define any
+    sequenceStartCallback() { }
+    sequenceEndingCallback() { }
     soundStoppedCallback() { }
 }

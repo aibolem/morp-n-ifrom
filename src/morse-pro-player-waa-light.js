@@ -36,11 +36,10 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
      * @param {function()} soundOffCallback - function to call when a beep stops.
      * @param {function()} soundStoppedCallback - function to call when the sequence stops.
      */
-    constructor(soundStoppedCallback, soundOnCallback, soundOffCallback, sequenceEndCallback) {
-        super(soundStoppedCallback);
+    constructor(sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback, soundOnCallback, soundOffCallback) {
+        super(sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback);
         if (soundOnCallback !== undefined) this.soundOnCallback = soundOnCallback;
         if (soundOffCallback !== undefined) this.soundOffCallback = soundOffCallback;
-        if (sequenceEndCallback !== undefined) this.sequenceEndCallback = sequenceEndCallback;
         this.wasOn = false;
         this.count = 0;
     }
@@ -96,8 +95,11 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
      * @override
      */
     _on() {
+        // if (this.count === 0) {
+        //     this.sequenceStartCallback();
+        // }
         this.soundOnCallback(this._timings[this.count]);
-        this.count++;
+        this.count = (this.count + 1) % this._timings.length;
     }
 
     /**
@@ -106,15 +108,14 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
      */
     _off() {
         this.soundOffCallback(this._timings[this.count]);
-        this.count++;
-        this.count %= this._timings.length;
-        if (this.count === 0) {
-            this.sequenceEndCallback();
-        }
+        this.count = (this.count + 1) % this._timings.length;
+        // if (this.count === 0) {
+        //     this.sequenceEndCallback();
+        // }
     }
 
     // empty callbacks in case user does not define any
     soundOnCallback() { }
     soundOffCallback() { }
-    sequenceEndCallback() { }
+    // sequenceEndCallback() { }
 }
