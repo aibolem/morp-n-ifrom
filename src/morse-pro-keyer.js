@@ -47,9 +47,9 @@ export default class MorseKeyer {
     constructor(keyCallback, wpm = 20, frequency = 550, messageCallback = undefined) {
         this.keyCallback = keyCallback;
         this.wpm = wpm;
-        this.frequency = frequency;
 
         this.player = new MorsePlayerWAA();
+        this.player.frequency = frequency;
         this.decoder = new MorseDecoder(this.wpm);
         this.decoder.messageCallback = messageCallback;
         this.decoder.noiseThreshold = 0;
@@ -137,7 +137,7 @@ export default class MorseKeyer {
      */
     playTone(isDit) {
         var duration = isDit ? this.ditLen : 3 * this.ditLen;
-        this.player.load([duration], this.frequency);
+        this.player.load([duration]);
         this.player.playFromStart();
     }
 }

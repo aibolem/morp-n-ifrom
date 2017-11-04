@@ -59,9 +59,9 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
     /**
      * @override
      */
-    load(timings, frequency) {
+    load(timings) {
         this._timings = timings;
-        super.load(timings, frequency);
+        super.load(timings);
     }
 
     /**
