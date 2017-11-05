@@ -82,45 +82,49 @@ export default class MorseCW extends MorseMessage {
      * @param {number} ditSpace - the length of an intra-character space in milliseconds (1 * dit)
      * @param {number} charSpace - the length of an inter-character space in milliseconds (normally 3 * dit)
      * @param {number} wordSpace - the length of an inter-word space in milliseconds (normally 7 * dit)
-     * @param {string} morse - the morse code string (matching [.-/ ]*)
-     * @param {string} [padding=''] - space to add to the end (either ' ' or '/'), useful if you want the sound to be able to loop
+     * @param {string} morse - the (canonical) morse code string (matching [.-/ ]*)
+     * @param {string} [padding=''] - space to add to the end (matching [ /]*), useful if you want the sound to be able to loop
      * @return {number[]}
      */
     static getTimingsGeneral(dit, dah, ditSpace, charSpace, wordSpace, morse, padding = '') {
-        //console.log("Morse: " + this.morse);
+        //console.log("Morse: " + morse);
 
         if (this.hasError) {
             console.log("Error in message, cannot compute timings: " + this.morse);
             return [];  // TODO: or throw exception?
         }
         morse = morse.replace(/ \/ /g, '/');  // this means that a space is only used for inter-character
+        morse = morse.replace(/([\.\-])(?=[\.\-])/g, "$1+");  // put a + in between all dits and dahs
+        morse += padding;
         var times = [];
         var c;
         for (var i = 0; i < morse.length; i++) {
-            c = morse[i];
-            if (c == "." || c == '-') {
-                if (c == '.') {
+            switch (morse[i]) {
+                case '.':
                     times.push(dit);
-                } else  {
+                    break;
+                case '-':
                     times.push(dah);
-                }
-                times.push(-ditSpace);
-            } else if (c == " ") {
-                times.pop();
-                times.push(-charSpace);
-            } else if (c == "/") {
-                times.pop();
-                times.push(-wordSpace);
+                    break;
+                case '+':
+                    times.push(-ditSpace);
+                    break;
+                case " ":
+                    times.push(-charSpace);
+                    break;
+                case "/":
+                    times.push(-wordSpace);
+                    break;
             }
         }
-        if (times[times.length - 1] == -ditSpace) {
-            times.pop();  // take off the last ditSpace
-        }
 
-        if (padding === ' ') {
-            times.push(-charSpace);
-        } else if (padding === '/') {
-            times.push(-wordSpace * 3);  // TODO: fix this hack
+        // If the padding has introduced several spaces on the end then add them all up
+        var lastSpace = 0;
+        while (times[times.length - 1] < 0) {
+            lastSpace += times.pop();
+        }
+        if (lastSpace < 0) {
+            times.push(lastSpace);
         }
 
         //console.log("Timings: " + times);

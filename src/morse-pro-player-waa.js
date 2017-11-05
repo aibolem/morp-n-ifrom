@@ -71,10 +71,9 @@ export default class MorsePlayerWAA {
     /**
      * Convenience method to help playing directly from a MorseCWWave instance.
      * @param {Object} cwWave - a MorseCWWave instance
-     * @param {Boolean} append - if true then the data will be added to the end of the existing data
      */
     loadCWWave(cwWave) {
-        this.load(cwWave.getTimings('/'));
+        this.load(cwWave.getTimings('///'));  // TODO: get the padding out of here and into the trainer
         this.frequency = cwWave.frequency;
     }
 
