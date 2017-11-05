@@ -180,22 +180,26 @@ export function text2ditdah(text, useProsigns) {
     return ditdah;
 }
 
+/**
+ * Canonicalise morse text.
+ * Canonical form matches [.-/ ]*, has single spaces between characters, has words separated by ' / ', and has no spaces at the start or end.
+ * A single '/' may be returned by this function.
+ */
 var tidyMorse = function(morse) {
-    morse = morse.trim();
     morse = morse.replace(/\|/g, "/"); // unify the word separator
     morse = morse.replace(/\//g, " / "); // make sure word separators are spaced out
     morse = morse.replace(/\s+/g, " "); // squash multiple spaces into single spaces
     morse = morse.replace(/(\/ )+\//g, "/"); // squash multiple word separators
-    morse = morse.replace(/^[\s\/]+/, "");  // remove iniial whitespace
-    morse = morse.replace(/[\s\/]+$/, "");  // remove trailing whitespace
     morse = morse.replace(/_/g, "-"); // unify the dash character
+    morse = morse.replace(/^\s+/, "");  // remove initial whitespace
+    morse = morse.replace(/\s+$/, "");  // remove trailing whitespace
     return morse;
 };
 
 /**
- * Translate morse to text.
+ * Translate morse to text. Canonicalise the morse first.
  * If something in the morse is untranslatable then it is surrounded by hash-signs ('#') and a hash is placed in the text.
- * @param {string} morse - morse message using [.-_/|] characters
+ * @param {string} morse - morse message using [.-_/| ] characters
  * @param {Boolean} useProsigns - true if prosigns are to be used (default is true)
  * @return {{message: string, morse: string, hasError: boolean}}
  */
