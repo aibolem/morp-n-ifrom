@@ -70,11 +70,11 @@ export default class MorseKeyer {
         }
         if (input === 0) {
             // If no keypress is detected then continue pushing chunks of silence to the decoder to complete the character and add a space
-            this.playing = false;  // make the keyer interupterable so this the next character can start
-            this.lastTime = (new Date()).getTime();  // time marking the end of the last data this was last pushed to decoder
+            this.playing = false;  // make the keyer interuptable so this the next character can start
+            this.lastTime = (new Date()).getTime();  // time marking the end of the last data that was last pushed to decoder
             if (this.spaceCounter < 3) {
                 this.spaceCounter++;
-                this.timer = setTimeout(this.check.bind(this), 2 * this.ditLen);  // keep pushing up to 3 dah-spaces to complete character or word
+                this.timer = setTimeout(this.check.bind(this), 2 * this.ditLen);  // keep pushing up to 6 dit-spaces to complete character or word
             } else {
                 this.stop();
             }
@@ -138,6 +138,6 @@ export default class MorseKeyer {
     playTone(isDit) {
         var duration = isDit ? this.ditLen : 3 * this.ditLen;
         this.player.load([duration]);
-        this.player.playFromStart();
+        this.player.playNow();
     }
 }

@@ -92,6 +92,9 @@ export default class MorsePlayerWAA {
         this.upNext = timings;
     }
 
+    /**
+     * Plays the loaded timing sequence from the start, regardless of whether playback is ongoing or paused.
+     */
     playFromStart() {
         if (this._noAudio || this._cTimings.length === 0) {
             return;
@@ -106,6 +109,10 @@ export default class MorsePlayerWAA {
         this.play();
     }
 
+    /**
+     * Starts or resumes playback of the loaded timing sequence.
+     * A complex series of interupt timers is used to provide playback and this introduces a small delay at the start. If immediate playback is required then used the playNow() method.
+     */
     play() {
         if (!this._isPlaying) {
             // if we're not actually playing then play from start
@@ -123,6 +130,39 @@ export default class MorsePlayerWAA {
         this._timer = setInterval(function () {
             this._scheduleNotes();
         }.bind(this), 1000 * this._timerInterval);
+    }
+
+    /**
+     * This method interupts any other playback going on and plays the timing sequence immediately without using any timing interupts.
+     * The method should be used when other code is taking care of some of the timing and needs an instant response, e.g. from a keyer.
+     * The pause() method will not work in conjunction with this method.
+     * The _isPlaying variable will remain true when playback stops.
+     * TODO: should this simpler/faster method go into a different class?
+     */
+    playNow() {
+        if (this._noAudio || this._cTimings.length === 0) {
+            return;
+        }
+
+        this.stop();
+        this._initialiseAudioNodes();
+        this._isPlaying = true;
+
+        var cumT = this.audioContext.currentTime;
+        for (var t = 0; t < this._cTimings.length; t += 1) {
+            var duration = this._cTimings[t];
+            if (duration > 0) {
+                var oscillator = this.audioContext.createOscillator();
+                oscillator.type = 'sine';
+                oscillator.frequency.value = this.frequency;
+                oscillator.connect(this.splitterNode);
+                oscillator.start(cumT);
+                oscillator.stop(cumT + duration);
+                cumT += duration;
+            } else {
+                cumT += -duration;
+            }
+        }
     }
 
     pause() {

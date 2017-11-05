@@ -39,6 +39,7 @@ export default class MorseIambicKeyer extends MorseKeyer {
     }
 
     /**
+     * @override
      * @access private
      */
     ditOrDah(input) {
@@ -62,6 +63,7 @@ export default class MorseIambicKeyer extends MorseKeyer {
 
     /**
      * Call this method when a key-press (or equivalent) is detected
+     * @override
      */
     start() {
         if (!this.playing) {
