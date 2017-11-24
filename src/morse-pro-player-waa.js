@@ -52,9 +52,13 @@ export default class MorsePlayerWAA {
      */
     _initialiseAudioNodes() {
         this.audioContext = new this.audioContextClass();
-        this.splitterNode = this.audioContext.createGain();  // this is here to attach other nodes to in subclass
-        this.gainNode = this.audioContext.createGain();  // this is actually used for volume
-        this.splitterNode.connect(this.gainNode);
+        this.splitterNode = this.audioContext.createGain();  // this node is here to attach other nodes to in subclass
+        this.lowPassNode = this.audioContext.createBiquadFilter();
+        this.lowPassNode.type = "lowpass";
+        this.lowPassNode.frequency.value = this.frequency * 1.5;  // TODO: remove this magic number and make the filter configurable
+        this.gainNode = this.audioContext.createGain();  // this node is actually used for volume
+        this.splitterNode.connect(this.lowPassNode);
+        this.lowPassNode.connect(this.gainNode);
         this.gainNode.connect(this.audioContext.destination);
         this.gainNode.gain.value = this._volume;
     }
