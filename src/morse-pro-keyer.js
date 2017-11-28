@@ -138,6 +138,6 @@ export default class MorseKeyer {
     playTone(isDit) {
         var duration = isDit ? this.ditLen : 3 * this.ditLen;
         this.player.load([duration]);
-        this.player.playNow();
+        this.player.playFromStart();
     }
 }
