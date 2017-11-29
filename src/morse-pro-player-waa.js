@@ -135,7 +135,7 @@ export default class MorsePlayerWAA {
         clearInterval(this._startTimer);  // ditto
         clearInterval(this._timer);
         this._isPaused = false;
-        this._tZero = this.audioContext.currentTime;
+        this._tZero = this.audioContext.currentTime - this._cTimings[this._nextNote];
         // schedule the first note ASAP (directly) and then if there is more to schedule, set up an interval timer
         if (this._scheduleNotes()) {
             this._timer = setInterval(function () {
@@ -156,6 +156,7 @@ export default class MorsePlayerWAA {
         clearInterval(this._timer);
 
         // ensure that the next note that is scheduled is a beep, not a pause (to help sync with vibration patterns)
+        // TODO: needs to use the same code as in _scheduleNotes to deal with upNext
         if (!this.isNote[this._nextNote]) {
             this._nextNote++;
             if (this.loop) {
@@ -172,6 +173,8 @@ export default class MorsePlayerWAA {
             this._isPlaying = false;
             this._isPaused = false;
             clearInterval(this._timer);
+            clearInterval(this._stopTimer);
+            clearInterval(this._startTimer);
             this.audioContext.close();
             this.soundStoppedCallback();
         }
@@ -188,9 +191,9 @@ export default class MorsePlayerWAA {
         while (this._nextNote < this.sequenceLength && (this._cTimings[this._nextNote] < now - this._tZero + this._lookAheadTime)) {
             // console.log('T: ' + Math.round(1000 * now)/1000 + ' (+' + Math.round(1000 * (now - this._tZero))/1000 + ')');
             // console.log(this._nextNote + ': ' + 
-                // (this.isNote[this._nextNote] ? 'Note  ' : 'Pause ') + 
-                // Math.round(1000 * this._cTimings[this._nextNote])/1000 + ' - ' + Math.round(1000 * this._cTimings[this._nextNote + 1])/1000 + 
-                // ' (' + Math.round(1000 * (this._cTimings[this._nextNote + 1] - this._cTimings[this._nextNote]))/1000 + ')');
+            //     (this.isNote[this._nextNote] ? 'Note  ' : 'Pause ') + 
+            //     Math.round(1000 * this._cTimings[this._nextNote])/1000 + ' - ' + Math.round(1000 * this._cTimings[this._nextNote + 1])/1000 + 
+            //     ' (' + Math.round(1000 * (this._cTimings[this._nextNote + 1] - this._cTimings[this._nextNote]))/1000 + ')');
             if (this._nextNote === 0 && !this.sequenceStartCallbackFired) {
                 // when scheduling the first note, schedule a callback as well
                 this._startTimer = setTimeout(function() {
