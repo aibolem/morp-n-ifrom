@@ -13,7 +13,7 @@ import MorsePlayerWAA from './morse-pro-player-waa';
 
 /**
  * Web browser sound player using Web Audio API.
- * Extends MorsePlayerWAA to provide callbacks when the sound goes on or off and when the sequence ends.
+ * Extends MorsePlayerWAA to provide callbacks when the sound goes on or off.
  * Can be used to turn a light on or off in time with the Morse sound.
  * The callbacks have an error of +/- 2.6ms
  *
@@ -32,9 +32,11 @@ import MorsePlayerWAA from './morse-pro-player-waa';
  */
 export default class MorsePlayerWAALight extends MorsePlayerWAA {
     /**
-     * @param {function()} soundOnCallback - function to call when a beep starts.
-     * @param {function()} soundOffCallback - function to call when a beep stops.
-     * @param {function()} soundStoppedCallback - function to call when the sequence stops.
+     * @param {function()} [sequenceStartCallback] - function to call each time the sequence starts.
+     * @param {function()} [sequenceEndingCallback] - function to call when the sequence is nearing the end.
+     * @param {function()} [soundStoppedCallback] - function to call when the sequence stops.
+     * @param {function()} [soundOnCallback] - function to call when a beep starts.
+     * @param {function()} [soundOffCallback] - function to call when a beep stops
      */
     constructor(sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback, soundOnCallback, soundOffCallback) {
         super(sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback);
@@ -45,6 +47,7 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
     }
 
     /**
+     * Set up the audio graph, connecting the splitter node to a JSNode in order to analyse the waveform
      * @access: private
      * @override
      */

@@ -34,7 +34,8 @@ export default class MorseCWWave extends MorseCW {
     }
 
     /**
-     * @return {number[]} an array of floats in range is [-1, 1] representing the wave-form, suitable for XAudioJS.
+     * Get a sample waveform, not using Web Audio API (synchronous).
+     * @return {number[]} an array of floats in range [-1, 1] representing the wave-form.
      */
     getSample() {
         var sample = [];

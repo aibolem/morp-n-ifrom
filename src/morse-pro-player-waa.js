@@ -22,6 +22,11 @@ See the Licence for the specific language governing permissions and limitations 
  * morsePlayerWAA.playFromStart();
  */
 export default class MorsePlayerWAA {
+    /**
+     * @param {function()} [sequenceStartCallback] - function to call each time the sequence starts.
+     * @param {function()} [sequenceEndingCallback] - function to call when the sequence is nearing the end.
+     * @param {function()} [soundStoppedCallback] - function to call when the sequence stops.
+     */
     constructor(sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback) {
         if (sequenceStartCallback !== undefined) this.sequenceStartCallback = sequenceStartCallback;
         if (sequenceEndingCallback !== undefined) this.sequenceEndingCallback = sequenceEndingCallback;
@@ -49,6 +54,7 @@ export default class MorsePlayerWAA {
     }
 
     /**
+     * Set up the audio graph
      * @access: private
      */
     _initialiseAudioNodes() {
@@ -56,11 +62,13 @@ export default class MorsePlayerWAA {
         this.splitterNode = this.audioContext.createGain();  // this node is here to attach other nodes to in subclass
         this.lowPassNode = this.audioContext.createBiquadFilter();
         this.lowPassNode.type = "lowpass";
+        // TODO: [Deprecation] BiquadFilterNode.frequency.value setter smoothing is deprecated
         this.lowPassNode.frequency.value = this.frequency * 1.5;  // TODO: remove this magic number and make the filter configurable
         this.gainNode = this.audioContext.createGain();  // this node is actually used for volume
         this.splitterNode.connect(this.lowPassNode);
         this.lowPassNode.connect(this.gainNode);
         this.gainNode.connect(this.audioContext.destination);
+        // TODO: [Deprecation] GainNode.gain.value setter smoothing is deprecated and will be removed in M64, around January 2018.
         this.gainNode.gain.value = this._volume * 0.813;  // multiply by 0.813 to reduce gain added by lowpass filter and avoid clipping
     }
 
@@ -73,12 +81,15 @@ export default class MorsePlayerWAA {
         this.gainNode.gain.value = this._volume;
     }
 
+    /**
+     * @returns {number} the current volume [0,1]
+     */
     get volume() {
         return this._volume;
     }
 
     /**
-     * Convenience method to help playing directly from a MorseCWWave instance.
+     * Convenience method to help playing directly from a MorseCWWave instance. Uses the CWWave timings and frequency.
      * Adds a silent element to the end of the sequence, as defined by loopPause variable.
      * @param {Object} cwWave - a MorseCWWave instance
      */
@@ -87,6 +98,10 @@ export default class MorsePlayerWAA {
         this.frequency = cwWave.frequency;
     }
 
+    /**
+     * Load timing sequence, replacing any existing sequence.
+     * @param {number[]} timings - list of millisecond timings; +ve numbers are beeps, -ve numbers are silence
+     */
     load(timings) {
         // console.log('Timings: ' + timings);
         /*
@@ -102,6 +117,10 @@ export default class MorsePlayerWAA {
         this.sequenceLength = this.isNote.length;
     }
 
+    /**
+     * Load timing sequence which will be played when the current sequence is completed (only one sequence is queued).
+     * @param {number[]} timings - list of millisecond timings; +ve numbers are beeps, -ve numbers are silence
+     */
     loadNext(timings) {
         this.upNext = timings;
     }
@@ -113,9 +132,7 @@ export default class MorsePlayerWAA {
         if (this._noAudio || this._cTimings.length === 0) {
             return;
         }
-
         this.stop();
-
         this._initialiseAudioNodes();
         this._nextNote = 0;
         this._isPlaying = true;
@@ -139,6 +156,7 @@ export default class MorsePlayerWAA {
         clearInterval(this._startTimer);  // ditto
         clearInterval(this._timer);
         this._isPaused = false;
+        // set the time base to now but (to work after a pause) subtract the start time of the next note so that it will play immediately
         this._tZero = this.audioContext.currentTime - this._cTimings[this._nextNote];
         // schedule the first note ASAP (directly) and then if there is more to schedule, set up an interval timer
         if (this._scheduleNotes()) {
@@ -186,7 +204,7 @@ export default class MorsePlayerWAA {
 
     /**
      * Schedule notes that start before now + lookAheadTime.
-     * @returns: boolean, true is there is more to schedule, false if sequence is complete
+     * @return {Boolean} true if there is more to schedule, false if sequence is complete
      * @access: private
      */
     _scheduleNotes() {
@@ -208,6 +226,7 @@ export default class MorsePlayerWAA {
             if (this.isNote[this._nextNote]) {
                 var oscillator = this.audioContext.createOscillator();
                 oscillator.type = 'sine';
+                // TODO: [Deprecation] OscillatorNode.frequency.value setter smoothing is deprecated and will be removed in M64, around January 2018.
                 oscillator.frequency.value = this.frequency;
                 oscillator.connect(this.splitterNode);
                 oscillator.start(this._tZero + this._cTimings[this._nextNote]);
@@ -245,22 +264,39 @@ export default class MorsePlayerWAA {
         return true;
     }
 
+    /**
+     * @returns {Boolean} whether there was an error in initialisation
+     */
     hasError() {
         return this._noAudio;
     }
 
+    /**
+     * @returns {Boolean} whether a sequence is being played or not (still true even when paused); becomes false when stop is used
+     */
     get isPlaying() {
         return this._isPlaying;
     }
 
+    /**
+     * @returns {Boolean} whether the playback is paused or not
+     */
     get isPaused() {
         return this._isPaused;
     }
 
+    /**
+     * Return the index of the next note in the sequence to be scheduled.
+     * Useful if the sequence has been paused.
+     * @returns {number} note index
+     */
     get nextNote() {
         return this._nextNote;
     }
 
+    /**
+     * @returns {number} representing this audio player type: 4
+     */
     get audioType() {
         return 4;
         // 4: Web Audio API using oscillators
