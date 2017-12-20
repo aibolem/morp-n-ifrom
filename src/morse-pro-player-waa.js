@@ -61,7 +61,7 @@ export default class MorsePlayerWAA {
         this.splitterNode.connect(this.lowPassNode);
         this.lowPassNode.connect(this.gainNode);
         this.gainNode.connect(this.audioContext.destination);
-        this.gainNode.gain.value = this._volume;
+        this.gainNode.gain.value = this._volume * 0.813;  // multiply by 0.813 to reduce gain added by lowpass filter and avoid clipping
     }
 
     set volume(v) {
