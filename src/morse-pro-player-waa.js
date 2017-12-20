@@ -235,7 +235,7 @@ export default class MorsePlayerWAA {
             // schedule stop() for after when the scheduled sequence ends
             this._stopTimer = setTimeout(function() {
                 this.stop();
-            }.bind(this), 1000 * (this._soundEndTime - now + this._lookAheadTime));  // adding on lookAheadTime for safety, shouldn't be needed
+            }.bind(this), 1000 * (this._soundEndTime - now + 3 * this._lookAheadTime));  // adding on 3 * lookAheadTime for safety, shouldn't be needed
             return false;  // indicate that sequence is complete
         } else if (now - this._tZero + this._timerInterval + this._lookAheadTime > this._cTimings[this.sequenceLength - 1] && this.sequenceStartCallbackFired) {
             // then we are going to schedule the last note in the sequence next time
