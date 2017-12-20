@@ -18,8 +18,8 @@
  * import * as RiffWave from 'morse-pro-util-riffwave';
  * var morseCWWave = new MorseCWWave();
  * morseCWWave.translate("abc");
- * var wav = RiffWave.getData(morseCWWave);  // returns byte array of WAV file
- */
+ * var wav = RiffWave.getData(morseCWWave.getSample());  // returns byte array of WAV file
+  */
 var u32ToArray = function(i) {
     return [i&0xFF, (i>>8)&0xFF, (i>>16)&0xFF, (i>>24)&0xFF];
 };
@@ -41,13 +41,12 @@ var split16bitArray = function(data) {
 
 /**
  * Convert PCM data to WAV file data.
- * @param {Object} morseCWWave - a MorseCWWave instance
- * @param {number} bitsPerSample - number of bits to use per sample (8 or 16), default is 8
- * @return {number[]}
+ * @param {number[]} data - waveform data, expected to be in (and clamped to) range [-1,1]
+ * @param {number} [sampleRate=8000] - the sample rate of the waveform in Hz
+ * @param {number} [bitsPerSample=8] - number of bits to store each data point (8 or 16)
+ * @return {number[]} - array of bytes representing the WAV file
  */
-export function getData(morseCWWave, bitsPerSample = 8) {
-    var data = morseCWWave.getPCMSample();
-    var sampleRate = morseCWWave.sampleRate;
+export function getData(data, sampleRate = 8000, bitsPerSample = 8) {
 
     var header = {                            // OFFS SIZE NOTES
         chunkId      : [0x52,0x49,0x46,0x46], // 0    4    "RIFF" = 0x52494646

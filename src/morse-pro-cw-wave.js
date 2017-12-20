@@ -42,28 +42,93 @@ export default class MorseCWWave extends MorseCW {
         if (timings.length === 0) {
             return [];
         }
-        var counterIncrementAmount = Math.PI * 2 * this.frequency / this.sampleRate;
+        timings.push(-5);  // add 5ms silence to the end to ensure the filtered signal can finish cleanly
+
+        /*
+            Compute lowpass biquad filter coefficients using method from Chromium
+        */
+
+        // set lowpass frequency cutoff to 1.5 x wave frequency
+        var lowpassFreq = (this.frequency * 1.5) / this.sampleRate;
+        var q = Math.SQRT1_2;
+      
+        var sin = Math.sin(2 * Math.PI * lowpassFreq);
+        var cos = Math.cos(2 * Math.PI * lowpassFreq);
+        var alpha = sin / (2 * Math.pow(10, q / 20));
+      
+        var a0 =  1 + alpha;
+
+        var b0 = ((1 - cos) * 0.5) / a0;
+        var b1 = (1 - cos) / a0;
+        var b2 = ((1 - cos) * 0.5) / a0;
+        var a1 = (-2 * cos) / a0;
+        var a2 = (1 - alpha) / a0;
+
+        /*
+            Compute filtered signal
+        */
+
+        var step = Math.PI * 2 * this.frequency / this.sampleRate;
         var on = timings[0] > 0 ? 1 : 0;
+        var signal;
+        var x0, x1 = 0, x2 = 0;
+        var y0, y1 = 0, y2 = 0;
+        var gain = 0.813;  // empirically, the lowpass filter outputs waveform of magnitude 1.23, so need to scale it down to avoid clipping
         for (var t = 0; t < timings.length; t += 1) {
             var duration = this.sampleRate * Math.abs(timings[t]) / 1000;
             for (var i = 0; i < duration; i += 1) {
-                sample.push(on * Math.sin(i * counterIncrementAmount));
+                x0 = on * Math.sin(i * step);  // the input signal
+                y0 = b0 * x0 + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2;
+                sample.push(y0 * gain);
+                x2 = x1;
+                x1 = x0;
+                y2 = y1;
+                y1 = y0;
             }
             on = 1 - on;
         }
-        console.log("Sample length: " + sample.length);
         return sample;
     }
 
     /**
-     * @return {number[]} an array of integers in range [0, 256] representing the wave-form. 8-bit unsigned PCM format.
+     * Get a sample waveform using Web Audio API (asynchronous).
+     * @return {Promise(number[])} a Promise resolving to an array of floats in range [-1, 1] representing the wave-form.
      */
-    getPCMSample() {
-        var pcmSample = [];
-        var sample = this.getSample();
-        for (var i = 0; i < sample.length; i += 1) {
-            pcmSample.push(128 + Math.round(127 * sample[i]));
+    getWAASample() {
+        var timings = this.getTimings();
+        var offlineAudioContextClass = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+        if (offlineAudioContextClass === undefined) {
+            throw new Error("No OfflineAudioContext class defined");
         }
-        return pcmSample;
+        // buffer length is the Morse duration + 5ms to let the lowpass filter end cleanly
+        var offlineCtx = new offlineAudioContextClass(1, this.sampleRate * (this.getDuration() + 5) / 1000, this.sampleRate);
+        var gainNode = offlineCtx.createGain();
+        // TODO: [Deprecation] GainNode.gain.value setter smoothing is deprecated and will be removed in M64, around January 2018. Please use setTargetAtTime() instead if smoothing is needed. See https://www.chromestatus.com/features/5287995770929152 for more details.
+        gainNode.gain.value = 0.813;  // empirically, the lowpass filter outputs waveform of magnitude 1.23, so need to scale it down to avoid clipping
+        var lowPassNode = offlineCtx.createBiquadFilter();
+        lowPassNode.type = "lowpass";
+        // TODO: [Deprecation] BiquadFilterNode.frequency.value setter smoothing is deprecated and will be removed in M64, around January 2018. Please use setTargetAtTime() instead if smoothing is needed. See https://www.chromestatus.com/features/5287995770929152 for more details.
+        lowPassNode.frequency.value = this.frequency * 1.5;  // TODO: remove this magic number and make the filter configurable
+        gainNode.connect(lowPassNode);
+        lowPassNode.connect(offlineCtx.destination);
+        var t = 0;
+        var oscillator;
+        var duration;
+        for (var i = 0; i < timings.length; i++) {
+            duration = Math.abs(timings[i]) / 1000;
+            if (timings[i] > 0) {  // -ve timings are silence
+                oscillator = offlineCtx.createOscillator();
+                oscillator.type = 'sine';
+                // TODO: [Deprecation] OscillatorNode.frequency.value setter smoothing is deprecated and will be removed in M64, around January 2018. Please use setTargetAtTime() instead if smoothing is needed. See https://www.chromestatus.com/features/5287995770929152 for more details
+                oscillator.frequency.value = this.frequency;
+                oscillator.connect(gainNode);
+                oscillator.start(t);
+                oscillator.stop(t + duration);
+            }
+            t += duration;
+        }
+        return offlineCtx.startRendering().then(function(renderedBuffer) {
+            return renderedBuffer.getChannelData(0);
+        });
     }
 }
