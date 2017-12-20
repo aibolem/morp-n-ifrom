@@ -39,6 +39,14 @@ var split16bitArray = function(data) {
     return r;
 };
 
+var fToU8 = function(data) {
+    var r = [];
+    for (var i = 0; i < data.length; i++) {
+        r[i] = Math.max(Math.min(128 + Math.round(127 * data[i]), 255), 0);
+    }
+    return r;
+}
+
 /**
  * Convert PCM data to WAV file data.
  * @param {number[]} data - waveform data, expected to be in (and clamped to) range [-1,1]
@@ -47,6 +55,7 @@ var split16bitArray = function(data) {
  * @return {number[]} - array of bytes representing the WAV file
  */
 export function getData(data, sampleRate = 8000, bitsPerSample = 8) {
+    data = fToU8(data);
 
     var header = {                            // OFFS SIZE NOTES
         chunkId      : [0x52,0x49,0x46,0x46], // 0    4    "RIFF" = 0x52494646
