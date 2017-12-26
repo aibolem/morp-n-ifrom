@@ -62,14 +62,15 @@ export default class MorsePlayerWAA {
         this.splitterNode = this.audioContext.createGain();  // this node is here to attach other nodes to in subclass
         this.lowPassNode = this.audioContext.createBiquadFilter();
         this.lowPassNode.type = "lowpass";
-        // TODO: [Deprecation] BiquadFilterNode.frequency.value setter smoothing is deprecated
-        this.lowPassNode.frequency.value = this.frequency * 1.5;  // TODO: remove this magic number and make the filter configurable
+        // TODO: remove this magic number and make the filter configurable?
+        this.lowPassNode.frequency.setValueAtTime(this.frequency * 1.5, this.audioContext.currentTime);
         this.gainNode = this.audioContext.createGain();  // this node is actually used for volume
+        // multiply by 0.813 to reduce gain added by lowpass filter and avoid clipping
+        this.gainNode.gain.setValueAtTime(this._volume * 0.813, this.audioContext.currentTime);
+
         this.splitterNode.connect(this.lowPassNode);
         this.lowPassNode.connect(this.gainNode);
         this.gainNode.connect(this.audioContext.destination);
-        // TODO: [Deprecation] GainNode.gain.value setter smoothing is deprecated and will be removed in M64, around January 2018.
-        this.gainNode.gain.value = this._volume * 0.813;  // multiply by 0.813 to reduce gain added by lowpass filter and avoid clipping
     }
 
     /**
@@ -209,6 +210,7 @@ export default class MorsePlayerWAA {
      */
     _scheduleNotes() {
         // console.log('Scheduling:');
+        var oscillator, start, end;
         var now = this.audioContext.currentTime;
         while (this._nextNote < this.sequenceLength && (this._cTimings[this._nextNote] < now - this._tZero + this._lookAheadTime)) {
             // console.log('T: ' + Math.round(1000 * now)/1000 + ' (+' + Math.round(1000 * (now - this._tZero))/1000 + ')');
@@ -224,14 +226,15 @@ export default class MorsePlayerWAA {
                 this.sequenceStartCallbackFired = true;
             }
             if (this.isNote[this._nextNote]) {
-                var oscillator = this.audioContext.createOscillator();
+                start = this._tZero + this._cTimings[this._nextNote];
+                end   = this._tZero + this._cTimings[this._nextNote + 1];
+                this._soundEndTime = end;  // we need to store this for the stop() callback
+                oscillator = this.audioContext.createOscillator();
                 oscillator.type = 'sine';
-                // TODO: [Deprecation] OscillatorNode.frequency.value setter smoothing is deprecated and will be removed in M64, around January 2018.
-                oscillator.frequency.value = this.frequency;
-                oscillator.connect(this.splitterNode);
-                oscillator.start(this._tZero + this._cTimings[this._nextNote]);
-                this._soundEndTime = this._tZero + this._cTimings[this._nextNote + 1];  // we need to store this for the stop() callback
+                oscillator.frequency.setValueAtTime(this.frequency, start);
+                oscillator.start(start);
                 oscillator.stop(this._soundEndTime);
+                oscillator.connect(this.splitterNode);
             }
 
             this._nextNote++;

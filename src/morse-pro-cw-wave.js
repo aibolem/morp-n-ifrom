@@ -104,12 +104,11 @@ export default class MorseCWWave extends MorseCW {
         // buffer length is the Morse duration + 5ms to let the lowpass filter end cleanly
         var offlineCtx = new offlineAudioContextClass(1, this.sampleRate * (this.getDuration() + 5) / 1000, this.sampleRate);
         var gainNode = offlineCtx.createGain();
-        // TODO: [Deprecation] GainNode.gain.value setter smoothing is deprecated and will be removed in M64, around January 2018. Please use setTargetAtTime() instead if smoothing is needed. See https://www.chromestatus.com/features/5287995770929152 for more details.
-        gainNode.gain.value = 0.813;  // empirically, the lowpass filter outputs waveform of magnitude 1.23, so need to scale it down to avoid clipping
+        // empirically, the lowpass filter outputs waveform of magnitude 1.23, so need to scale it down to avoid clipping
+        gainNode.gain.setValueAtTime(0.813, 0);
         var lowPassNode = offlineCtx.createBiquadFilter();
         lowPassNode.type = "lowpass";
-        // TODO: [Deprecation] BiquadFilterNode.frequency.value setter smoothing is deprecated and will be removed in M64, around January 2018. Please use setTargetAtTime() instead if smoothing is needed. See https://www.chromestatus.com/features/5287995770929152 for more details.
-        lowPassNode.frequency.value = this.frequency * 1.5;  // TODO: remove this magic number and make the filter configurable
+        lowPassNode.frequency.setValueAtTime(this.frequency * 1.5, 0);  // TODO: remove this magic number and make the filter configurable?
         gainNode.connect(lowPassNode);
         lowPassNode.connect(offlineCtx.destination);
         var t = 0;
@@ -120,11 +119,10 @@ export default class MorseCWWave extends MorseCW {
             if (timings[i] > 0) {  // -ve timings are silence
                 oscillator = offlineCtx.createOscillator();
                 oscillator.type = 'sine';
-                // TODO: [Deprecation] OscillatorNode.frequency.value setter smoothing is deprecated and will be removed in M64, around January 2018. Please use setTargetAtTime() instead if smoothing is needed. See https://www.chromestatus.com/features/5287995770929152 for more details
-                oscillator.frequency.value = this.frequency;
-                oscillator.connect(gainNode);
+                oscillator.frequency.setValueAtTime(this.frequency, t);
                 oscillator.start(t);
                 oscillator.stop(t + duration);
+                oscillator.connect(gainNode);
             }
             t += duration;
         }
