@@ -108,7 +108,7 @@ export default class MorseCWWave extends MorseCW {
         gainNode.gain.setValueAtTime(0.813, 0);
         var lowPassNode = offlineCtx.createBiquadFilter();
         lowPassNode.type = "lowpass";
-        lowPassNode.frequency.setValueAtTime(this.frequency * 1.5, 0);  // TODO: remove this magic number and make the filter configurable?
+        lowPassNode.frequency.setValueAtTime(this.frequency * 1.1, 0);  // TODO: remove this magic number and make the filter configurable?
         gainNode.connect(lowPassNode);
         lowPassNode.connect(offlineCtx.destination);
         var t = 0;

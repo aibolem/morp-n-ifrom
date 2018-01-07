@@ -63,7 +63,7 @@ export default class MorsePlayerWAA {
         this.lowPassNode = this.audioContext.createBiquadFilter();
         this.lowPassNode.type = "lowpass";
         // TODO: remove this magic number and make the filter configurable?
-        this.lowPassNode.frequency.setValueAtTime(this.frequency * 1.5, this.audioContext.currentTime);
+        this.lowPassNode.frequency.setValueAtTime(this.frequency * 1.1, this.audioContext.currentTime);
         this.gainNode = this.audioContext.createGain();  // this node is actually used for volume
         // multiply by 0.813 to reduce gain added by lowpass filter and avoid clipping
         this.gainNode.gain.setValueAtTime(this._volume * 0.813, this.audioContext.currentTime);
