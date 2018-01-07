@@ -41,12 +41,14 @@ export default class MorseKeyer {
     /**
      * @param {function(): number} keyCallback - A function which should return 0, 1, 2, or 3 from the vitual "paddle" depending if nothing, a dit, a dah or both is detected. This implementation will play dits if both keys are detected.
      * @param {number} [wpm=20] - Speed of the keyer.
+     * @param {number} [fwpm=20] - Farnsworth speed of the keyer.
      * @param {number} [frequency=550] - The frequency in Hz for the sidetone.
      * @param {function(dict: {message: string, timings: number[], morse: string})} messageCallback - A function which receives a dictionary with keys 'message', 'timings' and 'morse' for each decoded part (see MorseDecoder). Its use here will result in a single character being returned each time.
      */
-    constructor(keyCallback, wpm = 20, frequency = 550, messageCallback = undefined) {
+    constructor(keyCallback, wpm = 20, fwpm = 20, frequency = 550, messageCallback = undefined) {
         this.keyCallback = keyCallback;
         this.wpm = wpm;
+        this.fwpm = fwpm;
 
         this.player = new MorsePlayerWAA();
         this.player.frequency = frequency;
@@ -55,6 +57,7 @@ export default class MorseKeyer {
         this.decoder.noiseThreshold = 0;
 
         this.ditLen = WPM.ditLength(wpm);  // duration of dit in ms
+        this.fditLen = WPM.fditLength(wpm, fwpm);
         this.playing = false;
     }
 
@@ -62,49 +65,45 @@ export default class MorseKeyer {
      * @access: private
      */
     check() {
-        var input = this.keyCallback();
-        var dit;
+        var key = this.keyCallback();
+        var ditOrDah = this._ditOrDah(key);
+
         if (this.lastTime) {
             // record the amount of silence since the last time we were here
             this.decoder.addTiming(-( (new Date()).getTime() - this.lastTime ));
         }
-        if (input === 0) {
+        if (ditOrDah === undefined) {
             // If no keypress is detected then continue pushing chunks of silence to the decoder to complete the character and add a space
             this.playing = false;  // make the keyer interuptable so this the next character can start
             this.lastTime = (new Date()).getTime();  // time marking the end of the last data that was last pushed to decoder
             if (this.spaceCounter < 3) {
                 this.spaceCounter++;
-                this.timer = setTimeout(this.check.bind(this), 2 * this.ditLen);  // keep pushing up to 6 dit-spaces to complete character or word
+                this.timer = setTimeout(this.check.bind(this), 2 * this.fditLen);  // keep pushing up to 6 dit-spaces to complete character or word
             } else {
                 this.stop();
             }
-            return input;
-        }
-        dit = this.ditOrDah(input);
-        this.playTone(dit);
-        if (dit) {
-            this.decoder.addTiming(1 * this.ditLen);
-            this.lastTime = (new Date()).getTime() + (1 * this.ditLen);
-            this.timer = setTimeout(this.check.bind(this), 2 * this.ditLen);  // check key state again after the dit and after a dit-space
         } else {
-            this.decoder.addTiming(3 * this.ditLen);
-            this.lastTime = (new Date()).getTime() + (3 * this.ditLen);
-            this.timer = setTimeout(this.check.bind(this), 4 * this.ditLen);
+            var duration = (ditOrDah ? 1 : 3) * this.ditLen;
+            this._playTone(duration);
+            this.decoder.addTiming(duration);
+            this.lastTime = (new Date()).getTime() + duration;
+            this.timer = setTimeout(this.check.bind(this), duration + this.fditLen);  // check key state again after the dit or dah and after a dit-space
         }
-        return input;
     }
 
     /**
+     * Translate key input into whether to play nothing, dit, or dah
+     * @returns undefined, true or false for nothing, dit or dah
      * @access: private
      */
-    ditOrDah(input) {
-        var dit;
+    _ditOrDah(input) {
         if (input & 1) {
-            dit = true;
+            return true;
         } else if (input === 2) {
-            dit = false;
+            return false;
+        } else {
+            return undefined;
         }
-        return dit;
     }
 
     /**
@@ -133,10 +132,10 @@ export default class MorseKeyer {
 
     /**
      * Play a dit or dah sidetone.
+     * @param {number} duration - number of milliseconds to play
      * @access: private
      */
-    playTone(isDit) {
-        var duration = isDit ? this.ditLen : 3 * this.ditLen;
+    _playTone(duration) {
         this.player.load([duration]);
         this.player.playFromStart();
     }
