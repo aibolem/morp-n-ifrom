@@ -41,23 +41,23 @@ export default class MorseKeyer {
     /**
      * @param {function(): number} keyCallback - A function which should return 0, 1, 2, or 3 from the vitual "paddle" depending if nothing, a dit, a dah or both is detected. This implementation will play dits if both keys are detected.
      * @param {number} [wpm=20] - Speed of the keyer.
-     * @param {number} [fwpm=20] - Farnsworth speed of the keyer.
+     * @param {number} [fwpm=wpm] - Farnsworth speed of the keyer.
      * @param {number} [frequency=550] - The frequency in Hz for the sidetone.
      * @param {function(dict: {message: string, timings: number[], morse: string})} messageCallback - A function which receives a dictionary with keys 'message', 'timings' and 'morse' for each decoded part (see MorseDecoder). Its use here will result in a single character being returned each time.
      */
-    constructor(keyCallback, wpm = 20, fwpm = 20, frequency = 550, messageCallback = undefined) {
+    constructor(keyCallback, wpm = 20, fwpm = wpm, frequency = 550, messageCallback = undefined) {
         this.keyCallback = keyCallback;
         this.wpm = wpm;
         this.fwpm = fwpm;
 
         this.player = new MorsePlayerWAA();
         this.player.frequency = frequency;
-        this.decoder = new MorseDecoder(this.wpm);
+        this.decoder = new MorseDecoder(this.wpm, this.fwpm);
         this.decoder.messageCallback = messageCallback;
         this.decoder.noiseThreshold = 0;
 
         this.ditLen = WPM.ditLength(wpm);  // duration of dit in ms
-        this.fditLen = WPM.fditLength(wpm, fwpm);
+        this.fditLen = WPM.fditLength(wpm, fwpm);  // TODO: finish fwpm bit
         this.playing = false;
     }
 
