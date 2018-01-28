@@ -35,7 +35,7 @@ import MorsePlayerWAA from './morse-pro-player-waa';
  * var messageCallback = function(d) {
  *     console.log(d.message);
  * };
- * keyer = new MorseKeyer(keyCallback, 20, 550, messageCallback);
+ * keyer = new MorseKeyer(keyCallback, 20, 20, 550, messageCallback);
  */
 export default class MorseKeyer {
     /**
@@ -52,13 +52,12 @@ export default class MorseKeyer {
 
         this.player = new MorsePlayerWAA();
         this.player.frequency = frequency;
-        this.decoder = new MorseDecoder(this.wpm, this.fwpm);
-        this.decoder.messageCallback = messageCallback;
+        this.decoder = new MorseDecoder(this.wpm, this.fwpm, messageCallback);
         this.decoder.noiseThreshold = 0;
 
         this.ditLen = WPM.ditLength(wpm);  // duration of dit in ms
         this.fditLen = WPM.fditLength(wpm, fwpm);  // TODO: finish fwpm bit
-        this.playing = false;
+        this._state = { playing: false };
     }
 
     /**
@@ -67,28 +66,40 @@ export default class MorseKeyer {
     check() {
         var key = this.keyCallback();
         var ditOrDah = this._ditOrDah(key);
+        var beepLen;  // length of beep
+        var silenceLen;  // length of silence
+        var now = (new Date()).getTime();
 
-        if (this.lastTime) {
-            // record the amount of silence since the last time we were here
-            this.decoder.addTiming(-( (new Date()).getTime() - this.lastTime ));
+        if (this._state.lastTime !== undefined) {
+            this.decoder.addTiming(this._state.lastTime - now);  // add how long since we've last been here as silence
         }
         if (ditOrDah === undefined) {
             // If no keypress is detected then continue pushing chunks of silence to the decoder to complete the character and add a space
-            this.playing = false;  // make the keyer interuptable so this the next character can start
-            this.lastTime = (new Date()).getTime();  // time marking the end of the last data that was last pushed to decoder
-            if (this.spaceCounter < 3) {
-                this.spaceCounter++;
-                this.timer = setTimeout(this.check.bind(this), 2 * this.fditLen);  // keep pushing up to 6 dit-spaces to complete character or word
-            } else {
-                this.stop();
+            beepLen = 0;
+            this._state.playing = false;  // make it interupterable: means that a new char can start whenever
+            switch (this._state.spaceCounter) {
+                case 0:
+                    // we've already waited 1 ditLen, need to make it 1 fditLen plus 2 more
+                    silenceLen = (this.fditLen - this.ditLen) + (2 * this.fditLen);
+                    break;
+                case 1:
+                    silenceLen = (4 * this.fditLen);
+                    break;
+                case 2:
+                    silenceLen = 0;
+                    this.stop();
+                    break;
             }
+            this._state.spaceCounter++;
         } else {
-            var duration = (ditOrDah ? 1 : 3) * this.ditLen;
-            this._playTone(duration);
-            this.decoder.addTiming(duration);
-            this.lastTime = (new Date()).getTime() + duration;
-            this.timer = setTimeout(this.check.bind(this), duration + this.fditLen);  // check key state again after the dit or dah and after a dit-space
+            this._state.spaceCounter = 0;
+            beepLen = (ditOrDah ? 1 : 3) * this.ditLen;
+            this._playTone(beepLen);
+            this.decoder.addTiming(beepLen);
+            silenceLen = this.ditLen;  // while playing, assume we are inside a char and so wait 1 ditLen
         }
+        this._state.lastTime = now + beepLen;
+        if (beepLen + silenceLen) this.timer = setTimeout(this.check.bind(this), beepLen + silenceLen);  // check key state again after the dit or dah and after a dit-space
     }
 
     /**
@@ -110,13 +121,13 @@ export default class MorseKeyer {
      * Call this method when an initial key-press (or equivalent) is detected.
      */
     start() {
-        if (this.playing) {
+        if (this._state.playing) {
             // If the keyer is already playing then ignore a new start.
             return;
         } else {
-            this.playing = true;
-            this.spaceCounter = 0;
-            this.lastTime = 0;  // removes extended pauses
+            this._state.playing = true;
+            this._state.spaceCounter = 0;
+            this._state.lastTime = undefined;  // removes extended pauses
             clearTimeout(this.timer);
             this.check();
         }
@@ -126,7 +137,7 @@ export default class MorseKeyer {
      * This method can be called externally to stop the keyer but is also used internally when no key-press is detected.
      */
     stop() {
-        this.playing = false;
+        this._state.playing = false;
         clearTimeout(this.timer);
     }
 

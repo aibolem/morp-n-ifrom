@@ -136,7 +136,7 @@ export default class MorseDecoder {
      * @param {number} duration - millisecond duration to add, positive for a dit or dah, negative for a space
      */
     addTiming(duration) {
-        //console.log("Received: " + duration);
+        console.log("Received: " + duration);
         if (duration === 0) {
             return;
         }
