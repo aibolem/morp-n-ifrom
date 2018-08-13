@@ -117,6 +117,21 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
         // }
     }
 
+    /**
+     * @returns {number} representing this audio player type: 5
+     * @override
+     */
+    get audioType() {
+        return 5;
+        // 5: Web Audio API using oscillators and light control
+        // 4: Web Audio API using oscillators
+        // 3: Audio element using media stream worker (using PCM audio data)
+        // 2: Flash (using PCM audio data)
+        // 1: Web Audio API with webkit and native support (using PCM audio data)
+        // 0: Audio element using Mozilla Audio Data API (https://wiki.mozilla.org/Audio_Data_API) (using PCM audio data)
+        // -1: no audio support
+    }
+
     // empty callbacks in case user does not define any
     soundOnCallback() { }
     soundOffCallback() { }
