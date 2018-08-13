@@ -65,9 +65,7 @@ export default class MorsePlayerWAA {
         // TODO: remove this magic number and make the filter configurable?
         this.lowPassNode.frequency.setValueAtTime(this.frequency * 1.1, this.audioContext.currentTime);
         this.gainNode = this.audioContext.createGain();  // this node is actually used for volume
-        // multiply by 0.813 to reduce gain added by lowpass filter and avoid clipping
-        this.gainNode.gain.setValueAtTime(this._volume * 0.813, this.audioContext.currentTime);
-
+        this.volume = this._volume;
         this.splitterNode.connect(this.lowPassNode);
         this.lowPassNode.connect(this.gainNode);
         this.gainNode.connect(this.audioContext.destination);
@@ -79,7 +77,12 @@ export default class MorsePlayerWAA {
      */
     set volume(v) {
         this._volume = Math.min(Math.max(v, 0), 1);
-        this.gainNode.gain.value = this._volume;
+        try {
+            // multiply by 0.813 to reduce gain added by lowpass filter and avoid clipping
+            this.gainNode.gain.setValueAtTime(0.813 * this._volume, this.audioContext.currentTime);
+        } catch (ex) {
+            // getting here means _initialiseAudioNodes() has not yet been called: that's okay
+        }
     }
 
     /**
