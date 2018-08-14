@@ -23,10 +23,11 @@ import MorseMessage from './morse-pro-message';
  */
 export default class MorseCW extends MorseMessage {
     /**
+     * @param {boolean} [prosigns=true] - whether or not to include prosigns in the translations
      * @param {number} wpm - the speed in words per minute using PARIS as the standard word
      * @param {number} fwpm - the Farnsworth speed in words per minute (defaults to wpm)
      */
-    constructor(useProsigns, wpm = 20, fwpm = wpm) {
+    constructor(useProsigns = true, wpm = 20, fwpm = wpm) {
         super(useProsigns);
         /** @type {number} */
         this.wpm = wpm;
@@ -60,6 +61,11 @@ export default class MorseCW extends MorseMessage {
         return this._fwpm;
     }
 
+    /** @type {number} */
+    get wordSpace() {
+        return WPM.wordSpace(this._wpm, this._fwpm);
+    }
+
     /**
      * Return an array of millisecond timings.
      * With the Farnsworth method, the morse characters are played at one
@@ -67,11 +73,10 @@ export default class MorseCW extends MorseMessage {
      * @param {string} [padding=''] - space to add to the end (either ' ' or '/'), useful if you want the sound to be able to loop
      * @return {number[]}
      */
-    getTimings(padding = '') {
+    getTimings() {
         var dit = WPM.ditLength(this._wpm);
-        var r = WPM.ratio(this._wpm, this._fwpm);
-        // slow down the spaces by this ratio
-        return MorseCW.getTimingsGeneral(dit, 3 * dit, dit, 3 * dit * r, 7 * dit * r, this.morse, padding);
+        var fdit = WPM.fditLength(this._wpm, this._fwpm);
+        return MorseCW.getTimingsGeneral(dit, 3 * dit, dit, 3 * fdit, 7 * fdit, this.morse);
     }
 
     /**
@@ -86,7 +91,7 @@ export default class MorseCW extends MorseMessage {
      * @param {string} [padding=''] - space to add to the end (matching [ /]*), useful if you want the sound to be able to loop
      * @return {number[]}
      */
-    static getTimingsGeneral(dit, dah, ditSpace, charSpace, wordSpace, morse, padding = '') {
+    static getTimingsGeneral(dit, dah, ditSpace, charSpace, wordSpace, morse) {
         //console.log("Morse: " + morse);
 
         if (this.hasError) {
@@ -95,7 +100,6 @@ export default class MorseCW extends MorseMessage {
         }
         morse = morse.replace(/ \/ /g, '/');  // this means that a space is only used for inter-character
         morse = morse.replace(/([\.\-])(?=[\.\-])/g, "$1+");  // put a + in between all dits and dahs
-        morse += padding;
         var times = [];
         var c;
         for (var i = 0; i < morse.length; i++) {

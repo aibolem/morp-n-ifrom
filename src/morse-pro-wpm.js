@@ -27,7 +27,7 @@ export function wpm(ditLen) {
     return (MS_IN_MINUTE / DITS_PER_WORD) / ditLen;
 }
 
-/** Get the Farnsworth dit length in ms for a given WPM and Farnsworth WPM */
+/** Get the Farnsworth dit length in ms for a given WPM and Farnsworth WPM. Note, actual dit-spaces should not be slowed down */
 export function fditLength(wpm, fwpm) {
     return ditLength(wpm) * ratio(wpm, fwpm);
 }
@@ -53,4 +53,14 @@ export function ratio(wpm, fwpm) {
 /** Get the Farnsworth WPM for a given WPM and ratio */
 export function fwpm(wpm, r) {
     return DITS_PER_WORD * wpm / (SPACES_IN_PARIS * r + (DITS_PER_WORD - SPACES_IN_PARIS));
+}
+
+// TODO: add more methods like the one below, moving all knowledge of timing multipliers into here.
+
+/** Get the word-space in ms
+ * @param {number} wpm - speed in words per minute
+ * @param {number} [fwpm = wpm] - Farnsworth speed in words per minute
+ */
+export function wordSpace(wpm, fwpm = wpm) {
+    return 7 * fditLength(wpm, fwpm);
 }

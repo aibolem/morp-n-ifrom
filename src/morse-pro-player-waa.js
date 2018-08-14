@@ -40,8 +40,9 @@ export default class MorsePlayerWAA {
         }
 
         this.loop = false;
-        this.loopPause = '///';  // arbitrary Morse sequence appended to loaded sequence before looping
         this.frequency = undefined;
+        this.startPadding = 0;  // number of ms to wait before playing first note of initial sequence
+        this.endPadding = 0;  // number of ms to wait at the end of a sequence before playing the next one (or looping)
 
         this._cTimings = [];
         this._isPlaying = false;
@@ -51,6 +52,7 @@ export default class MorsePlayerWAA {
         this._timerInterval = 0.05;  // seconds
         this._timer = undefined;
         this._stopTimer = undefined;
+        this._notPlayedANote = true;
     }
 
     /**
@@ -69,6 +71,7 @@ export default class MorsePlayerWAA {
         this.splitterNode.connect(this.lowPassNode);
         this.lowPassNode.connect(this.gainNode);
         this.gainNode.connect(this.audioContext.destination);
+        this._notPlayedANote = true;
     }
 
     /**
@@ -94,24 +97,31 @@ export default class MorsePlayerWAA {
 
     /**
      * Convenience method to help playing directly from a MorseCWWave instance. Uses the CWWave timings and frequency.
-     * Adds a silent element to the end of the sequence, as defined by loopPause variable.
      * @param {Object} cwWave - a MorseCWWave instance
      */
     loadCWWave(cwWave) {
-        this.load(cwWave.getTimings(this.loopPause));
+        this.load(cwWave.getTimings());
         this.frequency = cwWave.frequency;
     }
 
     /**
      * Load timing sequence, replacing any existing sequence.
+     * If endPadding is non-zero then an appropriate pause is added to the end.
      * @param {number[]} timings - list of millisecond timings; +ve numbers are beeps, -ve numbers are silence
      */
     load(timings) {
+        // TODO: undefined behaviour if this is called in the middle of a sequence
+
         // console.log('Timings: ' + timings);
         /*
             The ith element of the sequence starts at _cTimings[i] and ends at _cTimings[i+1] (in fractional seconds)
             It is a note (i.e. not silence) if isNote[i] === True
         */
+
+        if (this.endPadding > 0) {
+            timings.push(-this.endPadding);
+        }
+
         this._cTimings = [0];
         this.isNote = [];
         for (var i = 0; i < timings.length; i++) {
@@ -119,6 +129,14 @@ export default class MorsePlayerWAA {
             this.isNote[i] = timings[i] > 0;
         }
         this.sequenceLength = this.isNote.length;
+    }
+
+    /**
+     * Convenience method to help playing directly from a MorseCWWave instance. Uses the CWWave timings.
+     * @param {Object} cwWave - a MorseCWWave instance
+     */
+    loadNextCWWave(cwWave) {
+        this.loadNext(cwWave.getTimings());
     }
 
     /**
@@ -133,6 +151,7 @@ export default class MorsePlayerWAA {
      * Plays the loaded timing sequence from the start, regardless of whether playback is ongoing or paused.
      */
     playFromStart() {
+        // TODO: why do we have this method at all? Better just to have play() and if user needs playFromStart, just call stop() first?
         if (this._noAudio || this._cTimings.length === 0) {
             return;
         }
@@ -140,7 +159,7 @@ export default class MorsePlayerWAA {
         this._initialiseAudioNodes();
         this._nextNote = 0;
         this._isPlaying = true;
-        this._isPaused = true;  // to make play() work
+        this._isPaused = true;  // pretend we were paused so that play() "resumes" playback
         this.play();
     }
 
@@ -152,19 +171,25 @@ export default class MorsePlayerWAA {
             // if we're not actually playing then play from start
             this.playFromStart();
         }
+        // otherwise we are resuming playback after a pause
         if (!this._isPaused) {
-            //  if we're not actually paused then ignore this
+            // if we're not actually paused then do nothing
             return;
         }
+        // otherwise we really are resuming playback (ore pretending we are, and actually playing from start...)
         clearInterval(this._stopTimer);  // if we were going to send a soundStoppedCallback then don't
         clearInterval(this._startTimer);  // ditto
         clearInterval(this._timer);
         this._isPaused = false;
-        // set the time base to now but (to work after a pause) subtract the start time of the next note so that it will play immediately
-        this._tZero = this.audioContext.currentTime - this._cTimings[this._nextNote];
+        // basically set the time base to now but 
+        //    - to work after a pause: subtract the start time of the next note so that it will play immediately
+        //    - to avoid clipping the very first note: add on startPadding if notPlayedANote
+        this._tZero = this.audioContext.currentTime - 
+            this._cTimings[this._nextNote] + 
+            (this._notPlayedANote ? this.startPadding / 1000 : 0);
         // schedule the first note ASAP (directly) and then if there is more to schedule, set up an interval timer
         if (this._scheduleNotes()) {
-            this._timer = setInterval(function () {
+            this._timer = setInterval(function() {
                 this._scheduleNotes();
             }.bind(this), 1000 * this._timerInterval);  // regularly check to see if there are more notes to schedule
         }
@@ -215,12 +240,15 @@ export default class MorsePlayerWAA {
         // console.log('Scheduling:');
         var oscillator, start, end;
         var now = this.audioContext.currentTime;
-        while (this._nextNote < this.sequenceLength && (this._cTimings[this._nextNote] < now - this._tZero + this._lookAheadTime)) {
+        while (this._nextNote < this.sequenceLength && 
+                (this._cTimings[this._nextNote] < now - this._tZero + this._lookAheadTime)) {
+            this._notPlayedANote = false;
             // console.log('T: ' + Math.round(1000 * now)/1000 + ' (+' + Math.round(1000 * (now - this._tZero))/1000 + ')');
             // console.log(this._nextNote + ': ' + 
             //     (this.isNote[this._nextNote] ? 'Note  ' : 'Pause ') + 
-            //     Math.round(1000 * this._cTimings[this._nextNote])/1000 + ' - ' + Math.round(1000 * this._cTimings[this._nextNote + 1])/1000 + 
-            //     ' (' + Math.round(1000 * (this._cTimings[this._nextNote + 1] - this._cTimings[this._nextNote]))/1000 + ')');
+            //     Math.round(1000 * this._cTimings[this._nextNote])/1000 + ' - ' + 
+            //     Math.round(1000 * this._cTimings[this._nextNote + 1])/1000 + ' (' + 
+            //     Math.round(1000 * (this._cTimings[this._nextNote + 1] - this._cTimings[this._nextNote]))/1000 + ')');
             if (this._nextNote === 0 && !this.sequenceStartCallbackFired) {
                 // when scheduling the first note, schedule a callback as well
                 this._startTimer = setTimeout(function() {
@@ -244,7 +272,8 @@ export default class MorsePlayerWAA {
 
             if (this._nextNote === this.sequenceLength) {
                 if (this.loop || this.upNext !== undefined) {
-                    this._tZero += this._cTimings[this._nextNote];  // reset time base
+                    // increment time base to be the absolute end time of the final element in the sequence
+                    this._tZero += this._cTimings[this._nextNote];
                     this._nextNote = 0;
                     if (this.upNext !== undefined) {
                         this.load(this.upNext);
@@ -258,16 +287,18 @@ export default class MorsePlayerWAA {
             // then all notes have been scheduled and we are not looping
             clearInterval(this._timer);
             // schedule stop() for after when the scheduled sequence ends
+            // adding on 3 * lookAheadTime for safety but shouldn't be needed
             this._stopTimer = setTimeout(function() {
                 this.stop();
-            }.bind(this), 1000 * (this._soundEndTime - now + 3 * this._lookAheadTime));  // adding on 3 * lookAheadTime for safety, shouldn't be needed
+            }.bind(this), 1000 * (this._soundEndTime - now + 3 * this._lookAheadTime));
             return false;  // indicate that sequence is complete
-        } else if (now - this._tZero + this._timerInterval + this._lookAheadTime > this._cTimings[this.sequenceLength - 1] && this.sequenceStartCallbackFired) {
+        } else if (now - this._tZero + this._timerInterval + this._lookAheadTime > this._cTimings[this.sequenceLength - 1] && 
+                this.sequenceStartCallbackFired) {
             // then we are going to schedule the last note in the sequence next time
             this.sequenceEndingCallback();
             this.sequenceStartCallbackFired = false;
         }
-        return true;
+        return true;  // indicate there are more notes to schedule
     }
 
     /**
