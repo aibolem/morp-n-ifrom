@@ -63,7 +63,7 @@ export default class MorseKeyer {
     /**
      * @access: private
      */
-    check() {
+    _check() {
         var key = this.keyCallback();
         var ditOrDah = this._ditOrDah(key);
         var beepLen;  // length of beep
@@ -99,7 +99,7 @@ export default class MorseKeyer {
             silenceLen = this.ditLen;  // while playing, assume we are inside a char and so wait 1 ditLen
         }
         this._state.lastTime = now + beepLen;
-        if (beepLen + silenceLen) this.timer = setTimeout(this.check.bind(this), beepLen + silenceLen);  // check key state again after the dit or dah and after a dit-space
+        if (beepLen + silenceLen) this.timer = setTimeout(this._check.bind(this), beepLen + silenceLen);  // check key state again after the dit or dah and after a dit-space
     }
 
     /**
@@ -129,7 +129,7 @@ export default class MorseKeyer {
             this._state.spaceCounter = 0;
             this._state.lastTime = undefined;  // removes extended pauses
             clearTimeout(this.timer);
-            this.check();
+            this._check();
         }
     }
 
