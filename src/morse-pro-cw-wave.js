@@ -71,7 +71,6 @@ export default class MorseCWWave extends MorseCW {
 
         var step = Math.PI * 2 * this.frequency / this.sampleRate;
         var on = timings[0] > 0 ? 1 : 0;
-        var signal;
         var x0, x1 = 0, x2 = 0;
         var y0, y1 = 0, y2 = 0;
         var gain = 0.813;  // empirically, the lowpass filter outputs waveform of magnitude 1.23, so need to scale it down to avoid clipping

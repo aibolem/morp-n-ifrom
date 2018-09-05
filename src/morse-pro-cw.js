@@ -126,15 +126,6 @@ export default class MorseCW extends MorseMessage {
             }
         }
 
-        // If the padding has introduced several spaces on the end then add them all up
-        var lastSpace = 0;
-        while (times[times.length - 1] < 0) {
-            lastSpace += times.pop();
-        }
-        if (lastSpace < 0) {
-            times.push(lastSpace);
-        }
-
         //console.log("Timings: " + times);
         return times;
     }
