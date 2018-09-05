@@ -34,13 +34,14 @@ describe('morse-pro-cw', function() {
         var tests = [
             {morse: '.- . / .', wpm: 20, fwpm: 20, timings: [60, -60, 180, -180, 60, -420, 60]},
             {morse: '.- . / .', wpm: 20, fwpm: 15, timings: [60, -60, 180, -338, 60, -788, 60]},
-            {morse: '.- . / .', wpm: 10, fwpm: 10, timings: [120, -120, 360, -360, 120, -840, 120]}
+            {morse: '.- . / .', wpm: 10, fwpm: 10, timings: [120, -120, 360, -360, 120, -840, 120]},
+            {morse: '..........', wpm: 100, fwpm: 100, timings: [12, -12, 12, -12, 12, -12, 12, -12, 12, -12, 12, -12, 12, -12, 12, -12, 12, -12, 12]}
         ];
 
         tests.forEach(function(test) {
             it('gives timings for "' + test.morse + '" ' + test.wpm + '/' + test.fwpm + ' as ' + test.timings, function() {
                 var morseCW = new MorseCW(true, test.wpm, test.fwpm);
-                morseCW.translate(test.morse);
+                morseCW.morse = test.morse;  // set morse field directly to avoid triggering translation errors
                 var t = morseCW.getTimings();
                 for (var i = 0; i < t.length; i++) {
                     t[i] = Math.round(t[i]);
@@ -71,6 +72,20 @@ describe('morse-pro-cw', function() {
                 morseCW.translate('. / .');
                 var wordSpace = -morseCW.getTimings()[1];
                 assert.equal(d + wordSpace, 60 * 1000 / test.fwpm);
+            });
+        });
+    });
+
+    describe('wordSpace', function() {
+        var tests = [
+            {wpm: 20, fwpm: 20, wordSpace: 420},
+            {wpm: 40, fwpm: 20, wordSpace: 763}
+        ];
+
+        tests.forEach(function(test) {
+            it('computes wordspace for "' + test.wpm + '/' + test.fwpm + ' as ' + test.wordSpace, function() {
+                var morseCW = new MorseCW(true, test.wpm, test.fwpm);
+                assert.equal(Math.round(morseCW.wordSpace), test.wordSpace);
             });
         });
     });
