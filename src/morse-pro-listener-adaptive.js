@@ -16,6 +16,7 @@ import MorseListener from './morse-pro-listener';
  */
 export default class MorseAdaptiveListener extends MorseListener {
     /**
+     * Parameters are all the same as the MorseListener class with the addition of the bufferDuration.
      * @param {number} [bufferDuration=500] - How long in ms to look back to find the frequency with the maximum volume.
      */
     constructor(

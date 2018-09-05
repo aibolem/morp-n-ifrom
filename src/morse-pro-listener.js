@@ -111,6 +111,13 @@ export default class MorseListener {
         this.input = undefined;  // current state: undefined, "mic", "file"
     }
 
+    /**
+     * Set the minimum threshold on the volume filter. i.e. the minimum volume considered to be a signal.
+     * Input validation is done to set a sensible default on non-numeric input and clamp the maximum to be zero.
+     * The volumFilterMax property is also set by this to be no less than the minimum.
+     * Calls the volumeFilterCallback with the new min and max.
+     * @param {number} v - the minimum volume in dB (-ve).
+     */
     set volumeFilterMin(v) {
         if (isNaN(v)) v = this.defaults.volumeFilterMin;
         // v is in dB and therefore -ve
@@ -124,6 +131,13 @@ export default class MorseListener {
         return this.analyserNode.minDecibels;
     }
 
+    /**
+     * Set the maximum threshold on the volume filter. i.e. the maximum volume considered to be a signal.
+     * Input validation is done to set a sensible default on non-numeric input and clamp the maximum to be zero.
+     * The volumFilterMin property is also set by this to be no more than the maximum.
+     * Calls the volumeFilterCallback with the new min and max.
+     * @param {number} v - the maximum volume in dB (-ve).
+     */
     set volumeFilterMax(v) {
         if (isNaN(v)) v = this.defaults.volumeFilterMax;
         // v is in dB and therefore -ve
@@ -137,6 +151,13 @@ export default class MorseListener {
         return this.analyserNode.maxDecibels;
     }
 
+    /**
+     * Set the minimum threshold on the frequency filter. i.e. the minimum frequency to be considered.
+     * Input validation is done to set a sensible default on non-numeric input and the value is clamped to be between zero and the current maximum frequency.
+     * The actual minimum will be the minimum frequency of the frequency bin the chosen frequency lies in.
+     * Calls the frequencyFilterCallback with the new min and max.
+     * @param {number} v - the minimum frequency in Hz.
+     */
     set frequencyFilterMin(f) {
         if (isNaN(f)) f = this.defaults.frequencyFilterMin;
         f = Math.min(Math.max(f, 0), this.maxFreq);
@@ -149,6 +170,13 @@ export default class MorseListener {
         return Math.max(this._filterBinLow * this.freqStep, 0);
     }
 
+    /**
+     * Set the maximum threshold on the frequency filter. i.e. the maximum frequency to be considered.
+     * Input validation is done to set a sensible default on non-numeric input and the value is clamped to be between zero and the current maximum frequency.
+     * The actual minimum will be the maximum frequency of the frequency bin the chosen frequency lies in.
+     * Calls the frequencyFilterCallback with the new min and max.
+     * @param {number} v - the maximum frequency in Hz.
+     */
     set frequencyFilterMax(f) {
         if (isNaN(f)) f = this.defaults.frequencyFilterMin;
         f = Math.min(Math.max(f, 0), this.maxFreq);
@@ -161,14 +189,21 @@ export default class MorseListener {
         return Math.min(this._filterBinHigh * this.freqStep, this.maxFreq);
     }
 
+    /**
+     * Set the minimum and maximum frequency filter values to be closely surrounding a specific frequency.
+     * @param {number} f - the frequency to target.
+     */
     set frequencyFilter(f) {
-        // use to target a specific frequency
         this.frequencyFilterMin = f;
         this.frequencyFilterMax = f;
     }
 
+    /**
+     * Set the threshold used to determine if an anlaysed region has sufficient sound to be "on".
+     * Input validation is done to set a sensible default on non-numeric input and the value is clamped to be between zero and 255.
+     * @param {number} v - threshold volume [0, 255]
+     */
     set volumeThreshold(v) {
-        // threshold used to determine if an anlysed region has sufficient sound to be "on"
         if (isNaN(v)) v = this.defaults.volumeThreshold;
         this._volumeThreshold = Math.min(Math.max(Math.round(v), 0), 255);
         this.volumeThresholdCallback(this._volumeThreshold);
@@ -193,6 +228,10 @@ export default class MorseListener {
         this.frequencyData = new Uint8Array(this.freqBins); // create an arrray of the right size for the frequency data
     }
 
+    /**
+     * Start the decoder listening to the microphone.
+     * Calls micSuccessCallback or micErrorCallback on success or error.
+     */
     startListening() {
         this.stop();
         // TODO: replace this with navigator.mediaDevices.getUserMedia() instead and shim for legacy browsers (https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia)
@@ -217,6 +256,11 @@ export default class MorseListener {
         );
     }
 
+    /**
+     * Load audio data from an ArrayBuffer. Use a FileReader to load from a file.
+     * Calls fileLoadCallback or fileErrorCallback on success or error.
+     * @param {ArrayBuffer} arrayBuffer 
+     */
     loadArrayBuffer(arrayBuffer) {
         // by separating loading (decoding) and playing, the playing can be done multiple times
         this.audioContext.decodeAudioData(
@@ -232,6 +276,10 @@ export default class MorseListener {
         );
     }
 
+    /**
+     * Play a loaded audio file (through speakers) and decode it.
+     * Calls EOFCallback when buffer ends.
+     */
     playArrayBuffer() {
         this.stop();
         // make BufferSource node
@@ -250,6 +298,9 @@ export default class MorseListener {
         this.sourceNode.start();
     }
 
+    /**
+     * Stop listening.
+     */
     stop() {
         if (this.input === undefined) {
             return;

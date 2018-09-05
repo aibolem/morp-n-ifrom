@@ -1,5 +1,5 @@
 /*
-This code is © Copyright Stephen C. Phillips, 2017.
+This code is © Copyright Stephen C. Phillips, 2018.
 Email: steve@scphillips.com
 
 Licensed under the EUPL, Version 1.2 or – as soon they will be approved by the European Commission - subsequent versions of the EUPL (the "Licence");
@@ -35,7 +35,9 @@ export default class MorseCW extends MorseMessage {
         this.fwpm = fwpm;
     }
 
-    /** @type {number} */
+    /** 
+     * Set the WPM speed. Ensures that Farnsworth WPM is no faster than WPM.
+     * @type {number} */
     set wpm(wpm) {
         this._wpm = wpm;
         if (wpm < this._fwpm) {
@@ -48,7 +50,9 @@ export default class MorseCW extends MorseMessage {
         return this._wpm;
     }
 
-    /** @type {number} */
+    /**
+     * Set the Farnsworth WPM speed. Ensures that WPM is no slower than Farnsworth WPM.
+     *  @type {number} */
     set fwpm(fwpm) {
         this._fwpm = fwpm;
         if (fwpm > this._wpm) {
@@ -61,7 +65,9 @@ export default class MorseCW extends MorseMessage {
         return this._fwpm;
     }
 
-    /** @type {number} */
+    /** 
+     * Get the length of the space between words in ms.
+     * @type {number} */
     get wordSpace() {
         return WPM.wordSpace(this._wpm, this._fwpm);
     }
@@ -70,7 +76,6 @@ export default class MorseCW extends MorseMessage {
      * Return an array of millisecond timings.
      * With the Farnsworth method, the morse characters are played at one
      * speed and the spaces between characters at a slower speed.
-     * @param {string} [padding=''] - space to add to the end (either ' ' or '/'), useful if you want the sound to be able to loop
      * @return {number[]}
      */
     getTimings() {
@@ -88,7 +93,6 @@ export default class MorseCW extends MorseMessage {
      * @param {number} charSpace - the length of an inter-character space in milliseconds (normally 3 * dit)
      * @param {number} wordSpace - the length of an inter-word space in milliseconds (normally 7 * dit)
      * @param {string} morse - the (canonical) morse code string (matching [.-/ ]*)
-     * @param {string} [padding=''] - space to add to the end (matching [ /]*), useful if you want the sound to be able to loop
      * @return {number[]}
      */
     static getTimingsGeneral(dit, dah, ditSpace, charSpace, wordSpace, morse) {

@@ -1,5 +1,5 @@
 /*
-This code is © Copyright Stephen C. Phillips, 2017.
+This code is © Copyright Stephen C. Phillips, 2018.
 Email: steve@scphillips.com
 
 Licensed under the EUPL, Version 1.2 or – as soon they will be approved by the European Commission - subsequent versions of the EUPL (the "Licence");

@@ -233,7 +233,7 @@ export default class MorsePlayerWAA {
 
     /**
      * Schedule notes that start before now + lookAheadTime.
-     * @return {Boolean} true if there is more to schedule, false if sequence is complete
+     * @return {boolean} true if there is more to schedule, false if sequence is complete
      * @access: private
      */
     _scheduleNotes() {
@@ -302,21 +302,21 @@ export default class MorsePlayerWAA {
     }
 
     /**
-     * @returns {Boolean} whether there was an error in initialisation
+     * @returns {boolean} whether there was an error in initialisation
      */
     hasError() {
         return this._noAudio;
     }
 
     /**
-     * @returns {Boolean} whether a sequence is being played or not (still true even when paused); becomes false when stop is used
+     * @returns {boolean} whether a sequence is being played or not (still true even when paused); becomes false when stop is used
      */
     get isPlaying() {
         return this._isPlaying;
     }
 
     /**
-     * @returns {Boolean} whether the playback is paused or not
+     * @returns {boolean} whether the playback is paused or not
      */
     get isPaused() {
         return this._isPaused;
