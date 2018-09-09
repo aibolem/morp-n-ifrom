@@ -24,8 +24,8 @@ import MorseMessage from './morse-pro-message';
 export default class MorseCW extends MorseMessage {
     /**
      * @param {boolean} [prosigns=true] - whether or not to include prosigns in the translations
-     * @param {number} wpm - the speed in words per minute using PARIS as the standard word
-     * @param {number} fwpm - the Farnsworth speed in words per minute (defaults to wpm)
+     * @param {number} [wpm=20] - the speed in words per minute using PARIS as the standard word
+     * @param {number} [fwpm=wpm] - the Farnsworth speed in words per minute (defaults to wpm)
      */
     constructor(useProsigns = true, wpm = 20, fwpm = wpm) {
         super(useProsigns);

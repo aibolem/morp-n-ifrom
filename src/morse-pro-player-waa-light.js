@@ -1,5 +1,5 @@
 /*
-This code is © Copyright Stephen C. Phillips, 2017.
+This code is © Copyright Stephen C. Phillips, 2018.
 Email: steve@scphillips.com
 
 Licensed under the EUPL, Version 1.2 or – as soon they will be approved by the European Commission - subsequent versions of the EUPL (the "Licence");
@@ -32,11 +32,11 @@ import MorsePlayerWAA from './morse-pro-player-waa';
  */
 export default class MorsePlayerWAALight extends MorsePlayerWAA {
     /**
-     * @param {function()} [sequenceStartCallback] - function to call each time the sequence starts.
-     * @param {function()} [sequenceEndingCallback] - function to call when the sequence is nearing the end.
-     * @param {function()} [soundStoppedCallback] - function to call when the sequence stops.
-     * @param {function()} [soundOnCallback] - function to call when a beep starts (passed the note number).
-     * @param {function()} [soundOffCallback] - function to call when a beep stops (passed the note number).
+     * @param {function()} sequenceStartCallback - function to call each time the sequence starts.
+     * @param {function()} sequenceEndingCallback - function to call when the sequence is nearing the end.
+     * @param {function()} soundStoppedCallback - function to call when the sequence stops.
+     * @param {function(number)} soundOnCallback - function to call when a beep starts (passed the note number).
+     * @param {function(number)} soundOffCallback - function to call when a beep stops (passed the note number).
      */
     constructor(sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback, soundOnCallback, soundOffCallback) {
         super(sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback);

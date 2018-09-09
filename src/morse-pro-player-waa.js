@@ -23,9 +23,9 @@ See the Licence for the specific language governing permissions and limitations 
  */
 export default class MorsePlayerWAA {
     /**
-     * @param {function()} [sequenceStartCallback] - function to call each time the sequence starts.
-     * @param {function()} [sequenceEndingCallback] - function to call when the sequence is nearing the end.
-     * @param {function()} [soundStoppedCallback] - function to call when the sequence stops.
+     * @param {function()} sequenceStartCallback - function to call each time the sequence starts.
+     * @param {function()} sequenceEndingCallback - function to call when the sequence is nearing the end.
+     * @param {function()} soundStoppedCallback - function to call when the sequence stops.
      */
     constructor(sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback) {
         if (sequenceStartCallback !== undefined) this.sequenceStartCallback = sequenceStartCallback;

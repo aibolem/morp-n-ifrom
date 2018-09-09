@@ -1,5 +1,5 @@
 /*
-This code is © Copyright Stephen C. Phillips, 2017.
+This code is © Copyright Stephen C. Phillips, 2018.
 Email: steve@scphillips.com
 
 Licensed under the EUPL, Version 1.2 or – as soon they will be approved by the European Commission - subsequent versions of the EUPL (the "Licence");
@@ -9,10 +9,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-// import * as WPM from './morse-pro-wpm';
-// import MorseDecoder from './morse-pro-decoder';
 import MorseKeyer from './morse-pro-keyer';
-// import MorsePlayerWAA from './morse-pro-player-waa';
 
 /*
     The Morse iambic keyer tests for input on a timer, plays the appropriate tone and passes the data to a decoder.

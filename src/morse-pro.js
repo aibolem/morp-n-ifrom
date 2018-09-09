@@ -12,6 +12,7 @@ See the Licence for the specific language governing permissions and limitations 
 /**
  * Basic methods to translate Morse code.
  */
+
 if (typeof(String.prototype.trim) === "undefined") {
     String.prototype.trim = function() {
         return String(this).replace(/^\s+|\s+$/g, '');
@@ -112,7 +113,7 @@ var tidyText = function(text) {
  * Translate text to morse in '..- .. / --' form.
  * If something in the text is untranslatable then it is surrounded by hash-signs ('#') and a hash is placed in the morse.
  * @param {string} text - alphanumeric message
- * @param {Boolean} useProsigns - true if prosigns are to be used (default is true)
+ * @param {boolean} useProsigns - true if prosigns are to be used (default is true)
  * @return {{message: string, morse: string, hasError: boolean}}
  */
 export function text2morse(text, useProsigns = true) {
@@ -164,9 +165,9 @@ export function text2morse(text, useProsigns = true) {
 }
 
 /**
- * Translate text to morse in 'Di-di-dah dah.' form.
+ * Translate text to morse in 'Di-di-dah dah' form.
  * @param {string} text - alphanumeric message
- * @param {Boolean} useProsigns - true if prosigns are to be used (default is true)
+ * @param {boolean} useProsigns - true if prosigns are to be used (default is true)
  * @return {string}
  */
 export function text2ditdah(text, useProsigns) {
@@ -187,6 +188,8 @@ export function text2ditdah(text, useProsigns) {
  * Canonicalise morse text.
  * Canonical form matches [.-/ ]*, has single spaces between characters, has words separated by ' / ', and has no spaces at the start or end.
  * A single '/' may be returned by this function.
+ * @param {string} morse - Morse code matching [.-_/| ]*
+ * @return {string} Morse code in canonical form matching [.-/ ]*
  */
 var tidyMorse = function(morse) {
     morse = morse.replace(/\|/g, "/"); // unify the word separator
@@ -203,7 +206,7 @@ var tidyMorse = function(morse) {
  * Translate morse to text. Canonicalise the morse first.
  * If something in the morse is untranslatable then it is surrounded by hash-signs ('#') and a hash is placed in the text.
  * @param {string} morse - morse message using [.-_/| ] characters
- * @param {Boolean} useProsigns - true if prosigns are to be used (default is true)
+ * @param {boolean} useProsigns - true if prosigns are to be used (default is true)
  * @return {{message: string, morse: string, hasError: boolean}}
  */
 export function morse2text(morse, useProsigns = true) {
