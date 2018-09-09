@@ -1,5 +1,5 @@
 /*
-This code is © Copyright Stephen C. Phillips, 2017.
+This code is © Copyright Stephen C. Phillips, 2018.
 Email: steve@scphillips.com
 
 Licensed under the EUPL, Version 1.2 or – as soon they will be approved by the European Commission - subsequent versions of the EUPL (the "Licence");
@@ -176,7 +176,7 @@ export default class MorsePlayerWAA {
             // if we're not actually paused then do nothing
             return;
         }
-        // otherwise we really are resuming playback (ore pretending we are, and actually playing from start...)
+        // otherwise we really are resuming playback (or pretending we are, and actually playing from start...)
         clearInterval(this._stopTimer);  // if we were going to send a soundStoppedCallback then don't
         clearInterval(this._startTimer);  // ditto
         clearInterval(this._timer);
@@ -207,11 +207,19 @@ export default class MorsePlayerWAA {
         clearInterval(this._timer);
 
         // ensure that the next note that is scheduled is a beep, not a pause (to help sync with vibration patterns)
-        // TODO: needs to use the same code as in _scheduleNotes to deal with upNext
         if (!this.isNote[this._nextNote]) {
+
             this._nextNote++;
-            if (this.loop) {
-                this._nextNote %= this.sequenceLength;
+
+            // if we'e got to the end of the sequence, then loop or load next sequence as appropriate
+            if (this._nextNote === this.sequenceLength) {
+                if (this.loop || this.upNext !== undefined) {
+                    this._nextNote = 0;
+                    if (this.upNext !== undefined) {
+                        this.load(this.upNext);
+                        this.upNext = undefined;
+                    }
+                }
             }
         }
     }
