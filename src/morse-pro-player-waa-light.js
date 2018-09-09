@@ -42,8 +42,8 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
         super(sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback);
         if (soundOnCallback !== undefined) this.soundOnCallback = soundOnCallback;
         if (soundOffCallback !== undefined) this.soundOffCallback = soundOffCallback;
-        this.wasOn = false;
-        this.count = 0;
+        this._wasOn = false;
+        this._count = 0;
     }
 
     /**
@@ -68,14 +68,6 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
     }
 
     /**
-     * @override
-     */
-    playFromStart() {
-        this.offCount = 0;
-        super.playFromStart();
-    }
-
-    /**
      * @access: private
      */
     _processSound(event) {
@@ -85,12 +77,12 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
             sum += Math.abs(input[i]) > 0;
         }
         var on = (sum > 128);  // is more than half the buffer non-zero?
-        if (on && !this.wasOn) {
+        if (on && !this._wasOn) {
             this._on();
-        } else if (!on && this.wasOn) {
+        } else if (!on && this._wasOn) {
             this._off();
         }
-        this.wasOn = on;
+        this._wasOn = on;
     }
 
     /**
@@ -98,11 +90,8 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
      * @override
      */
     _on() {
-        // if (this.count === 0) {
-        //     this.sequenceStartCallback();
-        // }
-        this.soundOnCallback(this._timings[this.count]);
-        this.count = (this.count + 1) % this._timings.length;
+        this.soundOnCallback(this._timings[this._count]);
+        this._count = (this._count + 1) % this._timings.length;
     }
 
     /**
@@ -110,11 +99,8 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
      * @override
      */
     _off() {
-        this.soundOffCallback(this._timings[this.count]);
-        this.count = (this.count + 1) % this._timings.length;
-        // if (this.count === 0) {
-        //     this.sequenceEndCallback();
-        // }
+        this.soundOffCallback(this._timings[this._count]);
+        this._count = (this._count + 1) % this._timings.length;
     }
 
     /**
