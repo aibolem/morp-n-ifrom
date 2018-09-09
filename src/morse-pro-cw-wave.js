@@ -35,15 +35,17 @@ export default class MorseCWWave extends MorseCW {
 
     /**
      * Get a sample waveform, not using Web Audio API (synchronous).
+     * @param {number} [endPadding =] - how much silence in ms to add to the end of the waveform.
      * @return {number[]} an array of floats in range [-1, 1] representing the wave-form.
      */
-    getSample() {
+    getSample(endPadding = 0) {
         var sample = [];
         var timings = this.getTimings();
         if (timings.length === 0) {
             return [];
         }
-        timings.push(-5);  // add 5ms silence to the end to ensure the filtered signal can finish cleanly
+        // add minimum of 5ms silence to the end to ensure the filtered signal can finish cleanly
+        timings.push(-Math.max(5, endPadding));
 
         /*
             Compute lowpass biquad filter coefficients using method from Chromium
@@ -92,16 +94,20 @@ export default class MorseCWWave extends MorseCW {
 
     /**
      * Get a sample waveform using Web Audio API (asynchronous).
+     * @param {number} [endPadding = 0] - how much silence in ms to add to the end of the waveform.
      * @return {Promise(number[])} a Promise resolving to an array of floats in range [-1, 1] representing the wave-form.
      */
-    getWAASample() {
+    getWAASample(endPadding = 0) {
+        // add minimum of 5ms silence to the end to ensure the filtered signal can finish cleanly
+        endPadding = Math.max(5, endPadding);
         var timings = this.getTimings();
+        timings.push(-endPadding);
         var offlineAudioContextClass = window.OfflineAudioContext || window.webkitOfflineAudioContext;
         if (offlineAudioContextClass === undefined) {
             throw new Error("No OfflineAudioContext class defined");
         }
         // buffer length is the Morse duration + 5ms to let the lowpass filter end cleanly
-        var offlineCtx = new offlineAudioContextClass(1, this.sampleRate * (this.getDuration() + 5) / 1000, this.sampleRate);
+        var offlineCtx = new offlineAudioContextClass(1, this.sampleRate * (this.getDuration() + endPadding) / 1000, this.sampleRate);
         var gainNode = offlineCtx.createGain();
         // empirically, the lowpass filter outputs waveform of magnitude 1.23, so need to scale it down to avoid clipping
         gainNode.gain.setValueAtTime(0.813, 0);
