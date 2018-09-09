@@ -326,6 +326,6 @@ export default class MorseDecoder {
         return this.getTimings('/');
     }
 
-    messageCallback() { }
-    speedCallback() { }
+    messageCallback(jsonData) { }
+    speedCallback(jsonData) { }
 }
