@@ -79,9 +79,14 @@ export default class MorseCW extends MorseMessage {
      * @return {number[]}
      */
     getTimings() {
-        var dit = WPM.ditLength(this._wpm);
-        var fdit = WPM.fditLength(this._wpm, this._fwpm);
-        return MorseCW.getTimingsGeneral(dit, 3 * dit, dit, 3 * fdit, 7 * fdit, this.morse);
+        return MorseCW.getTimingsGeneral(
+            WPM.ditLength(this._wpm),
+            WPM.dahLength(this._wpm),
+            WPM.ditSpace(this._wpm),
+            WPM.charSpace(this._wpm, this._fwpm),
+            WPM.wordSpace(this._wpm, this._fwpm),
+            this.morse
+        );
     }
 
     /**

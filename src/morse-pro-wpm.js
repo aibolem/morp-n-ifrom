@@ -1,5 +1,5 @@
 /*
-This code is © Copyright Stephen C. Phillips, 2017.
+This code is © Copyright Stephen C. Phillips, 2018.
 Email: steve@scphillips.com
 
 Licensed under the EUPL, Version 1.2 or – as soon they will be approved by the European Commission - subsequent versions of the EUPL (the "Licence");
@@ -17,9 +17,41 @@ const DITS_PER_WORD = 50;  /** dits in "PARIS " */
 const SPACES_IN_PARIS = 19;  /** 5x 3-dit inter-character spaces + 1x 7-dit space */
 const MS_IN_MINUTE = 60000;  /** number of milliseconds in 1 minute */
 
-/** Get the dit length in ms for a given WPM */
+/** Get the dit length in ms
+ * @param {number} wpm - speed in words per minute
+ */
 export function ditLength(wpm) {
     return (MS_IN_MINUTE / DITS_PER_WORD) / wpm;
+}
+
+/** Get the dah length in ms
+ * @param {number} wpm - speed in words per minute
+ */
+export function dahLength(wpm) {
+    return 3 * ditLength(wpm);
+}
+
+/** Get the dit space in ms
+ * @param {number} wpm - speed in words per minute
+ */
+export function ditSpace(wpm) {
+    return ditLength(wpm)
+}
+
+/** Get the character-space in ms
+ * @param {number} wpm - speed in words per minute
+ * @param {number} [fwpm = wpm] - Farnsworth speed in words per minute
+ */
+export function charSpace(wpm, fwpm = wpm) {
+    return 3 * fditLength(wpm, fwpm);
+}
+
+/** Get the word-space in ms
+ * @param {number} wpm - speed in words per minute
+ * @param {number} [fwpm = wpm] - Farnsworth speed in words per minute
+ */
+export function wordSpace(wpm, fwpm = wpm) {
+    return 7 * fditLength(wpm, fwpm);
 }
 
 /** Get the WPM for a given dit length in ms */
@@ -53,14 +85,4 @@ export function ratio(wpm, fwpm) {
 /** Get the Farnsworth WPM for a given WPM and ratio */
 export function fwpm(wpm, r) {
     return DITS_PER_WORD * wpm / (SPACES_IN_PARIS * r + (DITS_PER_WORD - SPACES_IN_PARIS));
-}
-
-// TODO: add more methods like the one below, moving all knowledge of timing multipliers into here.
-
-/** Get the word-space in ms
- * @param {number} wpm - speed in words per minute
- * @param {number} [fwpm = wpm] - Farnsworth speed in words per minute
- */
-export function wordSpace(wpm, fwpm = wpm) {
-    return 7 * fditLength(wpm, fwpm);
 }
