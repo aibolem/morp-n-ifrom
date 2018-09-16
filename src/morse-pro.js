@@ -252,5 +252,9 @@ export function morse2text(morse, useProsigns = true) {
  */
 export function looksLikeMorse(input) {
     input = tidyMorse(input);
-    return input.match(/^[ /.-]*$/);
+    if (input.match(/^[ /.-]*$/)) {
+        return true;
+    } else {
+        return false;
+    }
 }

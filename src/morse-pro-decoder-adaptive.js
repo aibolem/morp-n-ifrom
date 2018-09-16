@@ -10,6 +10,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
+import * as WPM from './morse-pro-wpm';
 import MorseDecoder from './morse-pro-decoder';
 
 /**
