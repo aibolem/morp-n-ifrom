@@ -20,55 +20,71 @@ const MS_IN_MINUTE = 60000;  /** number of milliseconds in 1 minute */
 
 /** Get the dit length in ms
  * @param {number} wpm - speed in words per minute
+ * @return {integer}
  */
 export function ditLength(wpm) {
-    return (MS_IN_MINUTE / DITS_PER_WORD) / wpm;
+    return Math.round((MS_IN_MINUTE / DITS_PER_WORD) / wpm);
 }
 
-/** Get the dah length in ms
+/**
+ * Get the dah length in ms
  * @param {number} wpm - speed in words per minute
+ * @return {integer}
  */
 export function dahLength(wpm) {
     return 3 * ditLength(wpm);
 }
 
-/** Get the dit space in ms
+/**
+ * Get the dit space in ms
  * @param {number} wpm - speed in words per minute
+ * @return {integer}
  */
 export function ditSpace(wpm) {
     return ditLength(wpm)
 }
 
-/** Get the character-space in ms
+/**
+ * Get the character-space in ms
  * @param {number} wpm - speed in words per minute
  * @param {number} [fwpm = wpm] - Farnsworth speed in words per minute
+ * @return {integer}
  */
 export function charSpace(wpm, fwpm = wpm) {
     return 3 * fditLength(wpm, fwpm);
 }
 
-/** Get the word-space in ms
+/**
+ * Get the word-space in ms
  * @param {number} wpm - speed in words per minute
  * @param {number} [fwpm = wpm] - Farnsworth speed in words per minute
+ * @return {integer}
  */
 export function wordSpace(wpm, fwpm = wpm) {
     return 7 * fditLength(wpm, fwpm);
 }
 
-/** Get the WPM for a given dit length in ms */
+/**
+ * Get the WPM for a given dit length in ms
+ * @return {number}
+ */
 export function wpm(ditLen) {
     return (MS_IN_MINUTE / DITS_PER_WORD) / ditLen;
 }
 
-/** Get the Farnsworth dit length in ms for a given WPM and Farnsworth WPM. Note, actual dit-spaces should not be slowed down */
+/**
+ * Get the Farnsworth dit length in ms for a given WPM and Farnsworth WPM. Note, actual dit-spaces should not be slowed down
+ * @return {integer}
+ */
 export function fditLength(wpm, fwpm) {
-    return ditLength(wpm) * ratio(wpm, fwpm);
+    return Math.round(ditLength(wpm) * ratio(wpm, fwpm));
 }
 
 /**
  * Get the dit length ratio for a given WPM and Farnsworth WPM
  * @param {number} wpm - speed in words per minute
  * @param {number} fwpm - Farnsworth speed in words per minute
+ * @return {number}
  */
 export function ratio(wpm, fwpm) {
     // "PARIS " is 31 units for the characters and 19 units for the inter-character spaces and inter-word space
