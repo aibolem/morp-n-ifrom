@@ -1,7 +1,8 @@
-/*
+/*!
 This code is © Copyright Stephen C. Phillips, 2018.
 Email: steve@scphillips.com
-
+*/
+/*
 Licensed under the EUPL, Version 1.2 or – as soon they will be approved by the European Commission - subsequent versions of the EUPL (the "Licence");
 You may not use this work except in compliance with the Licence.
 You may obtain a copy of the Licence at: https://joinup.ec.europa.eu/community/eupl/
@@ -35,7 +36,7 @@ export default class MorseCWWave extends MorseCW {
 
     /**
      * Get a sample waveform, not using Web Audio API (synchronous).
-     * @param {number} [endPadding =] - how much silence in ms to add to the end of the waveform.
+     * @param {number} [endPadding=0] - how much silence in ms to add to the end of the waveform.
      * @return {number[]} an array of floats in range [-1, 1] representing the wave-form.
      */
     getSample(endPadding = 0) {

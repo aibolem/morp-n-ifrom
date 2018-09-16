@@ -1,7 +1,8 @@
-/*
-This code is © Copyright Stephen C. Phillips, 2017.
+/*!
+This code is © Copyright Stephen C. Phillips, 2018.
 Email: steve@scphillips.com
-
+*/
+/*
 Licensed under the EUPL, Version 1.2 or – as soon they will be approved by the European Commission - subsequent versions of the EUPL (the "Licence");
 You may not use this work except in compliance with the Licence.
 You may obtain a copy of the Licence at: https://joinup.ec.europa.eu/community/eupl/
@@ -247,7 +248,7 @@ export function morse2text(morse, useProsigns = true) {
 /**
  * Determine whether a string is most likely morse code.
  * @param {string} input - the text
- * @return {boolean} - true if the string only contains [.-_|/]
+ * @return {boolean} - true if the string only contains [.-_|/] after executing tidyMorse
  */
 export function looksLikeMorse(input) {
     input = tidyMorse(input);

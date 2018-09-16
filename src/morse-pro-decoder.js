@@ -34,8 +34,8 @@ export default class MorseDecoder {
     /**
      * @param {number} [wpm=20] - The speed of the Morse in words per minute.
      * @param {number} [fwpm=wpm] - The Farnsworth speed of the Morse in words per minute.
-     * @param {number} [messageCallback] - Callback executed when decoder buffer is flushed (every character). Returns dictionary with keys 'timings', 'morse' and 'message'
-     * @param {number} [speedCallback] - Callback executed if the wpm or fwpm speed changes. The speed in this class doesn't change by itself, but e.g. the fwpm can change if wpm is changed. Returned dictionary has keys 'fwpm' and 'wpm'.
+     * @param {function()} messageCallback - Callback executed when decoder buffer is flushed (every character). Returns dictionary with keys 'timings', 'morse' and 'message'
+     * @param {function()} speedCallback - Callback executed if the wpm or fwpm speed changes. The speed in this class doesn't change by itself, but e.g. the fwpm can change if wpm is changed. Returned dictionary has keys 'fwpm' and 'wpm'.
     */
     constructor(wpm = 20, fwpm = wpm, messageCallback = undefined, speedCallback = undefined) {
         this._wpm = undefined;
