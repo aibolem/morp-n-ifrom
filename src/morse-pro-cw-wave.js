@@ -40,8 +40,19 @@ export default class MorseCWWave extends MorseCW {
      * @return {number[]} an array of floats in range [-1, 1] representing the wave-form.
      */
     getSample(endPadding = 0) {
+        return MorseCWWave.getSampleGeneral(this.getTimings(), this.frequency, this.sampleRate, endPadding);
+    }
+
+    /**
+     * Get a sample waveform, not using Web Audio API (synchronous).
+     * @param {number[]} timings - millisecond timings, +ve numbers representing sound, -ve for no sound (+ve/-ve can be in any order)
+     * @param {number} frequency - frequency of sound in Hz.
+     * @param {number} sampleRate - sample rate in Hz.
+     * @param {number} [endPadding=0] - how much silence in ms to add to the end of the waveform.
+     * @return {number[]} an array of floats in range [-1, 1] representing the wave-form.
+     */
+    static getSampleGeneral(timings, frequency, sampleRate, endPadding = 0) {
         var sample = [];
-        var timings = this.getTimings();
         if (timings.length === 0) {
             return [];
         }
@@ -53,7 +64,7 @@ export default class MorseCWWave extends MorseCW {
         */
 
         // set lowpass frequency cutoff to 1.5 x wave frequency
-        var lowpassFreq = (this.frequency * 1.5) / this.sampleRate;
+        var lowpassFreq = (frequency * 1.5) / sampleRate;
         var q = Math.SQRT1_2;
       
         var sin = Math.sin(2 * Math.PI * lowpassFreq);
@@ -72,13 +83,13 @@ export default class MorseCWWave extends MorseCW {
             Compute filtered signal
         */
 
-        var step = Math.PI * 2 * this.frequency / this.sampleRate;
+        var step = Math.PI * 2 * frequency / sampleRate;
         var on = timings[0] > 0 ? 1 : 0;
         var x0, x1 = 0, x2 = 0;
         var y0, y1 = 0, y2 = 0;
         var gain = 0.813;  // empirically, the lowpass filter outputs waveform of magnitude 1.23, so need to scale it down to avoid clipping
         for (var t = 0; t < timings.length; t += 1) {
-            var duration = this.sampleRate * Math.abs(timings[t]) / 1000;
+            var duration = sampleRate * Math.abs(timings[t]) / 1000;
             for (var i = 0; i < duration; i += 1) {
                 x0 = on * Math.sin(i * step);  // the input signal
                 y0 = b0 * x0 + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2;
