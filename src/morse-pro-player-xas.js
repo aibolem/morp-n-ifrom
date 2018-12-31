@@ -31,7 +31,7 @@ export default class MorsePlayerXAS {
         this.xaudioServerClass = xaudioServerClass;
         this._isPlaying = false;
         this.sample = [];
-        this.volume = 1;  // not currently settable
+        this._volume = 1;
         this.samplePos = undefined;
         this.noAudio = false;
         this.audioServer = undefined;
@@ -74,6 +74,21 @@ export default class MorsePlayerXAS {
         this.load();  // create an xAudioServer so that we know if it works at all and what type it is
     }
 
+    /**
+     * Set the volume for the player
+     * @param {number} v - the volume, clamped to [0,1]
+     */
+    set volume(v) {
+        this._volume = Math.min(Math.max(v, 0), 1);
+    }
+
+    /**
+     * @returns {number} the current volume [0,1]
+     */
+    get volume() {
+        return this._volume;
+    }
+
     stop() {
         this._isPlaying = false;
         this.audioServer.changeVolume(0);
@@ -114,7 +129,7 @@ export default class MorsePlayerXAS {
         this.stop();
         this._isPlaying = true;
         this.samplePos = 0;
-        this.audioServer.changeVolume(this.volume);
+        this.audioServer.changeVolume(this._volume);
     }
 
     hasError() {
