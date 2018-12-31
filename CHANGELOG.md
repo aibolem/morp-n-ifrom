@@ -3,7 +3,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [2.0.0] - 2018-09-09
+
 ### Added
+
 - more in-line documentation in many files
 - some more tests of main classes
 - morse-pro
@@ -37,6 +39,7 @@ All notable changes to this project will be documented in this file.
     - volume now settable
 
 ### Changed
+
 - updates node and npm to latest versions
 - updates all npm dependencies to latest versions (apart from babel which is latest v6, not v7)
 - Babel uses 'env' preset instead of 'es2015'
@@ -60,19 +63,25 @@ All notable changes to this project will be documented in this file.
     - return value of `audioType` property changed from 4 to 5
 
 ## [1.0.2] - 2017-08-11
+
 ### Added
+
 - Some tests
 - Integration with travis and coveralls
 
 ### Changed
+
 - Imports now use relative paths
 - npm library now transpiled from ES6 and located in lib directory
 
 ## [1.0.1] - 2017-07-28
+
 ### Added
+
 - ESDoc inline documentation
 
 ### Changed
+
 - Source Javascript moved into src directory
 
 ## [1.0.0] - 2017-07-23
