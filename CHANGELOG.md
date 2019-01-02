@@ -2,7 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
-## [2.0.0] - 2018-09-09
+## [2.0.0] - 2019-01-02
+
+No particular reason to make a release now except that it's been too long coming and will never really be ready. Best to release it now in case it is useful to someone. It's version 2.0.0 because of breaking changes, not for any other reason. More breaking changes are likely as I am not happy with the architecture, but who knows when?!
 
 ### Added
 
