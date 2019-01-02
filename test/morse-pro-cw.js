@@ -55,7 +55,7 @@ describe('morse-pro-cw', function() {
         var tests = [
             {message: 'PARIS', wpm: 20, fwpm: 20, duration: 2580},
             {message: 'PARIS', wpm: 10, fwpm: 10, duration: 5160},
-            {message: 'PARIS', wpm: 20, fwpm: 10, duration: 4475}
+            {message: 'PARIS', wpm: 20, fwpm: 10, duration: 4476}
         ];
 
         tests.forEach(function(test) {
@@ -63,7 +63,7 @@ describe('morse-pro-cw', function() {
                 var morseCW = new MorseCW(true, test.wpm, test.fwpm);
                 morseCW.translate(test.message);
                 var d = morseCW.getDuration();
-                assert.equal(Math.round(d), test.duration);
+                assert.equal(d, test.duration);
             });
             it('is the right duration for the wpm', function() {
                 var morseCW = new MorseCW(true, test.wpm, test.fwpm);
@@ -71,7 +71,7 @@ describe('morse-pro-cw', function() {
                 var d = morseCW.getDuration();
                 morseCW.translate('. / .');
                 var wordSpace = -morseCW.getTimings()[1];
-                assert.equal(d + wordSpace, 60 * 1000 / test.fwpm);
+                assert.equal(Math.abs((d + wordSpace) - (60 * 1000 / test.fwpm)) <= 1, true);  // bit of slack for rounding errors
             });
         });
     });

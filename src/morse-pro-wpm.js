@@ -23,7 +23,11 @@ const MS_IN_MINUTE = 60000;  /** number of milliseconds in 1 minute */
  * @return {integer}
  */
 export function ditLength(wpm) {
-    return Math.round((MS_IN_MINUTE / DITS_PER_WORD) / wpm);
+    return Math.round(_ditLength(wpm));
+}
+
+function _ditLength(wpm) {
+    return (MS_IN_MINUTE / DITS_PER_WORD) / wpm;
 }
 
 /**
@@ -32,7 +36,7 @@ export function ditLength(wpm) {
  * @return {integer}
  */
 export function dahLength(wpm) {
-    return 3 * ditLength(wpm);
+    return Math.round(3 * _ditLength(wpm));
 }
 
 /**
@@ -51,7 +55,7 @@ export function ditSpace(wpm) {
  * @return {integer}
  */
 export function charSpace(wpm, fwpm = wpm) {
-    return 3 * fditLength(wpm, fwpm);
+    return Math.round(3 * _fditLength(wpm, fwpm));
 }
 
 /**
@@ -61,7 +65,7 @@ export function charSpace(wpm, fwpm = wpm) {
  * @return {integer}
  */
 export function wordSpace(wpm, fwpm = wpm) {
-    return 7 * fditLength(wpm, fwpm);
+    return Math.round(7 * _fditLength(wpm, fwpm));
 }
 
 /**
@@ -77,7 +81,11 @@ export function wpm(ditLen) {
  * @return {integer}
  */
 export function fditLength(wpm, fwpm) {
-    return Math.round(ditLength(wpm) * ratio(wpm, fwpm));
+    return Math.round(_fditLength(wpm, fwpm));
+}
+
+function _fditLength(wpm, fwpm) {
+    return _ditLength(wpm) * ratio(wpm, fwpm);
 }
 
 /**
@@ -90,7 +98,7 @@ export function ratio(wpm, fwpm) {
     // "PARIS " is 31 units for the characters and 19 units for the inter-character spaces and inter-word space
     // One unit takes 1 * 60 / (50 * wpm)
     // The 31 units should take 31 * 60 / (50 * wpm) seconds at wpm
-    // PARIS should take 50 * 60 / (50 * fpm) to transmit at fpm, or 60 / fwpm  seconds at fwpm
+    // "PARIS " should take 50 * 60 / (50 * fwpm) to transmit at fwpm, or 60 / fwpm  seconds at fwpm
     // Keeping the time for the characters constant,
     // The spaces need to take: (60 / fwpm) - [31 * 60 / (50 * wpm)] seconds in total
     // The spaces are 4 inter-character spaces of 3 units and 1 inter-word space of 7 units. Their ratio must be maintained.
