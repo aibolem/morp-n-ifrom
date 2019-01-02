@@ -27,7 +27,7 @@ export default class MorseIambicKeyer extends MorseKeyer {
      * @param {number} [fwpm=20] - Farnsworth speed of the keyer.
      * @param {number} [frequency=550] - The frequency in Hz for the sidetone.
      * @param {Boolean} iambicA - if true then use iambic A mode, otherwise use iambic B mode (which sends an additional dit or dah when squeeze is released).
-     * @param {function(dict: {message: string, timings: number[], morse: string})} messageCallback - A function which receives a dictionary with keys 'message', 'timings' and 'morse' for each decoded part (see MorseDecoder). Its use here will result in a single character being returned each time.
+     * @param {function()} messageCallback - A function called with {message: string, timings: number[], morse: string} for each decoded part (see MorseDecoder). Its use here will result in a single character being returned each time.
      */
     constructor(keyCallback, wpm, fwpm, frequency, iambicA = true, messageCallback = false) {
         super(keyCallback, wpm, fwpm, frequency, messageCallback);

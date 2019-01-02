@@ -106,7 +106,7 @@ export default class MorseCWWave extends MorseCW {
 
     /**
      * Get a sample waveform using Web Audio API (asynchronous).
-     * @param {number} [endPadding = 0] - how much silence in ms to add to the end of the waveform.
+     * @param {number} [endPadding=0] - how much silence in ms to add to the end of the waveform.
      * @return {Promise(number[])} a Promise resolving to an array of floats in range [-1, 1] representing the wave-form.
      */
     getWAASample(endPadding = 0) {

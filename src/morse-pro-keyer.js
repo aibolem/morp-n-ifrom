@@ -44,7 +44,7 @@ export default class MorseKeyer {
      * @param {number} [wpm=20] - Speed of the keyer.
      * @param {number} [fwpm=wpm] - Farnsworth speed of the keyer.
      * @param {number} [frequency=550] - The frequency in Hz for the sidetone.
-     * @param {function(dict: {message: string, timings: number[], morse: string})} messageCallback - A function which receives a dictionary with keys 'message', 'timings' and 'morse' for each decoded part (see MorseDecoder). Its use here will result in a single character being returned each time.
+     * @param {function()} messageCallback - A function called with {message: string, timings: number[], morse: string} for each decoded part (see MorseDecoder). Its use here will result in a single character being returned each time.
      */
     constructor(keyCallback, wpm = 20, fwpm = wpm, frequency = 550, messageCallback = undefined) {
         this.keyCallback = keyCallback;

@@ -36,8 +36,8 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
      * @param {function()} sequenceStartCallback - function to call each time the sequence starts.
      * @param {function()} sequenceEndingCallback - function to call when the sequence is nearing the end.
      * @param {function()} soundStoppedCallback - function to call when the sequence stops.
-     * @param {function(number)} soundOnCallback - function to call when a beep starts (passed the note number).
-     * @param {function(number)} soundOffCallback - function to call when a beep stops (passed the note number).
+     * @param {function()} soundOnCallback - function to call wth the note number as the argument when a beep starts.
+     * @param {function()} soundOffCallback - function to call with the note number as the argument when a beep stops.
      */
     constructor(sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback, soundOnCallback, soundOffCallback) {
         super(sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback);
