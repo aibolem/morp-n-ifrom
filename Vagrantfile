@@ -17,7 +17,9 @@ Vagrant.configure("2") do |config|
 
   config.vm.hostname = hostname
 
-  config.vm.synced_folder ".", "/vagrant", type: "rsync"
+  config.vm.synced_folder ".", "/vagrant", type: "rsync", 
+    rsync__exclude: [".vagrant/", ".git/"],
+    rsync__args: ["--verbose", "--archive", "-z"]
 
   config.vm.provider "virtualbox" do |vb|
   	vb.memory = ram
