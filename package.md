@@ -10,7 +10,7 @@ Using "mocha" for executing tests. the "mocha-lcov-reporter" is required to crea
 
 ### Coverage
 
-Using ["istanbul"](https://github.com/gotwarlost/istanbul) and its command line client ["nyc"](https://github.com/istanbuljs/nyc). 
+Using ["istanbul"](https://github.com/gotwarlost/istanbul) and its command line client ["nyc"](https://github.com/istanbuljs/nyc).
 
 Babel support in `nyc` provided by [`babel-plugin-istanbul"](https://www.npmjs.com/package/nyc#use-with-babel-plugin-istanbul-for-babel-support).
 

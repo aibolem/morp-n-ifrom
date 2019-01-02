@@ -1,4 +1,4 @@
-# morse-pro Change Log
+# morse-pro Changelog
 
 All notable changes to this project will be documented in this file.
 
@@ -44,7 +44,8 @@ All notable changes to this project will be documented in this file.
 - updates all npm dependencies to latest versions (apart from babel which is latest v6, not v7)
 - Babel uses 'env' preset instead of 'es2015'
 - morse-pro
-    - tidyMorse now trims whitespace
+    - `tidyMorse` now trims whitespace
+    - `looksLikeMorse` now returns false when the input string is just whitespace
 - morse-pro-wpm
     - millisecond timings are now rounded to the nearest integer
 - morse-pro-util-riffwave
