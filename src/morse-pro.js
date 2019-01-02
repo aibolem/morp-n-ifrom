@@ -248,13 +248,9 @@ export function morse2text(morse, useProsigns = true) {
 /**
  * Determine whether a string is most likely morse code.
  * @param {string} input - the text
- * @return {boolean} - true if the string only contains [.-_|/] after executing tidyMorse
+ * @return {boolean} - true if the string only has Morse characters in after executing tidyMorse
  */
 export function looksLikeMorse(input) {
     input = tidyMorse(input);
-    if (input.match(/^[ /.-]*$/)) {
-        return true;
-    } else {
-        return false;
-    }
+    return (input.match(/^[/.-][ /.-]*$/) !== null);
 }

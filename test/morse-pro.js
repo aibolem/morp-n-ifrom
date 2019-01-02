@@ -85,7 +85,7 @@ describe('morse-pro', function() {
 
     describe('looksLikeMorse()', function() {
         var tests = [
-            {args: [''], expected: true},
+            {args: [''], expected: false},
             {args: ['.'], expected: true},
             {args: ['-/ |.'], expected: true},
             {args: ['a'], expected: false},
