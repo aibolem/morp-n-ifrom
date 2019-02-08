@@ -85,6 +85,18 @@ export default class MorseMessage {
     }
 
     /**
+     * Load in some Morse without attempting to translate it.
+     * @param {String} morse - Morse code string to load in
+     */
+    loadMorse(morse) {
+        if (!Morse.looksLikeMorse(morse)) {
+            throw new Error("Error in input");
+        }
+        this.input = morse;
+        this.inputWasMorse = true;
+        this.morse = Morse.tidyMorse(morse);
+    }
+    /**
      * Clear all the errors from the morse and message. Useful if you want to play the sound even though it didn't translate.
      */
     clearError() {

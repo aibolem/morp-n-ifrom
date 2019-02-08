@@ -192,7 +192,7 @@ export function text2ditdah(text, useProsigns) {
  * @param {string} morse - Morse code matching [.-_/| ]*
  * @return {string} Morse code in canonical form matching [.-/ ]*
  */
-var tidyMorse = function(morse) {
+export var tidyMorse = function(morse) {
     morse = morse.replace(/\|/g, "/"); // unify the word separator
     morse = morse.replace(/\//g, " / "); // make sure word separators are spaced out
     morse = morse.replace(/\s+/g, " "); // squash multiple spaces into single spaces
