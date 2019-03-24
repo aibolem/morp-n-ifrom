@@ -29,19 +29,35 @@ export default class Morse {
         this.morse2textD = {};
         this.addDict({'':''});
         this.addDict(this.dictionary.letter);
-        this.tokenMatch = new RegExp("^.");
-
         this.useProsigns = useProsigns;
-        if (useProsigns) {
-            this.addDict(this.dictionary.options.prosigns);
-            this.tokenMatch = new RegExp("^" + this.dictionary.prosign.start + "...?" + this.dictionary.prosign.end + "|.");
+    }
+
+    addDict(dict) {
+        for (let letter in dict) {
+            this.text2morseD[letter] = dict[letter];
+            this.morse2textD[dict[letter]] = letter;
         }
     }
 
-    addDict(add) {
-        for (let letter in add) {
-            this.text2morseD[letter] = add[letter];
-            this.morse2textD[add[letter]] = letter;
+    removeDict(dict) {
+        for (let letter in dict) {
+            delete this.text2morseD[letter];
+            delete this.morse2textD[dict[letter]];
+        }
+    }
+
+    get useProsigns() {
+        return this._useProsigns;
+    }
+
+    set useProsigns(useProsigns) {
+        this._useProsigns = useProsigns;
+        if (useProsigns) {
+            this.addDict(this.dictionary.options.prosigns);
+            this.tokenMatch = new RegExp("^" + this.dictionary.prosign.start + "...?" + this.dictionary.prosign.end + "|.");
+        } else {
+            this.removeDict(this.dictionary.options.prosigns);
+            this.tokenMatch = new RegExp("^.");
         }
     }
 
