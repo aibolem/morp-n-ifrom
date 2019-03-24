@@ -87,7 +87,7 @@ export default class MorseMessage {
         if (this.inputWasMorse) {
             return this.text;
         } else {
-            return this.morseCWWave;
+            return this.morse;
         }
     }
 
