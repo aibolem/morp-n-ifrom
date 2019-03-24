@@ -1,28 +1,35 @@
+// import Morse from '../src/morse-pro';
 import MorseCW from '../src/morse-pro-cw';
+// import buildAll from '../src/morse-pro-factory';
 
 var assert = require('assert');
+
+// var morse = new Morse();
 
 describe('morse-pro-cw', function() {
 
     describe('constructor()', function() {
         it('should default to 20 wpm', function() {
+            // let {morseCW} = buildAll();
             var morseCW = new MorseCW();
             assert.equal(morseCW.wpm, 20);
         });
         it('fwpm should default to wpm', function() {
-            var morseCW = new MorseCW(true, 30);
+            var morseCW = new MorseCW({wpm: 30});
             assert.equal(morseCW.fwpm, 30);
         });
     });
 
     describe('speed controls', function() {
         it('wpm should never be less than fwpm', function() {
+            // let {morseCW} = buildAll();
             var morseCW = new MorseCW();
             morseCW.wpm = 20;
             morseCW.fwpm = 30;
             assert.equal(morseCW.wpm, 30);
         });
         it('fwpm should never be more than wpm', function() {
+            // let {morseCW} = buildAll();
             var morseCW = new MorseCW();
             morseCW.fwpm = 20;
             morseCW.wpm = 10;
@@ -40,9 +47,12 @@ describe('morse-pro-cw', function() {
 
         tests.forEach(function(test) {
             it('gives timings for "' + test.morse + '" ' + test.wpm + '/' + test.fwpm + ' as ' + test.timings, function() {
-                var morseCW = new MorseCW(true, test.wpm, test.fwpm);
-                morseCW.morse = test.morse;  // set morse field directly to avoid triggering translation errors
-                var t = morseCW.getTimings();
+                var morseCW = new MorseCW({dictionary: 'international', wpm: test.wpm, fwpm: test.fwpm});
+                // let {morse, morseCW} = buildAll();
+                // morseCW.wpm = test.wpm;
+                // morseCW.fwpm = test.fwpm;
+                var morseTokens = morseCW.tokeniseMorse(test.morse);
+                var t = morseCW.morseTokens2timing(morseTokens);
                 for (var i = 0; i < t.length; i++) {
                     t[i] = Math.round(t[i]);
                 }
@@ -55,23 +65,27 @@ describe('morse-pro-cw', function() {
         var tests = [
             {message: 'PARIS', wpm: 20, fwpm: 20, duration: 2580},
             {message: 'PARIS', wpm: 10, fwpm: 10, duration: 5160},
-            {message: 'PARIS', wpm: 20, fwpm: 10, duration: 4476}
+            {message: 'PARIS', wpm: 20, fwpm: 10, duration: 4475}
         ];
 
         tests.forEach(function(test) {
             it('gives duration for "' + test.message + '" ' + test.wpm + '/' + test.fwpm + ' as ' + test.duration, function() {
-                var morseCW = new MorseCW(true, test.wpm, test.fwpm);
-                morseCW.translate(test.message);
-                var d = morseCW.getDuration();
-                assert.equal(d, test.duration);
+                var morseCW = new MorseCW({dictionary: 'international', wpm: test.wpm, fwpm: test.fwpm});
+                // let {morse, morseCW} = buildAll();
+                // morseCW.wpm = test.wpm;
+                // morseCW.fwpm = test.fwpm;
+                var morseTokens = morseCW.textTokens2morse(morseCW.tokeniseRawText(test.message)).morse;
+                var d = morseCW.getDuration(morseCW.morseTokens2timing(morseTokens));
+                assert.equal(Math.round(d), test.duration);
             });
             it('is the right duration for the wpm', function() {
-                var morseCW = new MorseCW(true, test.wpm, test.fwpm);
-                morseCW.translate(test.message);
-                var d = morseCW.getDuration();
-                morseCW.translate('. / .');
-                var wordSpace = -morseCW.getTimings()[1];
-                assert.equal(Math.abs((d + wordSpace) - (60 * 1000 / test.fwpm)) <= 1, true);  // bit of slack for rounding errors
+                var morseCW = new MorseCW({dictionary: 'international', wpm: test.wpm, fwpm: test.fwpm});
+                // let {morse, morseCW} = buildAll();
+                // morseCW.wpm = test.wpm;
+                // morseCW.fwpm = test.fwpm;
+                var morseTokens = morseCW.textTokens2morse(morseCW.tokeniseRawText(test.message)).morse;
+                var d = morseCW.getDuration(morseCW.morseTokens2timing(morseTokens)) + morseCW.wordSpace;
+                assert.equal(d - (60 * 1000 / test.fwpm) <= 1, true);  // bit of slack for rounding errors
             });
         });
     });
@@ -84,7 +98,10 @@ describe('morse-pro-cw', function() {
 
         tests.forEach(function(test) {
             it('computes wordspace for "' + test.wpm + '/' + test.fwpm + ' as ' + test.wordSpace, function() {
-                var morseCW = new MorseCW(true, test.wpm, test.fwpm);
+                var morseCW = new MorseCW({dictionary: 'international', wpm: test.wpm, fwpm: test.fwpm});
+                // let {morseCW} = buildAll();
+                // morseCW.wpm = test.wpm;
+                // morseCW.fwpm = test.fwpm;
                 assert.equal(Math.round(morseCW.wordSpace), test.wordSpace);
             });
         });

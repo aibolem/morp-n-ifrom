@@ -19,32 +19,36 @@ import * as Morse from './morse-pro';
  *
  * @example
  * import MorseMessage from 'morse-pro-message';
- * var morseMessage = new MorseMessage();
- * var input;
- * var output;
+ * import MorseCWWave from 'morse-pro-cw-wave';
+ * let morseCWWave = new MorseCWWave();
+ * let morseMessage = new MorseMessage(morseCWWave);
+ * let output;
  * try {
  *     output = morseMessage.translate("abc");
  * catch (ex) {
- *     // input will have errors surrounded by paired '#' signs
- *     // output will be best attempt at translation, with untranslatables replaced with '#'
- *     morseMessage.clearError();  // remove all the '#'
+ *     // output will be best attempt at translation
+ *     // to understand the detail of where the error is, look at morseMessage.errors
  * }
  * if (morseMessage.inputWasMorse) {
  *     // do something
  * }
+ * // get the Morse code waveform
+ * let wave = morseMessage.wave;
  */
 export default class MorseMessage {
-    /**
-     * @param {boolean} [prosigns=true] - whether or not to include prosigns in the translations
-     */
-    constructor(useProsigns = true) {
-        this.useProsigns = useProsigns;
-        this.input = "";
-        this.output = "";
-        this.morse = "";
-        this.message = "";
+    constructor(morseCWWave) {
+        this.morseCWWave = morseCWWave;
+        // this.player = morsePlayer;
+        this.rawInput = undefined;
         this.inputWasMorse = undefined;
+        this.text = undefined;
+        this.textTokens = undefined;
+        this.morse = undefined;
+        this.morseTokens = undefined;
+        this.errors = undefined;
         this.hasError = undefined;
+        // this.volumes = undefined;
+        // this.frequencies = undefined;
     }
 
     /**
@@ -52,60 +56,71 @@ export default class MorseMessage {
      * @param {boolean} isMorse - whether the input is Morse code or not (if not set then the looksLikeMorse method will be used)
      */
     translate(input, isMorse) {
-        var translation;
-
+        this.rawInput = input;
         if (typeof isMorse === "undefined") {
             // make a guess: could be wrong if someone wants to translate "." into Morse for instance
-            isMorse = Morse.looksLikeMorse(input);
+            isMorse = this.morseCWWave.looksLikeMorse(input);
         }
+        let d;
         if (isMorse) {
             this.inputWasMorse = true;
-            translation = Morse.morse2text(input, this.useProsigns);
+            d = this.morseCWWave.morse2text(input);
         } else {
             this.inputWasMorse = false;
-            translation = Morse.text2morse(input, this.useProsigns);
+            d = this.morseCWWave.text2morse(input);
         }
 
-        this.morse = translation.morse;
-        this.message = translation.message;
+        // console.log(d);
+        this.morseTokens = d.morse;
+        this.textTokens = d.text;
+        this.errors = d.error;
+        this.hasError = d.hasError; 
 
-        if (this.inputWasMorse) {
-            this.input = this.morse;
-            this.output = this.message;
-        } else {
-            this.input = this.message;
-            this.output = this.morse;
-        }
-
-        this.hasError = translation.hasError;
+        this.text = this.morseCWWave.displayText(this.textTokens);
+        // console.log(this.text);
+        this.morse = this.morseCWWave.displayMorse(this.morseTokens);
+        // console.log(this.morse);
         if (this.hasError) {
             throw new Error("Error in input");
         }
-        return this.output;
+
+        if (this.inputWasMorse) {
+            return this.text;
+        } else {
+            return this.morseCWWave;
+        }
     }
 
-    /**
-     * Load in some Morse without attempting to translate it.
-     * @param {String} morse - Morse code string to load in
-     */
-    loadMorse(morse) {
-        if (!Morse.looksLikeMorse(morse)) {
-            throw new Error("Error in input");
-        }
-        this.input = morse;
-        this.inputWasMorse = true;
-        this.morse = Morse.tidyMorse(morse);
+    get timings() {
+        return this.morseCWWave.morseTokens2timing(this.morseTokens);
     }
-    /**
-     * Clear all the errors from the morse and message. Useful if you want to play the sound even though it didn't translate.
-     */
-    clearError() {
-        if (this.inputWasMorse) {
-            this.morse = this.morse.replace(/#/g, "");  // leave in the bad Morse
-        } else {
-            this.message = this.message.replace(/#[^#]*?#/g, "");
-            this.morse = this.morse.replace(/#/g, "");
-        }
-        this.hasError = false;
+
+    get wave() {
+        return this.morseCWWave.getSample(this.timings);
     }
+
+    // /**
+    //  * Load in some Morse without attempting to translate it.
+    //  * @param {String} morse - Morse code string to load in
+    //  */
+    // loadMorse(morse) {
+    //     if (!Morse.looksLikeMorse(morse)) {
+    //         throw new Error("Error in input");
+    //     }
+    //     this.input = morse;
+    //     this.inputWasMorse = true;
+    //     this.morse = Morse.tidyMorse(morse);
+    // }
+    // /**
+    //  * Clear all the errors from the morse and message. Useful if you want to play the sound even though it didn't translate.
+    //  */
+    // clearError() {
+    //     if (this.inputWasMorse) {
+    //         this.morse = this.morse.replace(/#/g, "");  // leave in the bad Morse
+    //     } else {
+    //         this.message = this.message.replace(/#[^#]*?#/g, "");
+    //         this.morse = this.morse.replace(/#/g, "");
+    //     }
+    //     this.hasError = false;
+    // }
 }

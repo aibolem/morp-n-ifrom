@@ -10,30 +10,37 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-import * as WPM from './morse-pro-wpm';
-import MorseMessage from './morse-pro-message';
-
 /**
  * Class to create the on/off timings needed by e.g. sound generators. Timings are in milliseconds; "off" timings are negative.
  *
  * @example
- * import MorseCW from 'morse-pro-cw';
- * var morseCW = new MorseCW();
- * morseCW.translate("abc");
- * var timings = morseCW.getTimings();
- */
-export default class MorseCW extends MorseMessage {
-    /**
-     * @param {boolean} [prosigns=true] - whether or not to include prosigns in the translations
-     * @param {number} [wpm=20] - the speed in words per minute using PARIS as the standard word
-     * @param {number} [fwpm=wpm] - the Farnsworth speed in words per minute (defaults to wpm)
-     */
-    constructor(useProsigns = true, wpm = 20, fwpm = wpm) {
-        super(useProsigns);
+//  * import MorseCW from 'morse-pro-cw';
+//  * var morseCW = new MorseCW();
+//  * morseCW.translate("abc");
+//  * var timings = morseCW.getTimings();
+//  */
+
+import Morse from './morse-pro';
+
+const MS_IN_MINUTE = 60000;  /** number of milliseconds in 1 minute */
+// const PARIS_MORSE_TOKENS = [['. - - .', '. -', '. -.', '. .', '. . .']];
+
+export default class MorseCW extends Morse {
+    // /**
+    //  * @param {boolean} [prosigns=true] - whether or not to include prosigns in the translations
+    //  * @param {number} [wpm=20] - the speed in words per minute using PARIS as the standard word
+    //  * @param {number} [fwpm=wpm] - the Farnsworth speed in words per minute (defaults to wpm)
+    //  */
+    constructor({dictionary='international', useProsigns=true, wpm=20, fwpm=wpm} = {}) {
+        super({dictionary, useProsigns});
         /** @type {number} */
         this.wpm = wpm;
         /** @type {number} */
         this.fwpm = fwpm;
+
+        this._parisMorseTokens = this.textTokens2morse(this.tokeniseRawText('PARIS')).morse;
+        this._baseElement = this.dictionary.baseElement;
+        this.baseRatio = this.dictionary.ratio;
     }
 
     /** 
@@ -41,9 +48,7 @@ export default class MorseCW extends MorseMessage {
      * @type {number} */
     set wpm(wpm) {
         this._wpm = wpm;
-        if (wpm < this._fwpm) {
-            this._fwpm = wpm;
-        }
+        this._fwpm = Math.min(this._wpm, this._fwpm);
     }
 
     /** @type {number} */
@@ -56,9 +61,7 @@ export default class MorseCW extends MorseMessage {
      *  @type {number} */
     set fwpm(fwpm) {
         this._fwpm = fwpm;
-        if (fwpm > this._wpm) {
-            this._wpm = fwpm;
-        }
+        this._wpm = Math.max(this._wpm, this._fwpm);
     }
 
     /** @type {number} */
@@ -66,79 +69,100 @@ export default class MorseCW extends MorseMessage {
         return this._fwpm;
     }
 
-    /** 
-     * Get the length of the space between words in ms.
-     * @type {number} */
-    get wordSpace() {
-        return WPM.wordSpace(this._wpm, this._fwpm);
+    get baseRatio() {
+        return this._baseRatio;
+    }
+
+    set baseRatio(r) {
+        this._baseRatio = {};
+        Object.assign(this._baseRatio, r);
+        for (let element in this._baseRatio) {
+            this._baseRatio[element] /= this._baseRatio[this._baseElement];
+        }
+        this.initPARIS();
+    }
+
+    initPARIS() {
+        this._ditsInParis = this.getDuration(
+            this.morseTokens2timing(this._parisMorseTokens, this._baseRatio)
+        ) + Math.abs(this._baseRatio.wordSpace);
+        this._spacesInParis = Math.abs((4 * this._baseRatio.charSpace) + this._baseRatio.wordSpace);
     }
 
     /**
      * Return an array of millisecond timings.
      * With the Farnsworth method, the morse characters are played at one
      * speed and the spaces between characters at a slower speed.
+     * @param {Array} morseTokens - array of morse tokens
+     * @param {Dict} lengths - dictionary mapping element to millisecond length
      * @return {number[]}
      */
-    getTimings() {
-        return MorseCW.getTimingsGeneral(
-            WPM.ditLength(this._wpm),
-            WPM.dahLength(this._wpm),
-            WPM.ditSpace(this._wpm),
-            WPM.charSpace(this._wpm, this._fwpm),
-            WPM.wordSpace(this._wpm, this._fwpm),
-            this.morse
+    morseTokens2timing(morseTokens, lengths = this.getLengths()) {
+        let timings = [];
+        for (let word of morseTokens) {
+            for (let char of word) {
+                timings = timings.concat(char.split('').map(symbol => lengths[symbol]));
+                timings = timings.concat(lengths.charSpace);
+            }
+            timings.pop()
+            timings = timings.concat(lengths.wordSpace);
+        }
+        timings.pop();
+        return timings;
+    }
+
+    getDuration(timings) {
+        return timings.reduce(
+            (accumulator, currentValue) => accumulator + Math.abs(currentValue),
+            0
         );
     }
 
     /**
-     * Return an array of millisecond timings.
-     * Each sound and space has a duration. The durations of the spaces are distinguished by being negative.
-     * @param {number} dit - the length of a dit in milliseconds
-     * @param {number} dah - the length of a dah in milliseconds (normally 3 * dit)
-     * @param {number} ditSpace - the length of an intra-character space in milliseconds (1 * dit)
-     * @param {number} charSpace - the length of an inter-character space in milliseconds (normally 3 * dit)
-     * @param {number} wordSpace - the length of an inter-word space in milliseconds (normally 7 * dit)
-     * @param {string} morse - the (canonical) morse code string (matching [.-/ ]*)
-     * @return {number[]}
+     * Get the Farnsworth dit length to dit length ratio
+     * @return {number}
      */
-    static getTimingsGeneral(dit, dah, ditSpace, charSpace, wordSpace, morse) {
-        //console.log("Morse: " + morse);
-        morse = morse.replace(/ \/ /g, '/');  // this means that a space is only used for inter-character
-        morse = morse.replace(/([\.\-])(?=[\.\-])/g, "$1+");  // put a + in between all dits and dahs
-        var times = [];
-        for (var i = 0; i < morse.length; i++) {
-            switch (morse[i]) {
-                case '.':
-                    times.push(dit);
-                    break;
-                case '-':
-                    times.push(dah);
-                    break;
-                case '+':
-                    times.push(-ditSpace);
-                    break;
-                case " ":
-                    times.push(-charSpace);
-                    break;
-                case "/":
-                    times.push(-wordSpace);
-                    break;
-            }
-        }
-        //console.log("Timings: " + times);
-        return times;
+    getFarnsworthRatio() {
+        // "PARIS " is 31 units for the characters and 19 units for the inter-character spaces and inter-word space
+        // One unit takes 1 * 60 / (50 * wpm)
+        // The 31 units should take 31 * 60 / (50 * wpm) seconds at wpm
+        // "PARIS " should take 50 * 60 / (50 * fwpm) to transmit at fwpm, or 60 / fwpm  seconds at fwpm
+        // Keeping the time for the characters constant,
+        // The spaces need to take: (60 / fwpm) - [31 * 60 / (50 * wpm)] seconds in total
+        // The spaces are 4 inter-character spaces of 3 units and 1 inter-word space of 7 units. Their ratio must be maintained.
+        // A space unit is: [(60 / fwpm) - [31 * 60 / (50 * wpm)]] / 19 seconds
+        // Comparing that to 60 / (50 * wpm) gives a ratio of (50.wpm - 31.fwpm) / 19.fwpm
+        return (this._ditsInParis * this._wpm - (this._ditsInParis - this._spacesInParis) * this._fwpm) / (this._spacesInParis * this._fwpm);
     }
 
     /**
-     * Get the total duration of the message in ms
-     8 @return {number}
+     * Get the length of the base element (i.e. a dit) in milliseconds
+     * @return {number}
      */
-    getDuration() {
-        var times = this.getTimings();
-        var t = 0;
-        for (var i = 0; i < times.length; i++) {
-            t += Math.abs(times[i]);
+    getBaseLength() {
+        return (MS_IN_MINUTE / this._ditsInParis) / this._wpm;
+    }
+
+    getLengths() {
+        let ditLen = this.getBaseLength();
+        let fRatio = this.getFarnsworthRatio();
+        let lengths = {};
+        for (let element in this._baseRatio) {
+            lengths[element] = this._baseRatio[element] * ditLen;
         }
-        return t;
+        lengths.charSpace *= fRatio;
+        lengths.wordSpace *= fRatio;
+        return lengths;
+    }
+
+    getLength(element) {
+        return this.getLengths()[element];
+    }
+
+    /** 
+     * Get the length of the space between words in ms.
+     * @type {number} */
+    get wordSpace() {
+        return Math.abs(this.getLength('wordSpace'));
     }
 }

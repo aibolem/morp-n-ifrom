@@ -14,243 +14,145 @@ See the Licence for the specific language governing permissions and limitations 
  * Basic methods to translate Morse code.
  */
 
-if (typeof(String.prototype.trim) === "undefined") {
-    String.prototype.trim = function() {
-        return String(this).replace(/^\s+|\s+$/g, '');
-    };
-}
+import { dictionaries } from "./dictionary/index.js";
 
-var text2morseH = {
-    'A': ".-",
-    'B': "-...",
-    'C': "-.-.",
-    'D': "-..",
-    'E': ".",
-    'F': "..-.",
-    'G': "--.",
-    'H': "....",
-    'I': "..",
-    'J': ".---",
-    'K': "-.-",
-    'L': ".-..",
-    'M': "--",
-    'N': "-.",
-    'O': "---",
-    'P': ".--.",
-    'Q': "--.-",
-    'R': ".-.",
-    'S': "...",
-    'T': "-",
-    'U': "..-",
-    'V': "...-",
-    'W': ".--",
-    'X': "-..-",
-    'Y': "-.--",
-    'Z': "--..",
-    '1': ".----",
-    '2': "..---",
-    '3': "...--",
-    '4': "....-",
-    '5': ".....",
-    '6': "-....",
-    '7': "--...",
-    '8': "---..",
-    '9': "----.",
-    '0': "-----",
-    '.': ".-.-.-",
-    ',': "--..--",
-    ':': "---...",
-    '?': "..--..",
-    '\'': ".----.",
-    '-': "-....-",
-    '/': "-..-.",
-    '(': "-.--.",
-    ')': "-.--.-",
-    '"': ".-..-.",
-    '@': ".--.-.",
-    '=': "-...-",
-    '&': ".-...",
-    '+': ".-.-.",
-    '!': "-.-.--",
-    ' ': "/" //Not morse but helps translation
-};
-var morse2textH = {};
-var prosign2morseH = {
-    '<AA>': '.-.-',
-    '<AR>': '.-.-.',
-    '<AS>': '.-...',
-    '<BK>': '-...-.-',
-    '<BT>': '-...-', // also <TV>
-    '<CL>': '-.-..-..',
-    '<CT>': '-.-.-',
-    '<DO>': '-..---',
-    '<KN>': '-.--.',
-    '<SK>': '...-.-', // also <VA>
-    '<VA>': '...-.-',
-    '<SN>': '...-.', // also <VE>
-    '<VE>': '...-.',
-    '<SOS>': '...---...'
-};
-var morsepro2textH = {};
-var text2morseproH = {};
-for (var text in text2morseH) {
-    text2morseproH[text] = text2morseH[text];
-    morse2textH[text2morseH[text]] = text;
-    morsepro2textH[text2morseH[text]] = text;
-}
-for (var sign in prosign2morseH) {
-    text2morseproH[sign] = prosign2morseH[sign];
-    morsepro2textH[prosign2morseH[sign]] = sign;
-}
+export default class Morse {
+    constructor({dictionary='international', useProsigns=true} = {}) {
+        if (dictionary in dictionaries) {
+            this.dictionary = dictionaries[dictionary];
+        } else {
+            throw "No dictionary called '" + dictionary + "'";
+        }
 
-var tidyText = function(text) {
-    text = text.toUpperCase();
-    text = text.trim();
-    text = text.replace(/\s+/g, ' ');
-    return text;
-};
+        //TODO: need to keep an ordered list of dicts so we can rebuild when one is removed and they can override each other
+        this.text2morseD = {};
+        this.morse2textD = {};
+        this.addDict({'':''});
+        this.addDict(this.dictionary.letter);
+        this.tokenMatch = new RegExp("^.");
 
-/**
- * Translate text to morse in '..- .. / --' form.
- * If something in the text is untranslatable then it is surrounded by hash-signs ('#') and a hash is placed in the morse.
- * @param {string} text - alphanumeric message
- * @param {boolean} useProsigns - true if prosigns are to be used (default is true)
- * @return {{message: string, morse: string, hasError: boolean}}
- */
-export function text2morse(text, useProsigns = true) {
-    text = tidyText(text);
-    var ret = {
-        morse: "",
-        message: "",
-        hasError: false
-    };
-    if (text === "") {
-        return ret;
-    }
-
-    var tokens = [];
-    var prosign;
-    var token_length;
-    while (text.length > 0) {
-        token_length = 1;
+        this.useProsigns = useProsigns;
         if (useProsigns) {
-            prosign = text.match(/^<...?>/); // array of matches
-            if (prosign) {
-                token_length = prosign[0].length;
+            this.addDict(this.dictionary.options.prosigns);
+            this.tokenMatch = new RegExp("^" + this.dictionary.prosign.start + "...?" + this.dictionary.prosign.end + "|.");
+        }
+    }
+
+    addDict(add) {
+        for (let letter in add) {
+            this.text2morseD[letter] = add[letter];
+            this.morse2textD[add[letter]] = letter;
+        }
+    }
+
+    tidyText(text) {
+        text = text.toUpperCase();
+        text = text.trim();
+        text = text.replace(/\s+/g, ' ');
+        return text;
+    }
+
+    tokeniseRawText(text) {
+        let tokens = []
+        let words = text.split(' ');
+        for(let word of words) {
+            let letters = [];
+            while (word.length) {
+                let letter = word.match(this.tokenMatch)[0];
+                word = word.substr(letter.length);
+                letters.push(letter);
             }
+            tokens.push(letters);
         }
-        tokens.push(text.slice(0, token_length));
-        text = text.slice(token_length, text.length);
+        return tokens;
     }
-    var dict;
-    if (useProsigns) {
-        dict = text2morseproH;
-    } else {
-        dict = text2morseH;
+
+    tokeniseText(text) {
+        return this.tokeniseRawText(this.tidyText(text));
     }
-    var i, c, t;
-    for (i = 0; i < tokens.length; i++) {
-        t = tokens[i];
-        c = dict[t];
-        if (c === undefined) {
-            ret.message += "#" + t + "#";
-            ret.morse += "# ";
-            ret.hasError = true;
-        } else {
-            ret.message += t;
-            ret.morse += c + " ";
+
+    displayText(textTokens) {
+        let words = textTokens.map(word => word.join());
+        return words.join(' ');
+    }
+
+    textTokens2morse(textTokens) {
+        let translation = this._input2output(textTokens, this.text2morseD);
+        return {
+            text: textTokens,
+            morse: translation.output,
+            error: translation.error,
+            hasError: translation.hasError
         }
     }
-    ret.morse = ret.morse.slice(0, ret.morse.length - 1);
-    return ret;
-}
 
-/**
- * Translate text to morse in 'Di-di-dah dah' form.
- * @param {string} text - alphanumeric message
- * @param {boolean} useProsigns - true if prosigns are to be used (default is true)
- * @return {string}
- */
-export function text2ditdah(text, useProsigns) {
-    // TODO: deal with errors in the translation
-    var ditdah = text2morse(text, useProsigns).morse + ' '; // get the dots and dashes
-    ditdah = ditdah.replace(/\./g, 'di~').replace(/\-/g, 'dah~'); // do the basic job
-    ditdah = ditdah.replace(/~/g, '-'); // replace placeholder with dash
-    ditdah = ditdah.replace(/\- /g, ' '); // remove trailing dashes
-    ditdah = ditdah.replace(/di /g, 'dit '); // use 'dit' at end of letter
-    ditdah = ditdah.replace(/ \/ /g, ', '); // do punctuation
-    ditdah = ditdah.replace(/^d/, 'D'); // do capitalisation
-    ditdah = ditdah.replace(/ $/, ''); // remove the space we added
-    ditdah = ditdah.replace(/([th])$/, '$1.'); // add full-stop if there is anything there
-    return ditdah;
-}
+    text2morse(text) {
+        let textTokens = this.tokeniseText(text);
+        return this.textTokens2morse(textTokens);
+    }
 
-/**
- * Canonicalise morse text.
- * Canonical form matches [.-/ ]*, has single spaces between characters, has words separated by ' / ', and has no spaces at the start or end.
- * A single '/' may be returned by this function.
- * @param {string} morse - Morse code matching [.-_/| ]*
- * @return {string} Morse code in canonical form matching [.-/ ]*
- */
-export var tidyMorse = function(morse) {
-    morse = morse.replace(/\|/g, "/"); // unify the word separator
-    morse = morse.replace(/\//g, " / "); // make sure word separators are spaced out
-    morse = morse.replace(/\s+/g, " "); // squash multiple spaces into single spaces
-    morse = morse.replace(/(\/ )+\//g, "/"); // squash multiple word separators
-    morse = morse.replace(/_/g, "-"); // unify the dash character
-    morse = morse.replace(/^\s+/, "");  // remove initial whitespace
-    morse = morse.replace(/\s+$/, "");  // remove trailing whitespace
-    return morse;
-};
+    tokeniseMorse(morse) {
+        return this.dictionary.tokeniseMorse(morse);
+    }
 
-/**
- * Translate morse to text. Canonicalise the morse first.
- * If something in the morse is untranslatable then it is surrounded by hash-signs ('#') and a hash is placed in the text.
- * @param {string} morse - morse message using [.-_/| ] characters
- * @param {boolean} useProsigns - true if prosigns are to be used (default is true)
- * @return {{message: string, morse: string, hasError: boolean}}
- */
-export function morse2text(morse, useProsigns = true) {
-    morse = tidyMorse(morse);
-    var ret = {
-        morse: "",
-        message: "",
-        hasError: false
-    };
-    if (morse === "") {
+    displayMorse(morseTokens) {
+        let words = [];
+        for (let word of morseTokens) {
+            let chars = []
+            for (let char of word) {
+                for (let k in this.dictionary.display.morse) {
+                    char = char.replace(new RegExp(k, 'g'), this.dictionary.display.morse[k]);
+                }
+                chars.push(char);
+            }
+            words.push(chars.join(this.dictionary.display.join.charSpace));
+        }
+        return words.join(this.dictionary.display.join.wordSpace);
+    }
+
+    morseTokens2text(morseTokens) {
+        let translation = this._input2output(morseTokens, this.morse2textD);
+        return {
+            morse: morseTokens,
+            text: translation.output,
+            error: translation.error,
+            hasError: translation.hasError
+        }
+    }
+
+    morse2text(morse) {
+        let morseTokens = this.tokeniseMorse(morse);
+        return morseTokens2text(morseTokens);
+    }
+
+    looksLikeMorse(input) {
+        return input.match(this.dictionary.morseMatch) !== null;
+    }
+
+    _input2output(tokens, dict) {
+        let ret = {
+            output: [],
+            error: [],
+            hasError: false
+        }
+        for (let letters of tokens) {
+            let chars = [];
+            let errors = [];
+            for (let letter of letters) {
+                let char = '';
+                let error = true;
+                if (letter in dict) {
+                    char = dict[letter];
+                    error = false;
+                }
+                chars.push(char);
+                errors.push(error);
+                ret.hasError = ret.hasError || error;
+            }
+            ret.output.push(chars);
+            ret.error.push(errors);
+        }
         return ret;
     }
-
-    var tokens = morse.split(" ");
-    var dict;
-    if (useProsigns) {
-        dict = morsepro2textH;
-    } else {
-        dict = morse2textH;
-    }
-    var c, t;
-    for (var i = 0; i < tokens.length; i++) {
-        t = tokens[i];
-        c = dict[t];
-        if (c === undefined) {
-            ret.morse += "#" + t + "# ";
-            ret.message += "#";
-            ret.hasError = true;
-        } else {
-            ret.morse += t + " ";
-            ret.message += c;
-        }
-    }
-    ret.morse = ret.morse.slice(0, ret.morse.length - 1);
-    return ret;
 }
 
-/**
- * Determine whether a string is most likely morse code.
- * @param {string} input - the text
- * @return {boolean} - true if the string only has Morse characters in after executing tidyMorse
- */
-export function looksLikeMorse(input) {
-    input = tidyMorse(input);
-    return (input.match(/^[/.-][ /.-]*$/) !== null);
-}

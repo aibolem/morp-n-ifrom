@@ -96,21 +96,24 @@ export default class MorsePlayerWAA {
         return this._volume;
     }
 
-    /**
-     * Convenience method to help playing directly from a MorseCWWave instance. Uses the CWWave timings and frequency.
-     * @param {Object} cwWave - a MorseCWWave instance
-     */
-    loadCWWave(cwWave) {
-        this.load(cwWave.getTimings());
-        this.frequency = cwWave.frequency;
-    }
+    // /**
+    //  * Convenience method to help playing directly from a MorseCWWave instance. Uses the CWWave timings and frequency.
+    //  * @param {Object} cwWave - a MorseCWWave instance
+    //  */
+    // loadCWWave(cwWave) {
+    //     this.load(cwWave.getTimings());
+    //     this.frequency = cwWave.frequency;
+    // }
 
     /**
      * Load timing sequence, replacing any existing sequence.
      * If endPadding is non-zero then an appropriate pause is added to the end.
      * @param {number[]} timings - list of millisecond timings; +ve numbers are beeps, -ve numbers are silence
      */
-    load(timings) {
+    load(timings, frequency) {
+        // TODO: change frequency to frequency array, add volume array, queue them up
+        this.frequency = frequency;
+
         // TODO: undefined behaviour if this is called in the middle of a sequence
 
         // console.log('Timings: ' + timings);
@@ -132,19 +135,21 @@ export default class MorsePlayerWAA {
         this.sequenceLength = this.isNote.length;
     }
 
-    /**
-     * Convenience method to help playing directly from a MorseCWWave instance. Uses the CWWave timings.
-     * @param {Object} cwWave - a MorseCWWave instance
-     */
-    loadNextCWWave(cwWave) {
-        this.loadNext(cwWave.getTimings());
-    }
+    // /**
+    //  * Convenience method to help playing directly from a MorseCWWave instance. Uses the CWWave timings.
+    //  * @param {Object} cwWave - a MorseCWWave instance
+    //  */
+    // loadNextCWWave(cwWave) {
+    //     this.loadNext(cwWave.getTimings());
+    // }
 
     /**
      * Load timing sequence which will be played when the current sequence is completed (only one sequence is queued).
      * @param {number[]} timings - list of millisecond timings; +ve numbers are beeps, -ve numbers are silence
      */
-    loadNext(timings) {
+    loadNext(timings, frequency) {
+        // TODO: change frequency to frequency array, add volume array, queue them up
+        this.frequency = frequency;
         this.upNext = timings;
     }
 

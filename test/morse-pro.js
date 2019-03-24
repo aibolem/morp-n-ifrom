@@ -1,8 +1,8 @@
-import * as Morse from '../src/morse-pro';
+import * as Morse from '../src/morse-pro-compat';
 
 var assert = require('assert');
 
-describe('morse-pro', function() {
+describe('morse-pro-compat', function() {
     describe('text2morse()', function() {
         var tests = [
             {args: [''], expected: {morse: '', message: '', hasError: false}},
@@ -98,4 +98,18 @@ describe('morse-pro', function() {
             });
         });
     });
+
+    describe('tidyMorse()', function() {
+        var tests = [
+            {args: ['_|_'], expected: '- / -'},
+            {args: ['.  ..  /../  .'], expected: '. .. / .. / .'},
+        ];
+
+        tests.forEach(function(test) {
+            it('correctly tidies "' + test.args + '" to give "' + test.expected + '"', function() {
+                var res = Morse.tidyMorse.apply(null, test.args);
+                assert.equal(res, test.expected);
+            });
+        });
+    })
 });
