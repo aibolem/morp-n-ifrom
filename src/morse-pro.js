@@ -138,7 +138,7 @@ export default class Morse {
 
     morse2text(morse) {
         let morseTokens = this.tokeniseMorse(morse);
-        return morseTokens2text(morseTokens);
+        return this.morseTokens2text(morseTokens);
     }
 
     looksLikeMorse(input) {
