@@ -88,7 +88,7 @@ export default class Morse {
     }
 
     displayText(textTokens) {
-        let words = textTokens.map(word => word.join());
+        let words = textTokens.map(word => word.join(''));
         return words.join(' ');
     }
 

@@ -13,6 +13,7 @@ describe('morse-pro-message', function() {
             {args: ['S '], expected: {morse: '...', text: 'S', hasError: false}},
             {args: ['s s'], expected: {morse: '... / ...', text: 'S S', hasError: false}},
             {args: ['s  s'], expected: {morse: '... / ...', text: 'S S', hasError: false}},
+            {args: ['... ...'], expected: {morse: '... ...', text: 'SS', hasError: false}},
             {args: ['... / ...'], expected: {morse: '... / ...', text: 'S S', hasError: false}},
             // {args: ['<AA>'], expected: {morse: '.-.-', message: '<AA>', hasError: false}},
             // {args: ['<AA>', true], expected: {morse: '.-.-', message: '<AA>', hasError: false}},
