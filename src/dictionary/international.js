@@ -55,6 +55,8 @@ export var dictionary = {
         '!': '- . - . - -',
     },
 
+    letterMatch: /^./,
+
     ratio: {
         '.': 1,
         '-': 3,
@@ -85,11 +87,6 @@ export var dictionary = {
         }
     },
 
-    prosign: {
-        start: '<',
-        end: '>',
-    },
-
     tokeniseMorse: function(morse) {
         morse = morse.trim();
         morse = morse.replace(/_/g, '-')
@@ -104,30 +101,30 @@ export var dictionary = {
 
     morseMatch: new RegExp('^\\s*[\\.\\-_]+[\\.\\-_ \\/\\|]*$'),
 
-    name: {
-        '.': 'dit',
-        '-': 'dah',
-        ' ': 'intra-character space',
-        'charSpace': 'inter-character space',
-        'wordSpace': 'word space'
+    displayName: {
+        keys: ['.', '-', 'charSpace', 'wordSpace'],
+        values: ['dit', 'dah', 'intra-character space', 'inter-character space', 'word space']
     },
 
     options: {
         prosigns: {
-            '<AA>': '. - . -',
-            '<AR>': '. - . - .',
-            '<AS>': '. - . . .',
-            '<BK>': '- . . . - . -',
-            '<BT>': '- . . . -', // also <TV>
-            '<CL>': '- . - . . - . .',
-            '<CT>': '- . - . -',
-            '<DO>': '- . . - - -',
-            '<KN>': '- . - - .',
-            '<SK>': '. . . - . -', // also <VA>
-            '<VA>': '. . . - . -',
-            '<SN>': '. . . - .', // also <VE>
-            '<VE>': '. . . - .',
-            '<SOS>': '. . . - - - . . .'
+            letter: {
+                '<AA>': '. - . -',
+                '<AR>': '. - . - .',
+                '<AS>': '. - . . .',
+                '<BK>': '- . . . - . -',
+                '<BT>': '- . . . -', // also <TV>
+                '<CL>': '- . - . . - . .',
+                '<CT>': '- . - . -',
+                '<DO>': '- . . - - -',
+                '<KN>': '- . - - .',
+                '<SK>': '. . . - . -', // also <VA>
+                '<VA>': '. . . - . -',
+                '<SN>': '. . . - .', // also <VE>
+                '<VE>': '. . . - .',
+                '<SOS>': '. . . - - - . . .'    
+            },
+            letterMatch: /^<...?>|./
         }
     }
 }

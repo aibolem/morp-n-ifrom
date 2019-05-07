@@ -26,28 +26,20 @@ export default class MorseCWWave extends MorseCW {
      * @param {number} [frequency=550] - frequency of wave in Hz
      * @param {number} [sampleRate=8000] - sample rate for the waveform in Hz
      */
-    constructor({dictionary='international', useProsigns=true, wpm=20, fwpm=wpm, frequency=550, sampleRate=8000} = {}) {
-        super({dictionary, useProsigns, wpm, fwpm});
+    constructor({dictionary='international', options=[], wpm=20, fwpm=wpm, frequency=550, sampleRate=8000} = {}) {
+        super({dictionary, options, wpm, fwpm});
+        // TODO: remove this.frequency and replace with arrays of freq and volume to go with timings array when making a sample
         /** @type {number} */
         this.frequency = frequency;  // frequency of wave in Hz
         /** @type {number} */
         this.sampleRate = sampleRate;  // sample rate for the waveform in Hz
     }
 
-    // /**
-    //  * Get a sample waveform, not using Web Audio API (synchronous).
-    //  * @param {number} [endPadding=0] - how much silence in ms to add to the end of the waveform.
-    //  * @return {number[]} an array of floats in range [-1, 1] representing the wave-form.
-    //  */
-    // getSample(endPadding = 0) {
-    //     return MorseCWWave.getSampleGeneral(this.getTimings(), this.frequency, this.sampleRate, endPadding);
-    // }
-
     /**
      * Get a sample waveform, not using Web Audio API (synchronous).
      * @param {number[]} timings - millisecond timings, +ve numbers representing sound, -ve for no sound (+ve/-ve can be in any order)
-    //  * @param {number} frequency - frequency of sound in Hz.
-    //  * @param {number} sampleRate - sample rate in Hz.
+    // TODO * @param {number[]} frequencies - frequencies of elements in Hz.
+    // TODO * @param {number[]} volumes - volumes of elements in Hz.
      * @param {number} [endPadding=0] - how much silence in ms to add to the end of the waveform.
      * @return {number[]} an array of floats in range [-1, 1] representing the wave-form.
      */
@@ -106,6 +98,9 @@ export default class MorseCWWave extends MorseCW {
 
     /**
      * Get a sample waveform using Web Audio API (asynchronous).
+     * @param {number[]} timings - millisecond timings, +ve numbers representing sound, -ve for no sound (+ve/-ve can be in any order)
+    // TODO * @param {number[]} frequencies - frequencies of elements in Hz.
+    // TODO * @param {number[]} volumes - volumes of elements in Hz.
      * @param {number} [endPadding=0] - how much silence in ms to add to the end of the waveform.
      * @return {Promise(number[])} a Promise resolving to an array of floats in range [-1, 1] representing the wave-form.
      */

@@ -15,9 +15,14 @@ See the Licence for the specific language governing permissions and limitations 
  */
 
 import { dictionaries } from "./dictionary/index.js";
+// import { throws } from "assert";
 
 export default class Morse {
-    constructor({dictionary='international', useProsigns=true} = {}) {
+    /**
+     * 
+     * @param {Map} namedParameters: 'options' is a list of optional additional dictionaries such as 'prosigns'
+     */
+    constructor({dictionary='international', options=[]} = {}) {
         if (dictionary in dictionaries) {
             this.dictionary = dictionaries[dictionary];
         } else {
@@ -27,40 +32,90 @@ export default class Morse {
         //TODO: need to keep an ordered list of dicts so we can rebuild when one is removed and they can override each other
         this.text2morseD = {};
         this.morse2textD = {};
-        this.addDict({'':''});
-        this.addDict(this.dictionary.letter);
-        this.useProsigns = useProsigns;
+        this.addDict({letter:{'':''}});
+        this.addDict(this.dictionary);
+        this.letterMatch = this.dictionary.letterMatch;
+        for (let opt in options) {
+            this.addOption(opt);
+        }
     }
 
+    /**
+     * Add an additional dictionary to the one being used for translation.
+     * Dictionary needs 'letter' and (optional) 'letterMatch' keys.
+     * @param {String or Map} dict 
+     */
     addDict(dict) {
-        for (let letter in dict) {
-            this.text2morseD[letter] = dict[letter];
-            this.morse2textD[dict[letter]] = letter;
+        let letters = dict.letter
+        for (let letter in letters) {
+            this.text2morseD[letter] = letters[letter];
+            this.morse2textD[letters[letter]] = letter;
+        }
+        if (dict.letterMatch) {
+            // TODO: here we switch to a special letter match regexp if it exists. This is not really going to work if there is more than one option
+            this.letterMatch = dict.letterMatch;
         }
     }
 
+    addOption(optName) {
+        addDict(this.dictionary.options[optName])
+    }
+
+    /**
+     * Remove an additional dictionary to the one being used for translation.
+     * Either takes a named dictionary to be found as a kry in this.dictionary.options or an actual dictionary with letter and letterMatch keys.
+     * @param {String or Map} dict 
+     */
     removeDict(dict) {
-        for (let letter in dict) {
+        if (typeof dict === 'string') {
+            dict = this.dictionary.options[dict];
+        }
+        let letters = dict.letter;
+        for (let letter in letters) {
             delete this.text2morseD[letter];
-            delete this.morse2textD[dict[letter]];
+            delete this.morse2textD[letters[letter]];
         }
+        this.letterMatch = this.dictionary.letterMatch;  // revert to base letterMatch regexp
     }
 
-    get useProsigns() {
-        return this._useProsigns;
+    removeOption(optName) {
+        removeDict(this.dictionary.options[optName])
     }
 
-    set useProsigns(useProsigns) {
-        this._useProsigns = useProsigns;
-        if (useProsigns) {
-            this.addDict(this.dictionary.options.prosigns);
-            this.tokenMatch = new RegExp("^" + this.dictionary.prosign.start + "...?" + this.dictionary.prosign.end + "|.");
-        } else {
-            this.removeDict(this.dictionary.options.prosigns);
-            this.tokenMatch = new RegExp("^.");
+    /**
+     * General method for converting a set of tokens to a displayable string
+     * @param {Array} tokens - list of lists of tokens to form into String
+     * @param {String} charSpace - String to use to separate characters
+     * @param {String} wordSpace - String to use to separate words
+     * @param {Map} map - Map to replace tokens with alternatives, e.g. for display escaping {'>', '&gt;'}
+     * @param {Array} errors - list if lists of Booleans indicating if there is an error in the tokens parameter
+     * @param {String} errorPrefix - used to prefix any token that is an error
+     * @param {String} errorSuffix - used to suffix any token that is an error
+     * @returns a String of the tokens
+     */
+    display(tokens, charSpace, wordSpace, map={}, errors=undefined, errorPrefix='', errorSuffix='') {
+        for (let k in map) {
+            tokens = tokens.map(word => word.map(char => char.replace(new RegExp(k, 'g'), map[k])));
         }
+        if (errors !== undefined) {
+            for (let i = 0; i < tokens.length; i++) {
+                for (let j = 0; j < tokens[i].length; j++) {
+                    if (errors[i][j]) {
+                        tokens[i][j] = errorPrefix + tokens[i][j] + errorSuffix;
+                    }
+                }
+            }    
+        }
+        let words = tokens.map(word => word.join(charSpace));
+        let sentence = words.join(wordSpace);
+        return sentence;
     }
 
+    /**
+     * Tidies text (upper case, trim, squash multiple spaces)
+     * @param {String} text - the text to tidy
+     * @returns the tidied text
+     */
     tidyText(text) {
         text = text.toUpperCase();
         text = text.trim();
@@ -68,13 +123,18 @@ export default class Morse {
         return text;
     }
 
+    /**
+     * Splits text into words and letters
+     * @param {String} text - the text to tokenise
+     * @returns a list of lists, e.g. [['o', 'n', 'e'], ['t', 'w', 'o']]
+     */
     tokeniseRawText(text) {
         let tokens = []
         let words = text.split(' ');
         for(let word of words) {
             let letters = [];
             while (word.length) {
-                let letter = word.match(this.tokenMatch)[0];
+                let letter = word.match(this.letterMatch)[0];
                 word = word.substr(letter.length);
                 letters.push(letter);
             }
@@ -83,15 +143,39 @@ export default class Morse {
         return tokens;
     }
 
+    /**
+     * Tidies and then tokenises text
+     * @param {String} text - the text to tokenise
+     * @returns - the tidied, tokenised text
+     */
     tokeniseText(text) {
         return this.tokeniseRawText(this.tidyText(text));
     }
 
-    displayText(textTokens) {
-        let words = textTokens.map(word => word.join(''));
-        return words.join(' ');
+    // displayText(textTokens) {
+    //     let words = textTokens.map(word => word.join(''));
+    //     return words.join(' ');
+    // }
+
+    /**
+     * Convert from text tokens to displayable String
+     * @param {Array} textTokens - list of lists representing the words and characters
+     * @param {Map} escapeMap - Map to replace tokens with alternatives, e.g. for display escaping {'>', '&gt;'}
+     * @returns a String, joining the characters together, separating the words with a space
+     */
+    displayText(textTokens, escapeMap) {
+        return this.display(textTokens, '', ' ', escapeMap)
     }
 
+    displayTextErrors(textTokens, escapeMap, errorTokens, prefix, suffix) {
+        return this.display(textTokens, '', ' ', escapeMap, errorTokens, prefix, suffix);
+    }
+
+    /**
+     * 
+     * @param {Array} textTokens - list of lists of text tokens
+     * @returns Map - text: text tokens, morse: morse tokens, error: error tokens, hasError Boolean
+     */
     textTokens2morse(textTokens) {
         let translation = this._input2output(textTokens, this.text2morseD);
         return {
@@ -112,19 +196,37 @@ export default class Morse {
     }
 
     displayMorse(morseTokens) {
-        let words = [];
-        for (let word of morseTokens) {
-            let chars = []
-            for (let char of word) {
-                for (let k in this.dictionary.display.morse) {
-                    char = char.replace(new RegExp(k, 'g'), this.dictionary.display.morse[k]);
-                }
-                chars.push(char);
-            }
-            words.push(chars.join(this.dictionary.display.join.charSpace));
-        }
-        return words.join(this.dictionary.display.join.wordSpace);
+        return this.display(morseTokens, 
+            this.dictionary.display.join.charSpace, this.dictionary.display.join.wordSpace, this.dictionary.display.morse);
     }
+
+    displayMorseErrors(morseTokens, errorTokens, prefix, suffix) {
+        return this.display(morseTokens, 
+            this.dictionary.display.join.charSpace, this.dictionary.display.join.wordSpace, this.dictionary.display.morse, 
+            errorTokens, prefix, suffix);
+    }
+
+    // displayMorse(morseTokens) {
+    //     let words = morseTokens.map(word => word.join(this.dictionary.display.join.charSpace));
+    //     let sentence = words.join(this.dictionary.display.join.wordSpace);
+    //     for (let k in this.dictionary.display.morse) {
+    //         sentence = sentence.replace(new RegExp(k, 'g'), this.dictionary.display.morse[k]);
+    //     }
+
+
+    //     // let words = [];
+    //     // for (let word of morseTokens) {
+    //     //     let chars = []
+    //     //     for (let char of word) {
+    //     //         for (let k in this.dictionary.display.morse) {
+    //     //             char = char.replace(new RegExp(k, 'g'), this.dictionary.display.morse[k]);
+    //     //         }
+    //     //         chars.push(char);
+    //     //     }
+    //     //     words.push(chars.join(this.dictionary.display.join.charSpace));
+    //     // }
+    //     // return words.join(this.dictionary.display.join.wordSpace);
+    // }
 
     morseTokens2text(morseTokens) {
         let translation = this._input2output(morseTokens, this.morse2textD);

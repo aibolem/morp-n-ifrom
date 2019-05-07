@@ -27,7 +27,7 @@ import * as Morse from './morse-pro';
  *     output = morseMessage.translate("abc");
  * catch (ex) {
  *     // output will be best attempt at translation
- *     // to understand the detail of where the error is, look at morseMessage.errors
+ *     // to understand the detail of where the error is, look at morseMessage.errors or display getErrorString()
  * }
  * if (morseMessage.inputWasMorse) {
  *     // do something
@@ -52,43 +52,52 @@ export default class MorseMessage {
     }
 
     /**
+     * Translate to or from Morse.
      * @param {string} input - alphanumeric text or morse code to translate
      * @param {boolean} isMorse - whether the input is Morse code or not (if not set then the looksLikeMorse method will be used)
+     * @throws Error if there was something untranslatable
      */
     translate(input, isMorse) {
-        this.rawInput = input;
         if (typeof isMorse === "undefined") {
             // make a guess: could be wrong if someone wants to translate "." into Morse for instance
             isMorse = this.morseCWWave.looksLikeMorse(input);
         }
-        let d;
+
+        let ret;
         if (isMorse) {
-            this.inputWasMorse = true;
-            d = this.morseCWWave.morse2text(input);
+            ret = this.loadMorse(input);
         } else {
-            this.inputWasMorse = false;
-            d = this.morseCWWave.text2morse(input);
+            ret = this.loadText(input);
         }
 
-        // console.log(d);
+        if (this.hasError) {
+            throw new Error("Error in input:", input);
+        }
+
+        return ret;
+    }
+
+    _completeFields(d) {
         this.morseTokens = d.morse;
         this.textTokens = d.text;
         this.errors = d.error;
         this.hasError = d.hasError; 
-
         this.text = this.morseCWWave.displayText(this.textTokens);
-        // console.log(this.text);
         this.morse = this.morseCWWave.displayMorse(this.morseTokens);
-        // console.log(this.morse);
-        if (this.hasError) {
-            throw new Error("Error in input");
-        }
+    }
 
-        if (this.inputWasMorse) {
-            return this.text;
-        } else {
-            return this.morse;
-        }
+    loadMorse(input) {
+        this.rawInput = input;
+        this.inputWasMorse = true;
+        this._completeFields(this.morseCWWave.morse2text(input));
+        return this.text;
+    }
+
+    loadText(input) {
+        this.rawInput = input;
+        this.inputWasMorse = false;
+        this._completeFields(this.morseCWWave.text2morse(input));
+        return this.morse;
     }
 
     get timings() {
@@ -99,28 +108,33 @@ export default class MorseMessage {
         return this.morseCWWave.getSample(this.timings);
     }
 
-    // /**
-    //  * Load in some Morse without attempting to translate it.
-    //  * @param {String} morse - Morse code string to load in
-    //  */
-    // loadMorse(morse) {
-    //     if (!Morse.looksLikeMorse(morse)) {
-    //         throw new Error("Error in input");
-    //     }
-    //     this.input = morse;
-    //     this.inputWasMorse = true;
-    //     this.morse = Morse.tidyMorse(morse);
-    // }
-    // /**
-    //  * Clear all the errors from the morse and message. Useful if you want to play the sound even though it didn't translate.
-    //  */
-    // clearError() {
-    //     if (this.inputWasMorse) {
-    //         this.morse = this.morse.replace(/#/g, "");  // leave in the bad Morse
-    //     } else {
-    //         this.message = this.message.replace(/#[^#]*?#/g, "");
-    //         this.morse = this.morse.replace(/#/g, "");
-    //     }
-    //     this.hasError = false;
-    // }
+    /**
+     * 
+     * @param {String} prefix - this is placed before each input token that had an error
+     * @param {String} suffix - this is placed after each input token that had an error
+     * @param {Map} escapeMap - any token matching a key in this map is replaced by the value (e.g. {'>': '&gt;', '<': '&lt;'})
+     */
+    getInputErrorString(prefix, suffix, escapeMap={}) {
+        if (this.inputWasMorse) {
+            return this.getMorseErrorString(prefix, suffix);
+        } else {
+            return this.getTextErrorString(prefix, suffix, escapeMap);
+        }
+    }
+
+    getOutputErrorString(prefix, suffix, escapeMap={}) {
+        if (!this.inputWasMorse) {
+            return this.getMorseErrorString(prefix, suffix);
+        } else {
+            return this.getTextErrorString(prefix, suffix, escapeMap);
+        }
+    }
+
+    getTextErrorString(prefix, suffix, escapeMap={}) {
+        return this.morseCWWave.displayTextErrors(this.textTokens, escapeMap, this.errors, prefix, suffix);
+    }
+
+    getMorseErrorString(prefix, suffix) {
+        return this.morseCWWave.displayMorseErrors(this.morseTokens, this.errors, prefix, suffix);
+    }
 }

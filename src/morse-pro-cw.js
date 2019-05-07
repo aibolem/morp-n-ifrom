@@ -23,7 +23,6 @@ See the Licence for the specific language governing permissions and limitations 
 import Morse from './morse-pro';
 
 const MS_IN_MINUTE = 60000;  /** number of milliseconds in 1 minute */
-// const PARIS_MORSE_TOKENS = [['. - - .', '. -', '. -.', '. .', '. . .']];
 
 export default class MorseCW extends Morse {
     // /**
@@ -31,16 +30,22 @@ export default class MorseCW extends Morse {
     //  * @param {number} [wpm=20] - the speed in words per minute using PARIS as the standard word
     //  * @param {number} [fwpm=wpm] - the Farnsworth speed in words per minute (defaults to wpm)
     //  */
-    constructor({dictionary='international', useProsigns=true, wpm=20, fwpm=wpm} = {}) {
-        super({dictionary, useProsigns});
+    /**
+     * 
+     * @param {Map} namedParameters
+     */
+    constructor({dictionary='international', options=[], wpm=20, fwpm=wpm} = {}) {
+        super({dictionary, options});
         /** @type {number} */
         this.wpm = wpm;
         /** @type {number} */
         this.fwpm = fwpm;
 
+        /** Morse tokens representing 'PARIS' */
         this._parisMorseTokens = this.textTokens2morse(this.tokeniseRawText('PARIS')).morse;
+        /** The element of the dictionary that the ratios are based off */
         this._baseElement = this.dictionary.baseElement;
-        this.baseRatio = this.dictionary.ratio;
+        this.ratio = this.dictionary.ratio;
     }
 
     /** 
@@ -69,24 +74,31 @@ export default class MorseCW extends Morse {
         return this._fwpm;
     }
 
-    get baseRatio() {
-        return this._baseRatio;
+    get ratio() {
+        return this._ratio;
     }
 
-    set baseRatio(r) {
-        this._baseRatio = {};
-        Object.assign(this._baseRatio, r);
-        for (let element in this._baseRatio) {
-            this._baseRatio[element] /= this._baseRatio[this._baseElement];
+    /**
+     * Set the ratio of each element to the base element and recalcculate the PARIS parameters
+     * @param {Map} r - a Map from element to ratio (as defined in the 'ratio' element of a dictionary)
+     */
+    set ratio(r) {
+        this._ratio = {};
+        Object.assign(this._ratio, r);
+        for (let element in this._ratio) {
+            this._ratio[element] /= this._ratio[this._baseElement];
         }
         this.initPARIS();
     }
 
+    /**
+     * Calculate the number of dits in PARIS and the number of spaces in PARIS (both in terms of the base element)
+     */
     initPARIS() {
         this._ditsInParis = this.getDuration(
-            this.morseTokens2timing(this._parisMorseTokens, this._baseRatio)
-        ) + Math.abs(this._baseRatio.wordSpace);
-        this._spacesInParis = Math.abs((4 * this._baseRatio.charSpace) + this._baseRatio.wordSpace);
+            this.morseTokens2timing(this._parisMorseTokens, this._ratio)
+        ) + Math.abs(this._ratio.wordSpace);
+        this._spacesInParis = Math.abs((4 * this._ratio.charSpace) + this._ratio.wordSpace);
     }
 
     /**
@@ -94,7 +106,7 @@ export default class MorseCW extends Morse {
      * With the Farnsworth method, the morse characters are played at one
      * speed and the spaces between characters at a slower speed.
      * @param {Array} morseTokens - array of morse tokens
-     * @param {Dict} lengths - dictionary mapping element to millisecond length
+     * @param {Dict} lengths - dictionary mapping element to millisecond duration with negative duration for spaces
      * @return {number[]}
      */
     morseTokens2timing(morseTokens, lengths = this.getLengths()) {
@@ -111,6 +123,10 @@ export default class MorseCW extends Morse {
         return timings;
     }
 
+    /**
+     * Add up all the millisecond timings in a list
+     * @param {Array} timings - list of millisecond timings (-ve for spaces)
+     */
     getDuration(timings) {
         return timings.reduce(
             (accumulator, currentValue) => accumulator + Math.abs(currentValue),
@@ -143,25 +159,35 @@ export default class MorseCW extends Morse {
         return (MS_IN_MINUTE / this._ditsInParis) / this._wpm;
     }
 
+    /**
+     * Calculate and return the millisecond duration of each element with negative durations for spaces.
+     * @returns Map
+     */
     getLengths() {
         let ditLen = this.getBaseLength();
         let fRatio = this.getFarnsworthRatio();
         let lengths = {};
-        for (let element in this._baseRatio) {
-            lengths[element] = this._baseRatio[element] * ditLen;
+        for (let element in this._ratio) {
+            lengths[element] = this._ratio[element] * ditLen;
         }
         lengths.charSpace *= fRatio;
         lengths.wordSpace *= fRatio;
         return lengths;
     }
 
+    /**
+     * Calculate and return the millisecond duration of a single element (negative for a space).
+     * @param {String} element 
+     * @returns Number
+     */
     getLength(element) {
         return this.getLengths()[element];
     }
 
     /** 
-     * Get the length of the space between words in ms.
-     * @type {number} */
+     * Get the absolute duration of the space between words in ms.
+     * @type {number}
+     */
     get wordSpace() {
         return Math.abs(this.getLength('wordSpace'));
     }
