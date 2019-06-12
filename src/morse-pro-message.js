@@ -71,7 +71,7 @@ export default class MorseMessage {
         }
 
         if (this.hasError) {
-            throw new Error("Error in input:", input);
+            throw new Error("Error in input: " + '[' + input + ']');
         }
 
         return ret;
