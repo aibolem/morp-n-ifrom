@@ -36,7 +36,7 @@ export default class Morse {
         this.addDict(this.dictionary);
         this.letterMatch = this.dictionary.letterMatch;
         for (let i = 0; i < options.length; i++) {
-            this.addOption(opt[i]);
+            this.addOption(options[i]);
         }
     }
 
