@@ -110,9 +110,16 @@ export default class MorsePlayerWAA {
      * If endPadding is non-zero then an appropriate pause is added to the end.
      * @param {number[]} timings - list of millisecond timings; +ve numbers are beeps, -ve numbers are silence
      */
-    load(timings, frequency) {
-        // TODO: change frequency to frequency array, add volume array, queue them up
-        this.frequency = frequency;
+    load(sequence) {
+        let timings = sequence.timings;
+        let frequencies = sequence.frequencies;
+        // TODO: add volume array
+        // let volumes = sequence.volumes;
+        if (Array.isArray(frequencies)) {
+            throw "Arrays of frequencies not yet supported"
+        } else {
+            this.frequency = frequencies;
+        }
 
         // TODO: undefined behaviour if this is called in the middle of a sequence
 
@@ -147,10 +154,8 @@ export default class MorsePlayerWAA {
      * Load timing sequence which will be played when the current sequence is completed (only one sequence is queued).
      * @param {number[]} timings - list of millisecond timings; +ve numbers are beeps, -ve numbers are silence
      */
-    loadNext(timings, frequency) {
-        // TODO: change frequency to frequency array, add volume array, queue them up
-        this.frequency = frequency;
-        this.upNext = timings;
+    loadNext(sequence) {
+        this.upNext = sequence;
     }
 
     /**
@@ -217,7 +222,7 @@ export default class MorsePlayerWAA {
 
             this._nextNote++;
 
-            // if we'e got to the end of the sequence, then loop or load next sequence as appropriate
+            // if we've got to the end of the sequence, then loop or load next sequence as appropriate
             if (this._nextNote === this.sequenceLength) {
                 if (this.loop || this.upNext !== undefined) {
                     this._nextNote = 0;
