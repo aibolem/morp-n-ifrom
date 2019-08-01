@@ -36,24 +36,31 @@ export default class MorseCW extends Morse {
      */
     constructor({dictionary='international', options=[], wpm=20, fwpm=wpm} = {}) {
         super({dictionary, options});
-        /** @type {number} */
-        this.wpm = wpm;
-        /** @type {number} */
-        this.fwpm = fwpm;
-
         /** Morse tokens representing 'PARIS' */
         this._parisMorseTokens = this.textTokens2morse(this.tokeniseRawText('PARIS')).morse;
         /** The element of the dictionary that the ratios are based off */
         this._baseElement = this.dictionary.baseElement;
-        this.ratio = this.dictionary.ratio;
+        /** In initialise the ratios based on the dictionary but enable them to be changed thereafter */
+        this.ratios = this.dictionary.ratio;
+        this._farnsworthRatio = undefined;
+        /** @type {number} */
+        this.setWPM(wpm);
+        /** @type {number} */
+        this.setFWPM(fwpm);
     }
 
     /** 
      * Set the WPM speed. Ensures that Farnsworth WPM is no faster than WPM.
      * @type {number} */
-    set wpm(wpm) {
+    setWPM(wpm) {
+        this._setWPM(wpm);
+    }
+
+    _setWPM(wpm) {
+        wpm = Math.max(1, wpm || 1);
         this._wpm = wpm;
         this._fwpm = Math.min(this._wpm, this._fwpm);
+        this._farnsworthRatio = undefined;
     }
 
     /** @type {number} */
@@ -64,9 +71,15 @@ export default class MorseCW extends Morse {
     /**
      * Set the Farnsworth WPM speed. Ensures that WPM is no slower than Farnsworth WPM.
      *  @type {number} */
-    set fwpm(fwpm) {
+    setFWPM(fwpm) {
+        this._setFWPM(fwpm);
+    }
+
+    _setFWPM(fwpm) {
+        fwpm = Math.max(1, fwpm || 1);
         this._fwpm = fwpm;
         this._wpm = Math.max(this._wpm, this._fwpm);
+        this._farnsworthRatio = undefined;
     }
 
     /** @type {number} */
@@ -74,42 +87,45 @@ export default class MorseCW extends Morse {
         return this._fwpm;
     }
 
-    get ratio() {
-        return this._ratio;
+    /** @type {number[]} */
+    get ratios() {
+        return this._ratios;
     }
 
     /**
      * Set the ratio of each element to the base element and recalcculate the PARIS parameters
      * @param {Map} r - a Map from element to ratio (as defined in the 'ratio' element of a dictionary)
      */
-    set ratio(r) {
-        this._ratio = {};
-        Object.assign(this._ratio, r);
-        for (let element in this._ratio) {
-            this._ratio[element] /= this._ratio[this._baseElement];
+    set ratios(r) {
+        this._ratios = {};
+        Object.assign(this._ratios, r);
+        for (let element in this._ratios) {
+            this._ratios[element] /= this._ratios[this._baseElement];
         }
-        this.initPARIS();
+        this._initPARIS();
     }
 
     /**
-     * Calculate the number of dits in PARIS and the number of spaces in PARIS (both in terms of the base element)
+     * Calculate the number of dits in PARIS and the number of spaces in PARIS (both in terms of the base element).
+     * This changes with the ratios.
      */
-    initPARIS() {
+    _initPARIS() {
         this._ditsInParis = this.getDuration(
-            this.morseTokens2timing(this._parisMorseTokens, this._ratio)
-        ) + Math.abs(this._ratio.wordSpace);
-        this._spacesInParis = Math.abs((4 * this._ratio.charSpace) + this._ratio.wordSpace);
+            this.morseTokens2timing(this._parisMorseTokens, this._ratios)
+        ) + Math.abs(this._ratios.wordSpace);
+        this._spacesInParis = Math.abs((4 * this._ratios.charSpace) + this._ratios.wordSpace);
+        this._farnsworthRatio = undefined;
     }
 
     /**
      * Return an array of millisecond timings.
      * With the Farnsworth method, the morse characters are played at one
      * speed and the spaces between characters at a slower speed.
-     * @param {Array} morseTokens - array of morse tokens
-     * @param {Dict} lengths - dictionary mapping element to millisecond duration with negative duration for spaces
+     * @param {Array} morseTokens - array of morse tokens corresponding to the ratio element of the dictionary used, e.g. [['..', '.-'], ['--', '...']]
+     * @param {Dict} [lengths=this.lengths] - dictionary mapping element to duration with negative duration for spaces
      * @return {number[]}
      */
-    morseTokens2timing(morseTokens, lengths = this.getLengths()) {
+    morseTokens2timing(morseTokens, lengths = this.lengths) {
         let timings = [];
         for (let word of morseTokens) {
             for (let char of word) {
@@ -138,7 +154,7 @@ export default class MorseCW extends Morse {
      * Get the Farnsworth dit length to dit length ratio
      * @return {number}
      */
-    getFarnsworthRatio() {
+    get farnsworthRatio() {
         // "PARIS " is 31 units for the characters and 19 units for the inter-character spaces and inter-word space
         // One unit takes 1 * 60 / (50 * wpm)
         // The 31 units should take 31 * 60 / (50 * wpm) seconds at wpm
@@ -148,47 +164,65 @@ export default class MorseCW extends Morse {
         // The spaces are 4 inter-character spaces of 3 units and 1 inter-word space of 7 units. Their ratio must be maintained.
         // A space unit is: [(60 / fwpm) - [31 * 60 / (50 * wpm)]] / 19 seconds
         // Comparing that to 60 / (50 * wpm) gives a ratio of (50.wpm - 31.fwpm) / 19.fwpm
-        return (this._ditsInParis * this._wpm - (this._ditsInParis - this._spacesInParis) * this._fwpm) / (this._spacesInParis * this._fwpm);
+        this._farnsworthRatio = this._farnsworthRatio || (this._ditsInParis * this._wpm - (this._ditsInParis - this._spacesInParis) * this._fwpm) / (this._spacesInParis * this._fwpm);
+        return this._farnsworthRatio;
+    }
+
+    /**
+     * Set the WPM given dit length in ms
+     * @param {number} ditLen
+     */
+    setWPMfromDitLen(ditLen) {
+        this.setWPM((MS_IN_MINUTE / this._ditsInParis) / ditLen);
+    }
+
+    /** 
+     * Set the Farnsworth WPM given ratio of dit length / Farnsworth dit length
+     * @param {number} ratio
+     */
+    setFWPMfromRatio(ratio) {
+        ratio = Math.max(ratio, 1);
+        this.setFWPM(this._ditsInParis * this.wpm / (this._spacesInParis * ratio + (this._ditsInParis - this._spacesInParis)));
     }
 
     /**
      * Get the length of the base element (i.e. a dit) in milliseconds
      * @return {number}
      */
-    getBaseLength() {
+    get baseLength() {
         return (MS_IN_MINUTE / this._ditsInParis) / this._wpm;
     }
 
     /**
-     * Calculate and return the millisecond duration of each element with negative durations for spaces.
+     * Calculate and return the millisecond duration of each element, using negative durations for spaces.
      * @returns Map
      */
-    getLengths() {
-        let ditLen = this.getBaseLength();
-        let fRatio = this.getFarnsworthRatio();
+    get lengths() {
+        let ditLen = this.baseLength;
+        let fRatio = this.farnsworthRatio;
         let lengths = {};
-        for (let element in this._ratio) {
-            lengths[element] = this._ratio[element] * ditLen;
+        for (let element in this._ratios) {
+            lengths[element] = this._ratios[element] * ditLen;
         }
         lengths.charSpace *= fRatio;
         lengths.wordSpace *= fRatio;
         return lengths;
     }
 
-    /**
-     * Calculate and return the millisecond duration of a single element (negative for a space).
-     * @param {String} element 
-     * @returns Number
-     */
-    getLength(element) {
-        return this.getLengths()[element];
-    }
+    // /**
+    //  * Calculate and return the millisecond duration of a single element (negative for a space).
+    //  * @param {String} element 
+    //  * @returns Number
+    //  */
+    // getLength(element) {
+    //     return this.lengths[element];
+    // }
 
     /** 
      * Get the absolute duration of the space between words in ms.
      * @type {number}
      */
     get wordSpace() {
-        return Math.abs(this.getLength('wordSpace'));
+        return Math.abs(this.lengths.wordSpace);
     }
 }

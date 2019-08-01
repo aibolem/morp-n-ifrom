@@ -66,6 +66,7 @@ export default class MorsePlayerWAA {
         this.lowPassNode = this.audioContext.createBiquadFilter();
         this.lowPassNode.type = "lowpass";
         // TODO: remove this magic number and make the filter configurable?
+        // TODO: is this.frequency always defined here?
         this.lowPassNode.frequency.setValueAtTime(this.frequency * 1.1, this.audioContext.currentTime);
         this.gainNode = this.audioContext.createGain();  // this node is actually used for volume
         this.volume = this._volume;
@@ -116,6 +117,7 @@ export default class MorsePlayerWAA {
         // TODO: add volume array
         // let volumes = sequence.volumes;
         if (Array.isArray(frequencies)) {
+            // TODO: add frequency arrays; set this.frequency to the highest value to make the low-pass filter work
             throw "Arrays of frequencies not yet supported"
         } else {
             this.frequency = frequencies;

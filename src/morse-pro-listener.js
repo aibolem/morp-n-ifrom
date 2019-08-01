@@ -68,7 +68,6 @@ export default class MorseListener {
         )
     {
         // audio input and output
-        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
         this.audioContext = new window.AudioContext() || new window.webkitAudioContext();
 
         if (spectrogramCallback !== undefined) this.spectrogramCallback = spectrogramCallback;
@@ -215,7 +214,7 @@ export default class MorseListener {
     }
 
     /**
-     * @access: private
+     * @access private
      */
     initialiseAudioNodes() {
         // set up a javascript node (BUFFER_SIZE, NUM_INPUTS, NUM_OUTPUTS)
@@ -235,26 +234,20 @@ export default class MorseListener {
      */
     startListening() {
         this.stop();
-        // TODO: replace this with navigator.mediaDevices.getUserMedia() instead and shim for legacy browsers (https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia)
-        navigator.getUserMedia(
-            {
-                audio: true,
-                video: false
-            },
-            function(stream) {
-                // create an audio node from the stream
-                this.sourceNode = this.audioContext.createMediaStreamSource(stream);
-                this.input = "mic";
-                // connect nodes but don't connect mic to audio output to avoid feedback
-                this.sourceNode.connect(this.analyserNode);
-                this.jsNode.connect(this.audioContext.destination);
-                this.micSuccessCallback();
-            }.bind(this),
-            function(error) {
-                this.input = undefined;
-                this.micErrorCallback(error);
-            }.bind(this)
-        );
+        navigator.mediaDevices.getUserMedia({audio: true, video: false})
+        .then(function(stream) {
+            // create an audio node from the stream
+            this.sourceNode = this.audioContext.createMediaStreamSource(stream);
+            this.input = "mic";
+            // connect nodes but don't connect mic to audio output to avoid feedback
+            this.sourceNode.connect(this.analyserNode);
+            this.jsNode.connect(this.audioContext.destination);
+            this.micSuccessCallback();
+        }.bind(this))
+        .catch(function(error) {
+            this.input = undefined;
+            this.micErrorCallback(error);
+        }.bind(this));
     }
 
     /**
@@ -395,4 +388,25 @@ export default class MorseListener {
     fileLoadCallback(audioBuffer) { }
     fileErrorCallback(error) { }
     EOFCallback() { }
+}
+
+// TODO: add to constructor so we can call the micErrorCallback
+if (navigator.mediaDevices) {
+    // Shim from https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
+    if (navigator.mediaDevices.getUserMedia === undefined) {
+        navigator.mediaDevices.getUserMedia = function(constraints) {
+            // First get ahold of the legacy getUserMedia, if present
+            var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+            // Some browsers just don't implement it - return a rejected promise with an error      // to keep a consistent interface
+            if (!getUserMedia) {
+                return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+            }
+            // Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
+            return new Promise(function(resolve, reject) {
+                getUserMedia.call(navigator, constraints, resolve, reject);
+            });
+        }
+    }
+} else {
+    console.log('No mediaDevices: loaded from insecure site?');
 }

@@ -10,7 +10,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-import * as WPM from './morse-pro-wpm';
+// import * as WPM from './morse-pro-wpm';
 import MorseDecoder from './morse-pro-decoder';
 import MorsePlayerWAA from './morse-pro-player-waa';
 
@@ -52,17 +52,18 @@ export default class MorseKeyer {
         this.fwpm = fwpm;
 
         this.player = new MorsePlayerWAA();
-        this.player.frequency = frequency;
-        this.decoder = new MorseDecoder(this.wpm, this.fwpm, messageCallback);
+        this.frequency = frequency;
+        //TODO: make the decoder a constructor parameter instead, the player as well perhaps
+        this.decoder = new MorseDecoder({wpm:this.wpm, fwpm:this.fwpm, messageCallback:messageCallback});
         this.decoder.noiseThreshold = 0;
 
-        this.ditLen = WPM.ditLength(wpm);  // duration of dit in ms
-        this.fditLen = WPM.fditLength(wpm, fwpm);  // TODO: finish fwpm bit
+        this.ditLen = this.decoder.lengths['.'];  // duration of dit in ms
+        this.fditLen = this.ditLen;  // TODO: finish fwpm bit
         this._state = { playing: false };
     }
 
     /**
-     * @access: private
+     * @access private
      */
     _check() {
         var key = this.keyCallback();
@@ -148,7 +149,7 @@ export default class MorseKeyer {
      * @access: private
      */
     _playTone(duration) {
-        this.player.load([duration]);
+        this.player.load({timings: [duration], frequencies: this.frequency});
         this.player.playFromStart();
     }
 }

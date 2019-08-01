@@ -57,6 +57,7 @@ export var dictionary = {
 
     letterMatch: /^./,
 
+    /* 'charSpace' and 'wordSpace' are mandatory. The other symbols are dictionary dependent. */
     ratio: {
         '.': 1,
         '-': 3,

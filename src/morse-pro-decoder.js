@@ -9,8 +9,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-import * as Morse from './morse-pro';
-import * as WPM from './morse-pro-wpm';
+import MorseCW from './morse-pro-cw';
 
 /**
  * Class to convert from timings to Morse code.
@@ -21,33 +20,23 @@ import * as WPM from './morse-pro-wpm';
  * var messageCallback = function(data) {
  *     console.log("Decoded: {\n  timings: " + data.timings + "\n  morse: " + data.morse + "\n  message: " + data.message + "\n}");
  * }
- * var decoder = new MorseDecoder(10);
- * decoder.messageCallback = messageCallback;
+ * var decoder = new MorseDecoder({wpm:10, messageCallback});
  * var t;
  * while (decoder_is_operating) {
- *     // get some timing "t" from a sensor, make it +ve for noise and -ve for silence
+ *     // get some ms timing "t" from a sensor, make it +ve for noise and -ve for silence
  *     decoder.addTiming(t);
  * }
  * decoder.flush();  // make sure all the data is pushed through the decoder
  */
-export default class MorseDecoder {
+export default class MorseDecoder extends MorseCW {
     /**
      * @param {number} [wpm=20] - The speed of the Morse in words per minute.
      * @param {number} [fwpm=wpm] - The Farnsworth speed of the Morse in words per minute.
      * @param {function()} messageCallback - Callback executed with {message: string, timings: number[], morse: string} when decoder buffer is flushed (every character).
      * @param {function()} speedCallback - Callback executed with {wpm: number, fwpm: number} if the wpm or fwpm speed changes. The speed in this class doesn't change by itself, but e.g. the fwpm can change if wpm is changed. Returned dictionary has keys 'fwpm' and 'wpm'.
     */
-    constructor(wpm = 20, fwpm = wpm, messageCallback = undefined, speedCallback = undefined) {
-        this._wpm = undefined;
-        this._fwpm = undefined;  // farnsworth speed
-        this._ditLen = undefined;
-        this._fditLen = undefined;
-        this.defaults = {
-            wpm: 20,
-            fwpm: 20
-        };
-        this.wpm = wpm;
-        this.fwpm = fwpm;
+    constructor({options=[], wpm=20, fwpm=wpm, messageCallback=undefined, speedCallback=undefined} = {}) {
+        super({dictionary:'international', options, wpm, fwpm});
         if (messageCallback !== undefined) this.messageCallback = messageCallback;
         if (speedCallback !== undefined) this.speedCallback = speedCallback;  // function receives dictionary with wpm and fwpm set when the speed changes
         this.timings = [];  // all the ms timings received, all +ve
@@ -61,89 +50,67 @@ export default class MorseDecoder {
     /**
      * @access private
      */
-    updateThresholds() {
-        this._ditDahThreshold = ((1 * this._ditLen) + (3 * this._ditLen)) / 2;
-        this._dahSpaceThreshold = ((3 * this._fditLen) + (7 * this._fditLen)) / 2;
+    _clearThresholds() {
+        this._ditDahThreshold = undefined;
+        this._spaceThreshold = undefined;
+    }
+
+    get ditDahThreshold() {
+        this._ditDahThreshold = this._ditDahThreshold || (this.lengths['.'] + this.lengths['-']) / 2;
+        return this._ditDahThreshold;
+    }
+
+    get spaceThreshold() {
+        this._spaceThreshold = this._spaceThreshold || -(this.lengths.charSpace + this.lengths.wordSpace) / 2;
+        return this._spaceThreshold;
     }
 
     /**
      * Should be set to the WPM speed of the input sound.
-     * The input data is validated and this.defaults.wpm will be used if there is an error in input.
-     * The private _fwpm, _ditLen and _fditLen variables are also updated and the speedCallback is executed.
+     * The speedCallback is executed.
      * @param {number} wpm - Speed in words per minute.
      */
-    set wpm(wpm) {
-        if (isNaN(wpm)) wpm = this.defaults.wpm;
-        wpm = Math.max(wpm, 1);
-        this._wpm = wpm;
-        if (this._fwpm === undefined || this._fwpm > wpm) {
-            this._fwpm = this._wpm;
-        }
-        this._ditLen = WPM.ditLength(this._wpm);
-        this._fditLen = WPM.fditLength(this._wpm, this._fwpm);
-        this.updateThresholds();
+    setWPM(wpm) {
+        super._setWPM(wpm);
+        this._clearThresholds();
         this.speedCallback({wpm: this.wpm, fwpm: this.fwpm});
-    }
-
-    get wpm() {
-        return this._wpm;
     }
 
     /**
      * Should be set to the Farnsworth WPM speed of the input sound.
-     * The input data is validated and this.defaults.fwpm will be used if there is an error in input.
-     * The private _wpm, _ditLen and _fditLen variables are also updated and the speedCallback is executed.
+     * The speedCallback is executed.
      * @param {number} fwpm - Speed in words per minute.
      */
-    set fwpm(fwpm) {
-        if (isNaN(fwpm)) fwpm = this.defaults.fwpm;
-        fwpm = Math.max(fwpm, 1);
-        this._fwpm = fwpm;
-        if (this._wpm === undefined || this._wpm < fwpm) {
-            this.wpm = fwpm;
-        }
-        this._ditLen = WPM.ditLength(this._wpm);
-        this._fditLen = WPM.fditLength(this._wpm, this._fwpm);
-        this.updateThresholds();
+    setFWPM(fwpm) {
+        super._setFWPM(fwpm);
+        this._clearThresholds();
         this.speedCallback({wpm: this.wpm, fwpm: this.fwpm});
-    }
-
-    get fwpm() {
-        return this._fwpm;
     }
 
     /**
      * Set the length of a dit the decoder will look for.
-     * The private _wpm, _fwpm, and _fditLen variables are also updated.
+     * Updates wpm and fwpm.
      * @param {number} dit - Length of a dit in ms.
      */
     set ditLen(dit) {
-        this._ditLen = dit;
-        if (this._fditLen === undefined || this._fditLen < this._ditLen) {
-            this._fditLen = this._ditLen;
-        }
-        this._wpm = WPM.wpm(this._ditLen);
-        this._fwpm = WPM.fwpm(this._wpm, this._fditLen / this._ditLen);
-        this.updateThresholds();
+        this._fditLen = Math.max(dit, this._fditLen || 1);
+        this.setWPMfromDitLen(dit);
+        this.setFWPMfromRatio(dit / this._fditLen);
+        this._clearThresholds();
     }
 
     get ditLen() {
-        return this._ditLen;
+        return this.lengths['.'];
     }
 
     /**
      * Set the length of a Farnsworth dit the decoder will look for.
-     * The private _wpm, _fwpm, and _ditLen variables are also updated.
+     * Updates ditLen (ensuring ditLen is not longer).
      * @param {number} dit - Length of a Farnsworth dit in ms.
      */
     set fditLen(fdit) {
         this._fditLen = fdit;
-        if (this._ditLen === undefined || this._ditLen > this._fditLen) {
-            this._ditLen = this._fditLen;
-        }
-        this._wpm = WPM.wpm(this._ditLen);
-        this._fwpm = WPM.fwpm(this._wpm, this._fditLen / this._ditLen);
-        this.updateThresholds();
+        this.ditLen = Math.min(this.lengths['.'], fdit);
     }
 
     get fditLen() {
@@ -171,14 +138,14 @@ export default class MorseDecoder {
             } else if (Math.abs(duration) <= this.noiseThreshold) {
                 // if the duration is very short, assume it is a mistake and add it to the previous one
                 this.unusedTimes.pop();
-                duration = last - duration;  // take care of the sign change
+                duration = last - duration;  // take care of the sign change (if we're here then we know the sign has changed)
             }
         }
 
         this.unusedTimes.push(duration);
 
         // If we have just received a character space or longer then flush the timings
-        if (-duration >= this._ditDahThreshold) {
+        if (-duration >= this.ditDahThreshold) {
             // TODO: if fwpm != wpm then the ditDahThreshold only applies to sound, not spaces so this is slightly wrong (need another threshold)
             this.flush();
         }
@@ -206,13 +173,13 @@ export default class MorseDecoder {
 
         // If last element is quiet but it is not enough for a space character then pop it off and replace afterwards
         var last = this.unusedTimes[this.unusedTimes.length - 1];
-        if ((last < 0) && (-last < this._dahSpaceThreshold)) {
+        if ((last < 0) && (-last < this.spaceThreshold)) {
             this.unusedTimes.pop();
         }
 
         var u = this.unusedTimes;
-        var m = this.timings2morse(this.unusedTimes);
-        var t = Morse.morse2text(m).message;  // will be '#' if there's an error
+        var m = this._timings2morse(this.unusedTimes);
+        var t = this.displayText(this.morse2text(m).text, {});  // will be '#' if there's an error
         this.morse += m;
         this.message += t;
         if (last < 0) {
@@ -233,7 +200,7 @@ export default class MorseDecoder {
      * @return {string} - the dots and dashes as a string.
      * @access private
      */
-    timings2morse(times) {
+    _timings2morse(times) {
         var ditdah = "";
         var c;
         var d;
@@ -241,22 +208,22 @@ export default class MorseDecoder {
         for (var i = 0; i < times.length; i++) {
             d = times[i];
             if (d > 0) {
-                if (d < this._ditDahThreshold) {
+                if (d < this.ditDahThreshold) {
                     c = ".";
                 } else {
                     c = "-";
                 }
             } else {
                 d = -d;
-                if (d < this._ditDahThreshold) {
+                if (d < this.ditDahThreshold) {
                     c = "";
-                } else if (d < this._dahSpaceThreshold) {
+                } else if (d < this.spaceThreshold) {
                     c = " ";
                 } else {
                     c = "/";
                 }
             }
-            this.addDecode(d, c);
+            this._addDecode(d, c);
             ditdah = ditdah + c;
         }
         return ditdah;
@@ -268,15 +235,17 @@ export default class MorseDecoder {
      * @param {string} character - the corresponding character element [.-/ ].
      * @access private
      */
-    addDecode(duration, character) {
+    _addDecode(duration, character) {
         this.timings.push(duration);
         this.characters.push(character);
     }
 
     /**
+     * Get a list of all the timings that were interpreted to be a particular character
+     * @return {number[]}
      * @access private
      */
-    getTimings(character) {
+    _getTimings(character) {
         var ret = [];
         for (var i = 0; i < this.timings.length; i++) {
             if (this.characters[i] === character) {
@@ -291,7 +260,7 @@ export default class MorseDecoder {
      * @return {number[]}
      */
     get dits() {
-        return this.getTimings('.');
+        return this._getTimings('.');
     }
 
     /**
@@ -299,7 +268,7 @@ export default class MorseDecoder {
      * @return {number[]}
      */
     get dahs() {
-        return this.getTimings('-');
+        return this._getTimings('-');
     }
 
     /**
@@ -307,7 +276,7 @@ export default class MorseDecoder {
      * @return {number[]}
      */
     get ditSpaces() {
-        return this.getTimings('');
+        return this._getTimings('');
     }
 
     /**
@@ -315,7 +284,7 @@ export default class MorseDecoder {
      * @return {number[]}
      */
     get dahSpaces() {
-        return this.getTimings(' ');
+        return this._getTimings(' ');
     }
 
     /**
@@ -323,9 +292,10 @@ export default class MorseDecoder {
      * @return {number[]}
      */
     get spaces() {
-        return this.getTimings('/');
+        return this._getTimings('/');
     }
 
+    // default callbacks that do nothing
     messageCallback(jsonData) { }
     speedCallback(jsonData) { }
 }

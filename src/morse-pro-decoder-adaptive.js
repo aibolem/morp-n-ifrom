@@ -37,8 +37,8 @@ export default class MorseAdaptiveDecoder extends MorseDecoder {
     /**
      * @param {number} [bufferSize=30] - Size of the buffer to average over
      */
-    constructor(wpm, fwpm, bufferSize = 30, messageCallback = undefined, speedCallback = undefined) {
-        super(wpm, fwpm, messageCallback, speedCallback);
+    constructor({options=[], wpm=20, fwpm=wpm, messageCallback=undefined, speedCallback=undefined, bufferSize=30} = {}) {
+        super({options, wpm, fwpm, messageCallback, speedCallback});
         this.bufferSize = bufferSize;
         this.ditLengths = [];
         this.fditLengths = [];
@@ -46,11 +46,10 @@ export default class MorseAdaptiveDecoder extends MorseDecoder {
     }
 
     /**
-     * @override
      * @access private
      */
-    addDecode(duration, character) {
-        super.addDecode(duration, character);
+    _addDecode(duration, character) {
+        super._addDecode(duration, character);
 
         // adapt!
         var dit;
