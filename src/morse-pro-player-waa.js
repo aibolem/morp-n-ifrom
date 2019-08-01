@@ -58,7 +58,7 @@ export default class MorsePlayerWAA {
 
     /**
      * Set up the audio graph
-     * @access: private
+     * @access private
      */
     _initialiseAudioNodes() {
         this.audioContext = new this.audioContextClass();
@@ -255,7 +255,7 @@ export default class MorsePlayerWAA {
     /**
      * Schedule notes that start before now + lookAheadTime.
      * @return {boolean} true if there is more to schedule, false if sequence is complete
-     * @access: private
+     * @access private
      */
     _scheduleNotes() {
         // console.log('Scheduling:');

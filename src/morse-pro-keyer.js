@@ -107,7 +107,7 @@ export default class MorseKeyer {
     /**
      * Translate key input into whether to play nothing, dit, or dah
      * @returns undefined, true or false for nothing, dit or dah
-     * @access: private
+     * @access private
      */
     _ditOrDah(input) {
         if (input & 1) {
@@ -146,7 +146,7 @@ export default class MorseKeyer {
     /**
      * Play a dit or dah sidetone.
      * @param {number} duration - number of milliseconds to play
-     * @access: private
+     * @access private
      */
     _playTone(duration) {
         this.player.load({timings: [duration], frequencies: this.frequency});

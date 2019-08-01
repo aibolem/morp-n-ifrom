@@ -312,7 +312,7 @@ export default class MorseListener {
 
     /**
      * This ScriptProcessorNode is called when it is full, we then actually look at the data in the analyserNode node to measure the volume in the frequency band of interest. We don't actually use the input or output of the ScriptProcesorNode.
-     * @access: private
+     * @access private
      */
     processSound() {
         // get the data from the analyserNode node and put into frequencyData
@@ -342,7 +342,7 @@ export default class MorseListener {
 
     /**
      * Called each tick with whether the sound is judged to be on or off. If a change from on to off or off to on is detected then the number of ticks of the segment is passed to the decoder.
-     * @access: private
+     * @access private
      */
     recordOnOrOff(soundIsOn) {
         if (this.notStarted) {

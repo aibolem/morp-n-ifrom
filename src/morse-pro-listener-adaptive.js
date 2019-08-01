@@ -50,7 +50,7 @@ export default class MorseAdaptiveListener extends MorseListener {
     }
 
     /**
-     * @access: private
+     * @access private
      */
     processSound() {
         super.processSound();

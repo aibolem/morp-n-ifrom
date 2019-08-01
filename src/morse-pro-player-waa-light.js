@@ -49,7 +49,7 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
 
     /**
      * Set up the audio graph, connecting the splitter node to a JSNode in order to analyse the waveform
-     * @access: private
+     * @access private
      * @override
      */
     _initialiseAudioNodes() {
@@ -69,7 +69,7 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
     }
 
     /**
-     * @access: private
+     * @access private
      */
     _processSound(event) {
         var input = event.inputBuffer.getChannelData(0);
@@ -87,7 +87,7 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
     }
 
     /**
-     * @access: private
+     * @access private
      * @override
      */
     _on() {
@@ -96,7 +96,7 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
     }
 
     /**
-     * @access: private
+     * @access private
      * @override
      */
     _off() {
