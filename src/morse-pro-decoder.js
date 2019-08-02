@@ -12,7 +12,7 @@ See the Licence for the specific language governing permissions and limitations 
 import MorseCW from './morse-pro-cw';
 
 /**
- * Class to convert from timings to Morse code.
+ * Class to convert from timings to Morse code. Uses "international" dictionary.
  *
  * @example
  * // The messageCallback is called when a character or more is decoded
@@ -20,7 +20,8 @@ import MorseCW from './morse-pro-cw';
  * var messageCallback = function(data) {
  *     console.log("Decoded: {\n  timings: " + data.timings + "\n  morse: " + data.morse + "\n  message: " + data.message + "\n}");
  * }
- * var decoder = new MorseDecoder({wpm:10, messageCallback});
+ * var wpm = 10;
+ * var decoder = new MorseDecoder({wpm, messageCallback});
  * var t;
  * while (decoder_is_operating) {
  *     // get some ms timing "t" from a sensor, make it +ve for noise and -ve for silence
@@ -30,6 +31,7 @@ import MorseCW from './morse-pro-cw';
  */
 export default class MorseDecoder extends MorseCW {
     /**
+     * @param {Array.<string>} options - Dictionary options to load.
      * @param {number} [wpm=20] - The speed of the Morse in words per minute.
      * @param {number} [fwpm=wpm] - The Farnsworth speed of the Morse in words per minute.
      * @param {function()} messageCallback - Callback executed with {message: string, timings: number[], morse: string} when decoder buffer is flushed (every character).

@@ -14,6 +14,7 @@ See the Licence for the specific language governing permissions and limitations 
  * Web browser sound player using Web Audio API.
  *
  * @example
+ * //TODO: check example
  * import MorseCWWave from 'morse-pro-cw-wave';
  * import MorsePlayerWAA from 'morse-pro-player-waa';
  * var morseCWWave = new MorseCWWave();
@@ -24,11 +25,13 @@ See the Licence for the specific language governing permissions and limitations 
  */
 export default class MorsePlayerWAA {
     /**
+     * @param {number} frequency - fallback frequency to use if the loaded sequence does not define any.
      * @param {function()} sequenceStartCallback - function to call each time the sequence starts.
      * @param {function()} sequenceEndingCallback - function to call when the sequence is nearing the end.
      * @param {function()} soundStoppedCallback - function to call when the sequence stops.
      */
-    constructor(sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback) {
+    //TODO: add a default (fallback) frequency and make constructor args into a dict
+    constructor({frequency=550, sequenceStartCallback=undefined, sequenceEndingCallback=undefined, soundStoppedCallback=undefined} = {}) {
         if (sequenceStartCallback !== undefined) this.sequenceStartCallback = sequenceStartCallback;
         if (sequenceEndingCallback !== undefined) this.sequenceEndingCallback = sequenceEndingCallback;
         if (soundStoppedCallback !== undefined) this.soundStoppedCallback = soundStoppedCallback;
@@ -41,7 +44,8 @@ export default class MorsePlayerWAA {
         }
 
         this.loop = false;
-        this.frequency = undefined;
+        this.fallbackFrequency = frequency;
+        this._frequency = undefined;
         this.startPadding = 0;  // number of ms to wait before playing first note of initial sequence
         this.endPadding = 0;  // number of ms to wait at the end of a sequence before playing the next one (or looping)
 
@@ -61,13 +65,13 @@ export default class MorsePlayerWAA {
      * @access private
      */
     _initialiseAudioNodes() {
+        // cannot work until this.frequency is defined
         this.audioContext = new this.audioContextClass();
         this.splitterNode = this.audioContext.createGain();  // this node is here to attach other nodes to in subclass
         this.lowPassNode = this.audioContext.createBiquadFilter();
         this.lowPassNode.type = "lowpass";
         // TODO: remove this magic number and make the filter configurable?
-        // TODO: is this.frequency always defined here?
-        this.lowPassNode.frequency.setValueAtTime(this.frequency * 1.1, this.audioContext.currentTime);
+        this.lowPassNode.frequency.setValueAtTime(this._frequency * 1.1, this.audioContext.currentTime);
         this.gainNode = this.audioContext.createGain();  // this node is actually used for volume
         this.volume = this._volume;
         this.splitterNode.connect(this.lowPassNode);
@@ -109,18 +113,20 @@ export default class MorsePlayerWAA {
     /**
      * Load timing sequence, replacing any existing sequence.
      * If endPadding is non-zero then an appropriate pause is added to the end.
-     * @param {number[]} timings - list of millisecond timings; +ve numbers are beeps, -ve numbers are silence
+     * @param {Object} sequence - the sequence to play.
+     * @param {number[]} sequence.timings - list of millisecond timings; +ve numbers are beeps, -ve numbers are silence.
+     * @param {number} sequence.frequencies - a single frequency to be used for all beeps. If not set, the fallback frequency defined in the constructor is used.
      */
     load(sequence) {
         let timings = sequence.timings;
-        let frequencies = sequence.frequencies;
+        let frequencies = sequence.frequencies || this.fallbackFrequency;
         // TODO: add volume array
         // let volumes = sequence.volumes;
         if (Array.isArray(frequencies)) {
             // TODO: add frequency arrays; set this.frequency to the highest value to make the low-pass filter work
             throw "Arrays of frequencies not yet supported"
         } else {
-            this.frequency = frequencies;
+            this._frequency = frequencies;
         }
 
         // TODO: undefined behaviour if this is called in the middle of a sequence
@@ -283,7 +289,7 @@ export default class MorsePlayerWAA {
                 this._soundEndTime = end;  // we need to store this for the stop() callback
                 oscillator = this.audioContext.createOscillator();
                 oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(this.frequency, start);
+                oscillator.frequency.setValueAtTime(this._frequency, start);
                 oscillator.start(start);
                 oscillator.stop(this._soundEndTime);
                 oscillator.connect(this.splitterNode);

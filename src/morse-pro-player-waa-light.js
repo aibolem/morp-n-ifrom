@@ -19,6 +19,7 @@ import MorsePlayerWAA from './morse-pro-player-waa';
  * The callbacks have an error of +/- 2.6ms
  *
  * @example
+ * //TODO: check example
  * import MorseCWWave from 'morse-pro-cw-wave';
  * import MorsePlayerWAALight from 'morse-pro-player-waa-light';
  * var morseCWWave = new MorseCWWave();
@@ -50,7 +51,6 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
     /**
      * Set up the audio graph, connecting the splitter node to a JSNode in order to analyse the waveform
      * @access private
-     * @override
      */
     _initialiseAudioNodes() {
         super._initialiseAudioNodes();
@@ -61,7 +61,7 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
     }
 
     /**
-     * @override
+     * 
      */
     load(timings, frequency) {
         this._timings = timings;

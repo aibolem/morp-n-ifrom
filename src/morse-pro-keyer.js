@@ -1,5 +1,5 @@
 /*!
-This code is © Copyright Stephen C. Phillips, 2018.
+This code is © Copyright Stephen C. Phillips, 2019.
 Email: steve@scphillips.com
 */
 /*
@@ -9,10 +9,6 @@ You may obtain a copy of the Licence at: https://joinup.ec.europa.eu/community/e
 Unless required by applicable law or agreed to in writing, software distributed under the Licence is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
-
-// import * as WPM from './morse-pro-wpm';
-import MorseDecoder from './morse-pro-decoder';
-import MorsePlayerWAA from './morse-pro-player-waa';
 
 /**
  * The Morse keyer tests for input on a timer, plays the appropriate tone and passes the data to a decoder.
@@ -36,25 +32,20 @@ import MorsePlayerWAA from './morse-pro-player-waa';
  * var messageCallback = function(d) {
  *     console.log(d.message);
  * };
- * keyer = new MorseKeyer(keyCallback, 20, 20, 550, messageCallback);
+ * decoder = new MorseDecoder({wpm:20, messageCallback});
+ * player = new MorsePlayerWAA({frequency:550});
+ * keyer = new MorseKeyer({keyCallback, decoder, player});
  */
 export default class MorseKeyer {
     /**
      * @param {function(): number} keyCallback - A function which should return 0, 1, 2, or 3 from the vitual "paddle" depending if nothing, a dit, a dah or both is detected. This implementation will play dits if both keys are detected.
-     * @param {number} [wpm=20] - Speed of the keyer.
-     * @param {number} [fwpm=wpm] - Farnsworth speed of the keyer.
-     * @param {number} [frequency=550] - The frequency in Hz for the sidetone.
-     * @param {function()} messageCallback - A function called with {message: string, timings: number[], morse: string} for each decoded part (see MorseDecoder). Its use here will result in a single character being returned each time.
+     * @param {MorseDecoder} decoder - Configured MorseDecoder.
+     * @param {MorsePlayerWAA} player - Configured MorsePlayerWAA.
      */
-    constructor(keyCallback, wpm = 20, fwpm = wpm, frequency = 550, messageCallback = undefined) {
+    constructor({keyCallback, decoder, player}) {
         this.keyCallback = keyCallback;
-        this.wpm = wpm;
-        this.fwpm = fwpm;
-
-        this.player = new MorsePlayerWAA();
-        this.frequency = frequency;
-        //TODO: make the decoder a constructor parameter instead, the player as well perhaps
-        this.decoder = new MorseDecoder({wpm:this.wpm, fwpm:this.fwpm, messageCallback:messageCallback});
+        this.player = player;
+        this.decoder = decoder;
         this.decoder.noiseThreshold = 0;
 
         this.ditLen = this.decoder.lengths['.'];  // duration of dit in ms
@@ -149,7 +140,7 @@ export default class MorseKeyer {
      * @access private
      */
     _playTone(duration) {
-        this.player.load({timings: [duration], frequencies: this.frequency});
+        this.player.load({timings: [duration]});
         this.player.playFromStart();
     }
 }
