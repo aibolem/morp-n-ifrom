@@ -1,5 +1,5 @@
 /*!
-This code is © Copyright Stephen C. Phillips, 2018.
+This code is © Copyright Stephen C. Phillips, 2019.
 Email: steve@scphillips.com
 */
 /*
@@ -10,11 +10,10 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-import * as WPM from './morse-pro-wpm';
 import MorseDecoder from './morse-pro-decoder';
 
 /**
- * Class to convert from timings to Morse code. Adapts to changing speed.
+ * Class to convert from timings to Morse code. Uses "international" dictionary. Adapts to changing speed.
  *
  * @example
  * var messageCallback = function(data) {
@@ -23,12 +22,10 @@ import MorseDecoder from './morse-pro-decoder';
  * var speedCallback = function(s) {
  *     console.log('Speed is now: ' + s.wpm + ' WPM');
  * };
- * var decoder = new MorseAdaptiveDecoder(10);
- * decoder.messageCallback = messageCallback;
- * decoder.speedCallback = speedCallback;
+ * var decoder = new MorseAdaptiveDecoder({messageCallback, speedCallback});
  * var t;
  * while (decoder_is_operating) {
- *     // get some timing "t" from a sensor, make it +ve for noise and -ve for silence
+ *     // get some ms timing "t" from a sensor, make it +ve for noise and -ve for silence
  *     decoder.addTiming(t);
  * }
  * decoder.flush();  // make sure all the data is pushed through the decoder
@@ -42,6 +39,9 @@ export default class MorseAdaptiveDecoder extends MorseDecoder {
         this.bufferSize = bufferSize;
         this.ditLengths = [];
         this.fditLengths = [];
+        // fill the buffers with undefined so as to weight the first reading the same as later ones
+        this.ditLengths[bufferSize] = undefined;
+        this.fditLengths[bufferSize] = undefined;
         this.lockSpeed = false;
     }
 
@@ -73,7 +73,7 @@ export default class MorseAdaptiveDecoder extends MorseDecoder {
             //     fdit = duration / 7;
             //     break;
         }
-        this.ditLengths.push(dit);
+        this.ditLengths.push(dit);  // put new ones on the end
         this.fditLengths.push(fdit);
         this.ditLengths = this.ditLengths.slice(-this.bufferSize);
         this.fditLengths = this.fditLengths.slice(-this.bufferSize);
@@ -87,9 +87,7 @@ export default class MorseAdaptiveDecoder extends MorseDecoder {
         var weight;
 
         for (var i = 0; i < this.bufferSize; i++) {
-            // weight = Math.exp(-this.bufferSize + 1 + i);  // exponential weighting
             weight = i + 1;  // linear weighting
-            // weight = 1;  // constant weighting
             if (this.ditLengths[i] !== undefined) {
                 sum += this.ditLengths[i] * weight;
                 denom += weight;
