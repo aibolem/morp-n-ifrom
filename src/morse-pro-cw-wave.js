@@ -28,7 +28,7 @@ export default class MorseCWWave extends MorseCW {
      */
     constructor({dictionary='international', options=[], wpm=20, fwpm=wpm, frequency=550, sampleRate=8000} = {}) {
         super({dictionary, options, wpm, fwpm});
-        // TODO: remove this.frequency and replace with arrays of freq and volume to go with timings array when making a sample
+        // TODO: make this.frequency a fallback and replace with arrays of freq and volume to go with timings array when making a sample
         /** @type {number} */
         this.frequency = frequency;  // frequency of wave in Hz
         /** @type {number} */

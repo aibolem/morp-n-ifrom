@@ -107,6 +107,7 @@ export var dictionary = {
         values: ['dit', 'dah', 'intra-character space', 'inter-character space', 'word space']
     },
 
+    // TODO: add accented characters as an option
     options: {
         prosigns: {
             letter: {

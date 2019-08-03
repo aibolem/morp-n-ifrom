@@ -30,7 +30,6 @@ export default class MorsePlayerWAA {
      * @param {function()} sequenceEndingCallback - function to call when the sequence is nearing the end.
      * @param {function()} soundStoppedCallback - function to call when the sequence stops.
      */
-    //TODO: add a default (fallback) frequency and make constructor args into a dict
     constructor({frequency=550, sequenceStartCallback=undefined, sequenceEndingCallback=undefined, soundStoppedCallback=undefined} = {}) {
         if (sequenceStartCallback !== undefined) this.sequenceStartCallback = sequenceStartCallback;
         if (sequenceEndingCallback !== undefined) this.sequenceEndingCallback = sequenceEndingCallback;
