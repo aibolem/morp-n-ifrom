@@ -103,7 +103,7 @@ export default class MorseMessage {
     }
 
     get wave() {
-        return this.morseCWWave.getSample(this.timings);
+        return this.morseCWWave.getSample(this.timings, 50);
     }
 
     /**
