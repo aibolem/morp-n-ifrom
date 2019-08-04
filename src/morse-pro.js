@@ -43,7 +43,7 @@ export default class Morse {
     /**
      * Add an additional dictionary to the one being used for translation.
      * Dictionary needs 'letter' and (optional) 'letterMatch' keys.
-     * @param {String or Map} dict 
+     * @param {Object} dict 
      */
     addDict(dict) {
         let letters = dict.letter
@@ -58,12 +58,19 @@ export default class Morse {
     }
 
     addOption(optName) {
-        this.addDict(this.dictionary.options[optName])
+        if (this.dictionary.options[optName] !== undefined) {
+            this.addDict(this.dictionary.options[optName])
+        } else {
+            throw "No option '" + optName + "' in '" + this.dictionary.id + "'";
+        }
+        
     }
+
+    //TODO: sort this out. removeDict doesn't work the same as addDict and cannot remove the base dict
 
     /**
      * Remove an additional dictionary to the one being used for translation.
-     * Either takes a named dictionary to be found as a kry in this.dictionary.options or an actual dictionary with letter and letterMatch keys.
+     * Either takes a named dictionary to be found as a key in this.dictionary.options or an actual dictionary with letter and letterMatch keys.
      * @param {String or Map} dict 
      */
     removeDict(dict) {
