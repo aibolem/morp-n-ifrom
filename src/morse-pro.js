@@ -138,7 +138,7 @@ export default class Morse {
     tokeniseRawText(text) {
         let tokens = []
         let words = text.split(' ');
-        for(let word of words) {
+        for (let word of words) {
             let letters = [];
             while (word.length) {
                 let letter = word.match(this.letterMatch)[0];
