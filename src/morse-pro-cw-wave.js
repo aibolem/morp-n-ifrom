@@ -40,6 +40,7 @@ export default class MorseCWWave extends MorseCW {
      * @param {number[]} timings - millisecond timings, +ve numbers representing sound, -ve for no sound (+ve/-ve can be in any order)
     // TODO * @param {number[]} frequencies - frequencies of elements in Hz.
     // TODO * @param {number[]} volumes - volumes of elements in Hz.
+    // TODO: remove endpadding?
      * @param {number} [endPadding=0] - how much silence in ms to add to the end of the waveform.
      * @return {number[]} an array of floats in range [-1, 1] representing the wave-form.
      */
@@ -80,12 +81,13 @@ export default class MorseCWWave extends MorseCW {
         */
 
         var step = Math.PI * 2 * this.frequency / this.sampleRate;
-        var on = timings[0] > 0 ? 1 : 0;
+        var on, duration;
         var x0, x1 = 0, x2 = 0;
         var y0, y1 = 0, y2 = 0;
         var gain = 0.813;  // empirically, the lowpass filter outputs waveform of magnitude 1.23, so need to scale it down to avoid clipping
         for (var t = 0; t < timings.length; t += 1) {
-            var duration = this.sampleRate * Math.abs(timings[t]) / 1000;
+            duration = this.sampleRate * Math.abs(timings[t]) / 1000;
+            on = timings[t] > 0 ? 1 : 0;
             for (var i = 0; i < duration; i += 1) {
                 x0 = on * Math.sin(i * step);  // the input signal
                 y0 = b0 * x0 + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2;
@@ -95,7 +97,6 @@ export default class MorseCWWave extends MorseCW {
                 y2 = y1;
                 y1 = y0;
             }
-            on = 1 - on;
         }
         return sample;
     }
