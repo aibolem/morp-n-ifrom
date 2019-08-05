@@ -49,7 +49,11 @@ export default class MorseCWWave extends MorseCW {
             return [];
         }
         // add minimum of 5ms silence to the end to ensure the filtered signal can finish cleanly
-        timings.push(-Math.max(5, endPadding));
+        if (timings[timings.length - 1] > 0) {
+            timings.push(-Math.max(5, endPadding));
+        } else {
+            timings[timings.length - 1] = -Math.max(5, endPadding, -timings[timings.length - 1]);
+        }
 
         /*
             Compute lowpass biquad filter coefficients using method from Chromium
@@ -101,14 +105,17 @@ export default class MorseCWWave extends MorseCW {
      * @param {number[]} timings - millisecond timings, +ve numbers representing sound, -ve for no sound (+ve/-ve can be in any order)
     // TODO * @param {number[]} frequencies - frequencies of elements in Hz.
     // TODO * @param {number[]} volumes - volumes of elements in Hz.
+    // TODO: remove endpadding?
      * @param {number} [endPadding=0] - how much silence in ms to add to the end of the waveform.
      * @return {Promise(number[])} a Promise resolving to an array of floats in range [-1, 1] representing the wave-form.
      */
     getWAASample(timings, endPadding = 0) {
         // add minimum of 5ms silence to the end to ensure the filtered signal can finish cleanly
-        endPadding = Math.max(5, endPadding);
-        // var timings = this.getTimings();
-        timings.push(-endPadding);
+        if (timings[timings.length - 1] > 0) {
+            timings.push(-Math.max(5, endPadding));
+        } else {
+            timings[timings.length - 1] = -Math.max(5, endPadding, -timings[timings.length - 1]);
+        }
         var offlineAudioContextClass = window.OfflineAudioContext || window.webkitOfflineAudioContext;
         if (offlineAudioContextClass === undefined) {
             throw new Error("No OfflineAudioContext class defined");
