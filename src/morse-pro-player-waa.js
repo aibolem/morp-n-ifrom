@@ -35,10 +35,10 @@ export default class MorsePlayerWAA {
         if (sequenceEndingCallback !== undefined) this.sequenceEndingCallback = sequenceEndingCallback;
         if (soundStoppedCallback !== undefined) this.soundStoppedCallback = soundStoppedCallback;
         this._noAudio = false;
-        console.log("Trying Web Audio API (Oscillators)");
         this.audioContextClass = window.AudioContext || window.webkitAudioContext;
         if (this.audioContextClass === undefined) {
             this._noAudio = true;
+            console.log("Web Audio API unavailable");
             throw (new Error("No AudioContext class defined"));
         }
 
@@ -111,7 +111,7 @@ export default class MorsePlayerWAA {
 
     /**
      * Load timing sequence, replacing any existing sequence.
-     * If endPadding is non-zero then an appropriate pause is added to the end.
+     * If this.endPadding is non-zero then an appropriate pause is added to the end.
      * @param {Object} sequence - the sequence to play.
      * @param {number[]} sequence.timings - list of millisecond timings; +ve numbers are beeps, -ve numbers are silence.
      * @param {number} sequence.frequencies - a single frequency to be used for all beeps. If not set, the fallback frequency defined in the constructor is used.
