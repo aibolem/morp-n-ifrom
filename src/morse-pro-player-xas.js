@@ -27,16 +27,18 @@ export default class MorsePlayerXAS {
     /**
      * @param {Object} xaudioServerClass - the XAudioServer class
      */
-    constructor(xaudioServerClass) {
+    constructor(xaudioServerClass, morseCWWave) {
         this.xaudioServerClass = xaudioServerClass;
+        this.morseCWWave = morseCWWave;
         this._isPlaying = false;
-        this.sample = [];
         this._volume = 1;
         this.samplePos = undefined;
         this.noAudio = false;
         this.audioServer = undefined;
-        this.sampleRate = undefined;
+        this.sampleRate = 8000;
         this.sample = undefined;
+        this.startPadding = 0;
+        this.endPadding = 1000;
 
         var that = this;  // needed so that the 3 closures defined here keep a reference to this object
 
@@ -95,22 +97,20 @@ export default class MorsePlayerXAS {
     }
 
     /**
-     * Convenience method to help playing directly from a MorseCWWave instance.
-     * @param {Object} cwWave - a MorseCWWave instance
+     * Load timing sequence, replacing any existing sequence.
+     * If this.endPadding is non-zero then an appropriate pause is added to the end.
+     * Uses the frequency defined in this.cwWave
+     * @param {Object} sequence - the sequence to play.
+     * @param {number[]} sequence.timings - list of millisecond timings; +ve numbers are beeps, -ve numbers are silence.
      */
-    loadCWWave(cwWave) {
-        this.load(cwWave.getSample(), cwWave.sampleRate);
-    }
-
-    load(sample, sampleRate) {
-        this.sampleRate = sampleRate || 8000;
-        this.sample = (sample || []);
-
-        var silence = [];
-        for (var i = 0; i < this.sampleRate; i += 1) {
-            silence.push(0.0);
-        }
-        this.sample = this.sample.concat(silence);  // add on a second of silence to the end to keep IE quiet
+    load(sequence={timings:[]}) {
+        let timings = sequence.timings;
+        // add on silence at start and end
+        timings.unshift(-this.startPadding);
+        timings.push(-this.endPadding);
+        // TODO: pass in frequencies and volumes once CWWave supports them
+        this.sample = this.morseCWWave.getSample(timings);
+        this.sampleRate = this.morseCWWave.sampleRate;
 
         console.log("Trying XAudioServer");
 
