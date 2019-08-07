@@ -48,12 +48,9 @@ export var dictionary = {
         '(': '. . . . .s- .',
         ')': '. . . . .s. .s. .',
         '"': '. . - .s- .', // fall back to using open quotes for straight
-        '“': '. . - .s- .', // U+201C
-        '”': '. . - .s- . - .', // U+201D
-        // '@': '. - - . - .',
-        // '=': '- . . . -',
+        '\u201c': '. . - .s- .', // open quotes
+        '\u201d': '. . - .s- . - .', // close quotes
         '&': '.s. . .',
-        // '+': '. - . - .',
         '!': '- - - .',
         ';': '. . .s. .',
     },
@@ -88,8 +85,8 @@ export var dictionary = {
         morse: {
             '\\.': '.',
             '\\-': '-', // just a normal hyphen
-            'd': '⸺', // U+2e3a two-em dash
-            'D': '⸻', // U+2e3b three-em dash
+            'd': '\u2e3a', // two-em dash
+            'D': '\u2e3b', // three-em dash
             ' ': '',
             's': ' '
         },
@@ -106,15 +103,15 @@ export var dictionary = {
         // morse = morse.replace(/\s+/g, ' ');
         morse = morse.replace(/\s*\/[\s\/]*/g, '/');
         morse = morse.replace(/([\.\-]) (?=[\.\-])/g, '$1s');
-        morse = morse.replace(/⸺/g, 'd');
-        morse = morse.replace(/⸻/g, 'D');
+        morse = morse.replace(/\u2e3a/g, 'd');
+        morse = morse.replace(/\u2e3b/g, 'D');
         let words = morse.split('/');
         let tokens = words.map(word => word.split('   '));
         tokens = tokens.map(letters => letters.map(letter => letter.replace(/([\.\-])(?=[\.\-])/g, '$1 ')));
         return tokens;
     },
 
-    morseMatch: new RegExp('^\\s*[\\.\\-_⸺⸻]+[\\.\\-_⸺⸻ \\/\\|]*$'),
+    morseMatch: new RegExp('^\\s*[\\.\\-_\u2e3a\u2e3b]+[\\.\\-_\u2e3a\u2e3b \\/\\|]*$'),
 
     displayName: {
         keys: ['.', '-', 'd', 'D', ' ', 's', 'charSpace', 'wordSpace'],
