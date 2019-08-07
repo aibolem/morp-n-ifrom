@@ -159,11 +159,6 @@ export default class Morse {
         return this.tokeniseRawText(this.tidyText(text));
     }
 
-    // displayText(textTokens) {
-    //     let words = textTokens.map(word => word.join(''));
-    //     return words.join(' ');
-    // }
-
     /**
      * Convert from text tokens to displayable String
      * @param {Array} textTokens - list of lists representing the words and characters
@@ -212,28 +207,6 @@ export default class Morse {
             this.dictionary.display.join.charSpace, this.dictionary.display.join.wordSpace, this.dictionary.display.morse, 
             errorTokens, prefix, suffix);
     }
-
-    // displayMorse(morseTokens) {
-    //     let words = morseTokens.map(word => word.join(this.dictionary.display.join.charSpace));
-    //     let sentence = words.join(this.dictionary.display.join.wordSpace);
-    //     for (let k in this.dictionary.display.morse) {
-    //         sentence = sentence.replace(new RegExp(k, 'g'), this.dictionary.display.morse[k]);
-    //     }
-
-
-    //     // let words = [];
-    //     // for (let word of morseTokens) {
-    //     //     let chars = []
-    //     //     for (let char of word) {
-    //     //         for (let k in this.dictionary.display.morse) {
-    //     //             char = char.replace(new RegExp(k, 'g'), this.dictionary.display.morse[k]);
-    //     //         }
-    //     //         chars.push(char);
-    //     //     }
-    //     //     words.push(chars.join(this.dictionary.display.join.charSpace));
-    //     // }
-    //     // return words.join(this.dictionary.display.join.wordSpace);
-    // }
 
     morseTokens2text(morseTokens) {
         let translation = this._input2output(morseTokens, this.morse2textD);
