@@ -34,14 +34,15 @@ import MorsePlayerWAA from './morse-pro-player-waa';
  */
 export default class MorsePlayerWAALight extends MorsePlayerWAA {
     /**
+     * @param {number} frequency - fallback frequency to use if the loaded sequence does not define any.
      * @param {function()} sequenceStartCallback - function to call each time the sequence starts.
      * @param {function()} sequenceEndingCallback - function to call when the sequence is nearing the end.
      * @param {function()} soundStoppedCallback - function to call when the sequence stops.
      * @param {function()} soundOnCallback - function to call wth the note number as the argument when a beep starts.
      * @param {function()} soundOffCallback - function to call with the note number as the argument when a beep stops.
      */
-    constructor(sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback, soundOnCallback, soundOffCallback) {
-        super(sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback);
+    constructor({frequency, sequenceStartCallback=undefined, sequenceEndingCallback=undefined, soundStoppedCallback=undefined, soundOnCallback=undefined, soundOffCallback=undefined} = {}) {
+        super({frequency, sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback});
         if (soundOnCallback !== undefined) this.soundOnCallback = soundOnCallback;
         if (soundOffCallback !== undefined) this.soundOffCallback = soundOffCallback;
         this._wasOn = false;
