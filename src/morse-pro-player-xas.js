@@ -27,9 +27,12 @@ export default class MorsePlayerXAS {
     /**
      * @param {Object} xaudioServerClass - the XAudioServer class
      */
-    constructor(xaudioServerClass, morseCWWave) {
-        this.xaudioServerClass = xaudioServerClass;
+    constructor({XAudioServerClass, morseCWWave, startPadding=0, endPadding=1000} = {}) {
+        this.XAudioServerClass = XAudioServerClass;
         this.morseCWWave = morseCWWave;
+        this.startPadding = startPadding;
+        this.endPadding = endPadding;
+
         this._isPlaying = false;
         this._volume = 1;
         this.samplePos = undefined;
@@ -37,8 +40,6 @@ export default class MorsePlayerXAS {
         this.audioServer = undefined;
         this.sampleRate = 8000;
         this.sample = undefined;
-        this.startPadding = 0;
-        this.endPadding = 1000;
 
         var that = this;  // needed so that the 3 closures defined here keep a reference to this object
 
@@ -114,7 +115,7 @@ export default class MorsePlayerXAS {
 
         console.log("Trying XAudioServer");
 
-        this.audioServer = new this.xaudioServerClass(
+        this.audioServer = new this.XAudioServerClass(
             1,                      // number of channels
             this.sampleRate,        // sample rate
             this.sampleRate >> 2,   // buffer low point for underrun callback triggering

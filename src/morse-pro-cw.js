@@ -34,8 +34,8 @@ export default class MorseCW extends Morse {
      * 
      * @param {Map} namedParameters
      */
-    constructor({dictionary='international', options=[], wpm=20, fwpm=wpm} = {}) {
-        super({dictionary, options});
+    constructor({dictionary, dictionaryOptions, wpm=20, fwpm=wpm} = {}) {
+        super({dictionary, dictionaryOptions});
         /** Morse tokens representing 'PARIS' */
         this._parisMorseTokens = this.textTokens2morse(this.tokeniseRawText('PARIS')).morse;
         /** The element of the dictionary that the ratios are based off */

@@ -22,7 +22,7 @@ export default class Morse {
      * 
      * @param {Map} namedParameters: 'options' is a list of optional additional dictionaries such as 'prosigns'
      */
-    constructor({dictionary='international', options=[]} = {}) {
+    constructor({dictionary='international', dictionaryOptions=[]} = {}) {
         if (dictionary in dictionaries) {
             this.dictionary = dictionaries[dictionary];
         } else {
@@ -35,8 +35,8 @@ export default class Morse {
         this.addDict({letter:{'':''}});
         this.addDict(this.dictionary);
         this.letterMatch = this.dictionary.letterMatch;
-        for (let i = 0; i < options.length; i++) {
-            this.addOption(options[i]);
+        for (let i = 0; i < dictionaryOptions.length; i++) {
+            this.addOption(dictionaryOptions[i]);
         }
     }
 

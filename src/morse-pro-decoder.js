@@ -37,8 +37,8 @@ export default class MorseDecoder extends MorseCW {
      * @param {function()} messageCallback - Callback executed with {message: string, timings: number[], morse: string} when decoder buffer is flushed (every character).
      * @param {function()} speedCallback - Callback executed with {wpm: number, fwpm: number} if the wpm or fwpm speed changes. The speed in this class doesn't change by itself, but e.g. the fwpm can change if wpm is changed. Returned dictionary has keys 'fwpm' and 'wpm'.
     */
-    constructor({options=[], wpm=20, fwpm=wpm, messageCallback=undefined, speedCallback=undefined} = {}) {
-        super({dictionary:'international', options, wpm, fwpm});
+    constructor({dictionaryOptions, wpm, fwpm, messageCallback, speedCallback} = {}) {
+        super({dictionary:'international', dictionaryOptions, wpm, fwpm});
         if (messageCallback !== undefined) this.messageCallback = messageCallback;
         if (speedCallback !== undefined) this.speedCallback = speedCallback;  // function receives dictionary with wpm and fwpm set when the speed changes
         this.timings = [];  // all the ms timings received, all +ve

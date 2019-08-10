@@ -41,8 +41,8 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
      * @param {function()} soundOnCallback - function to call wth the note number as the argument when a beep starts.
      * @param {function()} soundOffCallback - function to call with the note number as the argument when a beep stops.
      */
-    constructor({frequency, sequenceStartCallback=undefined, sequenceEndingCallback=undefined, soundStoppedCallback=undefined, soundOnCallback=undefined, soundOffCallback=undefined} = {}) {
-        super({frequency, sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback});
+    constructor({defaultFrequency, startPadding, endPadding, sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback, soundOnCallback, soundOffCallback, onSample, offSample, playMode} = {}) {
+        super({defaultFrequency, startPadding, endPadding, sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback, onSample, offSample, playMode});
         if (soundOnCallback !== undefined) this.soundOnCallback = soundOnCallback;
         if (soundOffCallback !== undefined) this.soundOffCallback = soundOffCallback;
         this._wasOn = false;
@@ -55,8 +55,8 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
      */
     _initialiseAudioNodes() {
         super._initialiseAudioNodes();
-        this.jsNode = this.audioContext.createScriptProcessor(256, 1, 1);
-        this.jsNode.connect(this.audioContext.destination);  // otherwise Chrome ignores it
+        this.jsNode = this._audioContext.createScriptProcessor(256, 1, 1);
+        this.jsNode.connect(this._audioContext.destination);  // otherwise Chrome ignores it
         this.jsNode.onaudioprocess = this._processSound.bind(this);
         this.splitterNode.connect(this.jsNode);
     }
