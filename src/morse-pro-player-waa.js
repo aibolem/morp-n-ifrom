@@ -36,7 +36,7 @@ export default class MorsePlayerWAA {
         if (sequenceEndingCallback !== undefined) this.sequenceEndingCallback = sequenceEndingCallback;
         if (soundStoppedCallback !== undefined) this.soundStoppedCallback = soundStoppedCallback;
 
-        this.playMode = playMode;  // TODO: check value is in ['sine', 'sample']
+        this.playMode = playMode;
         this._noAudio = false;
         this._audioContextClass = window.AudioContext || window.webkitAudioContext;
         if (this._audioContextClass === undefined) {
@@ -84,19 +84,56 @@ export default class MorsePlayerWAA {
      * @access private
      */
     _initialiseAudioNodes() {
-        // cannot work until this.frequency is defined
+        // cannot work until this._frequency is defined
         this.splitterNode = this._audioContext.createGain();  // this node is here to attach other nodes to in subclass
         this.lowPassNode = this._audioContext.createBiquadFilter();
         this.lowPassNode.type = "lowpass";
-        // TODO: remove this magic number and make the filter configurable?
-        // TODO: don't need lowpass filter if we are using sample playmode
-        this.lowPassNode.frequency.setValueAtTime(this._frequency * 1.1, this._audioContext.currentTime);
+        // this.lowPassNode.frequency.setValueAtTime(this._frequency * 1.1, this._audioContext.currentTime);
+        this.frequency = this._frequency;
         this.gainNode = this._audioContext.createGain();  // this node is actually used for volume
         this.volume = this._volume;
         this.splitterNode.connect(this.lowPassNode);
         this.lowPassNode.connect(this.gainNode);
         this.gainNode.connect(this._audioContext.destination);
         this._notPlayedANote = true;
+    }
+
+    static get HIGH_FREQ() {
+        return 20000;
+    }
+
+    set frequency(freq) {
+        this._frequency = freq;
+        try {
+            if (this._playMode !== 'sample') {
+                // TODO: remove this magic number and make the filter configurable?
+                this.lowPassNode.frequency.setValueAtTime(this._frequency * 1.1, this._audioContext.currentTime);
+            } else {
+                this.lowPassNode.frequency.setValueAtTime(MorsePlayerWAA.HIGH_FREQ, this._audioContext.currentTime);
+            }
+        } catch(ex) {
+            // getting here means _initialiseAudioNodes() has not yet been called: that's okay
+        }
+    }
+
+    get frequency() {
+        return this._frequency;
+    }
+
+    /**
+     * Set the play mode (one of 'sine' and 'sample'). Also corrects the volume and low-pass filter.
+     * @param {String} mode - the play mode to use
+     */
+    set playMode(mode) {
+        // TODO: check value is in ['sine', 'sample']
+        this._playMode = mode;
+        // force re-evaluation of volume and frequency in case the mode has been changed during playback
+        this.volume = this._volume;
+        this.frequency = this._frequency;
+    }
+
+    get playMode() {
+        return this._playMode;
     }
 
     /**
@@ -106,9 +143,12 @@ export default class MorsePlayerWAA {
     set volume(v) {
         this._volume = Math.min(Math.max(v, 0), 1);
         try {
-            // multiply by 0.813 to reduce gain added by lowpass filter and avoid clipping
-            // TODO: don't need to reduce volume if we are using sample playmode
-            this.gainNode.gain.setValueAtTime(0.813 * this._volume, this._audioContext.currentTime);
+            if (this._playMode !== 'sample') {
+                // multiply by 0.813 to reduce gain added by lowpass filter and avoid clipping
+                this.gainNode.gain.setValueAtTime(0.813 * this._volume, this._audioContext.currentTime);
+            } else {
+                this.gainNode.gain.setValueAtTime(this._volume, this._audioContext.currentTime);
+            }
         } catch (ex) {
             // getting here means _initialiseAudioNodes() has not yet been called: that's okay
         }
@@ -146,7 +186,7 @@ export default class MorsePlayerWAA {
             // TODO: add frequency arrays; set this.frequency to the highest value to make the low-pass filter work
             throw "Arrays of frequencies not yet supported"
         } else {
-            this._frequency = frequencies;
+            this.frequency = frequencies;
         }
 
         // TODO: undefined behaviour if this is called in the middle of a sequence
@@ -303,7 +343,7 @@ export default class MorsePlayerWAA {
 
             if (this.isNote[this._nextNote]) {
                 // TODO: enable choice of waveform
-                if (this.playMode === 'sine') {
+                if (this._playMode === 'sine') {
                     start = this._tZero + this._cTimings[this._nextNote];
                     stop  = this._tZero + this._cTimings[this._nextNote + 1];
                     this._soundEndTime = stop;  // we need to store this for the stop() callback
