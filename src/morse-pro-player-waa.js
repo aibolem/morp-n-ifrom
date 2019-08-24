@@ -89,6 +89,7 @@ export default class MorsePlayerWAA {
         this.lowPassNode = this._audioContext.createBiquadFilter();
         this.lowPassNode.type = "lowpass";
         // TODO: remove this magic number and make the filter configurable?
+        // TODO: don't need lowpass filter if we are using sample playmode
         this.lowPassNode.frequency.setValueAtTime(this._frequency * 1.1, this._audioContext.currentTime);
         this.gainNode = this._audioContext.createGain();  // this node is actually used for volume
         this.volume = this._volume;
@@ -106,6 +107,7 @@ export default class MorsePlayerWAA {
         this._volume = Math.min(Math.max(v, 0), 1);
         try {
             // multiply by 0.813 to reduce gain added by lowpass filter and avoid clipping
+            // TODO: don't need to reduce volume if we are using sample playmode
             this.gainNode.gain.setValueAtTime(0.813 * this._volume, this._audioContext.currentTime);
         } catch (ex) {
             // getting here means _initialiseAudioNodes() has not yet been called: that's okay
@@ -313,10 +315,10 @@ export default class MorsePlayerWAA {
                     oscillator.connect(this.splitterNode);
                 } else {
                     // only other option for 'mode' is 'sample'
-                    start = this._tZero + this._cTimings[this._nextNote];
-                    start2  = this._tZero + this._cTimings[this._nextNote + 1];
-                    stop = this._tZero + this._cTimings[this._nextNote + 2];  // will sometimes be undefined but that's okay
-                    stop2 = this._tZero + this._cTimings[this._nextNote + 3];  // TODO: improve this so it handles looping better?
+                    start  = this._tZero + this._cTimings[this._nextNote];
+                    start2 = this._tZero + this._cTimings[this._nextNote + 1];
+                    stop   = this._tZero + this._cTimings[this._nextNote + 2];  // will sometimes be undefined but that's okay
+                    stop2  = this._tZero + this._cTimings[this._nextNote + 3];  // TODO: improve this so it handles looping better?
 
                     // start and stop the "on" sound
                     bsn = this._audioContext.createBufferSource();
