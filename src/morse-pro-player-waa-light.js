@@ -54,6 +54,7 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
      * @access private
      */
     _initialiseAudioNodes() {
+        // TODO: have this create its own oscillators so that we can get the light signal when using samples
         super._initialiseAudioNodes();
         this.jsNode = this._audioContext.createScriptProcessor(256, 1, 1);
         this.jsNode.connect(this._audioContext.destination);  // otherwise Chrome ignores it
