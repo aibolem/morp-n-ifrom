@@ -53,7 +53,10 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
         if (soundOffCallback !== undefined) this.soundOffCallback = soundOffCallback;
         this._wasOn = false;
         this._count = 0;
+        if (playMode === 'sample') {
+            console.log('WARNING: The light does not yet work when using "sample" play mode');
         }
+    }
 
     /**
      * Set up the audio graph, connecting the splitter node to a JSNode in order to analyse the waveform
@@ -69,21 +72,13 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
     }
 
     /**
-     * 
-     */
-    load(timings, frequency) {
-        this._timings = timings;
-        super.load(timings, frequency);
-    }
-
-    /**
      * @access private
      */
     _processSound(event) {
         var input = event.inputBuffer.getChannelData(0);
         var sum = 0;
         for (var i = 0; i < input.length; i++) {
-            sum += Math.abs(input[i]) > 0;
+            sum += input[i] != 0;
         }
         var on = (sum > 128);  // is more than half the buffer non-zero?
         if (on && !this._wasOn) {
@@ -96,20 +91,16 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
 
     /**
      * @access private
-     * @override
      */
     _on() {
-        this.soundOnCallback(this._timings[this._count]);
-        this._count = (this._count + 1) % this._timings.length;
+        this.soundOnCallback();
     }
 
     /**
      * @access private
-     * @override
      */
     _off() {
-        this.soundOffCallback(this._timings[this._count]);
-        this._count = (this._count + 1) % this._timings.length;
+        this.soundOffCallback();
     }
 
     /**
@@ -128,6 +119,6 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
     }
 
     // empty callbacks in case user does not define any
-    soundOnCallback(noteNumber) { }
-    soundOffCallback(noteNumber) { }
+    soundOnCallback() { }
+    soundOffCallback() { }
 }
