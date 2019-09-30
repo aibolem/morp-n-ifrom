@@ -22,7 +22,11 @@ import MorseKeyer from './morse-pro-keyer';
 
 export default class MorseIambicKeyer extends MorseKeyer {
     /**
-     * @param {Boolean} iambicA - if true then use iambic A mode, otherwise use iambic B mode (which sends an additional dit or dah when squeeze is released).
+     * @param {Object} params - optional parameters.
+     * @param {function(): number} params.keyCallback - A function which should return 0, 1, 2, or 3 from the vitual "paddle" depending if nothing, a dit, a dah or both is detected. This implementation will play dits if both keys are detected.
+     * @param {MorseDecoder} params.decoder - Configured MorseDecoder.
+     * @param {MorsePlayerWAA} params.player - Configured MorsePlayerWAA.
+     * @param {boolean} [params.iambicA=true] - if true then use iambic A mode, otherwise use iambic B mode (which sends an additional dit or dah when squeeze is released).
      */
     constructor({keyCallback, decoder, player, iambicA=true}) {
         super({keyCallback, decoder, player});

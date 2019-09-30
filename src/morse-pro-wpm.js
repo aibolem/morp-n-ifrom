@@ -11,6 +11,7 @@ See the Licence for the specific language governing permissions and limitations 
 */
 
 /**
+ * DEPRECATED
  * Useful constants and functions for computing the speed of Morse code.
  */
 

@@ -14,22 +14,27 @@ See the Licence for the specific language governing permissions and limitations 
  * Web browser sound player using Web Audio API.
  *
  * @example
- * //TODO: check example
- * import MorseCWWave from 'morse-pro-cw-wave';
+ * import MorseCW from 'morse-pro-cw';
  * import MorsePlayerWAA from 'morse-pro-player-waa';
- * var morseCWWave = new MorseCWWave();
- * morseCWWave.translate("abc");
+ * var morseCW = new MorseCW();
+ * var tokens = morseCW.text2morse("abc");
+ * var timings = morseCW.morseTokens2timing(tokens);
  * var morsePlayerWAA = new MorsePlayerWAA();
- * morsePlayerWAA.loadCWWave(morseCWWave);
+ * morsePlayerWAA.load({timings});
  * morsePlayerWAA.playFromStart();
  */
 export default class MorsePlayerWAA {
     /**
-     * @param {number} frequency - fallback frequency to use if the loaded sequence does not define any.
-     * @param {function()} sequenceStartCallback - function to call each time the sequence starts.
-     * @param {function()} sequenceEndingCallback - function to call when the sequence is nearing the end.
-     * @param {function()} soundStoppedCallback - function to call when the sequence stops.
-     * //TODO onSample etc
+     * @param {Object} params - lots of optional parameters.
+     * @param {number} [params.defaultFrequency=550] - fallback frequency (Hz) to use if the loaded sequence does not define any.
+     * @param {number} [params.startPadding=0] - number of ms to wait before playing first note of initial sequence.
+     * @param {number} [params.endPadding=0] - number of ms to wait at the end of a sequence before playing the next one (or looping).
+     * @param {function()} params.sequenceStartCallback - function to call each time the sequence starts.
+     * @param {function()} params.sequenceEndingCallback - function to call when the sequence is nearing the end.
+     * @param {function()} params.soundStoppedCallback - function to call when the sequence stops.
+     * @param {string} params.onSample - URL of the sound file to play at the start of a note.
+     * @param {string} params.offSample - URL of the sound file to play at the end of a note.
+     * @param {string} [params.playMode="sine"] - play mode, either "sine" or "sample".
      */
     constructor({defaultFrequency=550, startPadding=0, endPadding=0, sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback, onSample, offSample, playMode='sine'} = {}) {
         if (sequenceStartCallback !== undefined) this.sequenceStartCallback = sequenceStartCallback;
@@ -299,12 +304,16 @@ export default class MorsePlayerWAA {
      */
     stop() {
         if (this._isPlaying) {
+            // TODO: find a better way to immediately kill all the sounds, for instance bringing volume to zero and disconnecting all oscillators
             this._createAudioContextSingleton();
             this._stop();
         }
     }
 
-    /** Internal clean stop that doesn't destroy audiocontext */
+    /** 
+     * Internal clean stop that doesn't destroy audiocontext
+     * @access private
+     */
     _stop() {
         this._isPlaying = false;
         this._isPaused = false;
@@ -451,8 +460,20 @@ export default class MorsePlayerWAA {
     }
 
     // empty callbacks in case user does not define any
+
+    /**
+     * Called to coincide with the start of the first note in a sequence.
+     */
     sequenceStartCallback() { }
+
+    /**
+     * Called at the point of the last notes of a sequence being scheduled. Designed to provide the opportunity to schedule some more notes.
+     */
     sequenceEndingCallback() { }
+
+    /**
+     * Called when all sounds have definitely stopped.
+     */
     soundStoppedCallback() { }
 
     /**

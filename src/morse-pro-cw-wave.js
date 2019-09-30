@@ -17,14 +17,20 @@ import MorseCW from './morse-pro-cw';
  *
  * @example
  * import MorseCWWave from 'morse-pro-cw-wave';
- * var morseCWWave = new MorseCWWave();
- * morseCWWave.translate("abc");
- * var sample = morseCWWave.getSample();
+ * var morseCW = new MorseCW();
+ * var tokens = morseCW.text2morse("abc");
+ * var timings = morseCW.morseTokens2timing(tokens);
+ * var sample = morseCWWave.getSample(timings);
  */
 export default class MorseCWWave extends MorseCW {
     /**
-     * @param {number} [frequency=550] - frequency of wave in Hz
-     * @param {number} [sampleRate=8000] - sample rate for the waveform in Hz
+     * @param {Object} params - dictionary of optional parameters.
+     * @param {string} params.dictionary - which dictionary to use, e.g. 'international' or 'american'.
+     * @param {string[]} params.dictionaryOptions - optional additional dictionaries such as 'prosigns'.
+     * @param {number} params.wpm - speed in words per minute using "PARIS " as the standard word.
+     * @param {number} params.fwpm - farnsworth speed.
+     * @param {number} [params.frequency=550] - frequency of wave in Hz
+     * @param {number} [params.sampleRate=8000] - sample rate for the waveform in Hz
      */
     constructor({dictionary, dictionaryOptions, wpm, fwpm, frequency=550, sampleRate=8000} = {}) {
         super({dictionary, dictionaryOptions, wpm, fwpm});

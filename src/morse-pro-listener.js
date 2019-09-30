@@ -14,6 +14,8 @@ See the Licence for the specific language governing permissions and limitations 
  * A class to 'listen' for Morse code from the microphone or an audio file, filter the sound and pass timings to a decoder to convert to text.
  */
 
+ //TOOD: change constructor so that it uses a dictionary of parameters
+
 export default class MorseListener {
     /**
      * @param {number} fftSize - Size of the discrete Fourier transform to use. Must be a power of 2 >= 256 (defaults to 256). A smaller fftSize gives better time resolution but worse frequency resolution.

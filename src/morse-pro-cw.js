@@ -10,29 +10,26 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-/**
- * Class to create the on/off timings needed by e.g. sound generators. Timings are in milliseconds; "off" timings are negative.
- *
- * @example
-//  * import MorseCW from 'morse-pro-cw';
-//  * var morseCW = new MorseCW();
-//  * morseCW.translate("abc");
-//  * var timings = morseCW.getTimings();
-//  */
-
 import Morse from './morse-pro';
 
 const MS_IN_MINUTE = 60000;  /** number of milliseconds in 1 minute */
 
+/**
+ * Class to create the on/off timings needed by e.g. sound generators. Timings are in milliseconds; "off" timings are negative.
+ *
+ * @example
+ * import MorseCW from 'morse-pro-cw';
+ * var morseCW = new MorseCW();
+ * var tokens = morseCW.text2morse("abc");
+ * var timings = morseCW.morseTokens2timing(tokens);
+ */
 export default class MorseCW extends Morse {
-    // /**
-    //  * @param {boolean} [prosigns=true] - whether or not to include prosigns in the translations
-    //  * @param {number} [wpm=20] - the speed in words per minute using PARIS as the standard word
-    //  * @param {number} [fwpm=wpm] - the Farnsworth speed in words per minute (defaults to wpm)
-    //  */
     /**
-     * 
-     * @param {Map} namedParameters
+     * @param {Object} params - dictionary of optional parameters.
+     * @param {string} [params.dictionary='international'] - which dictionary to use, e.g. 'international' or 'american'.
+     * @param {string[]} [params.dictionaryOptions=[]] - optional additional dictionaries such as 'prosigns'.
+     * @param {number} [params.wpm=20] - speed in words per minute using "PARIS " as the standard word.
+     * @param {number} [params.fwpm=wpm] - farnsworth speed.
      */
     constructor({dictionary, dictionaryOptions, wpm=20, fwpm=wpm} = {}) {
         super({dictionary, dictionaryOptions});
@@ -51,7 +48,8 @@ export default class MorseCW extends Morse {
 
     /** 
      * Set the WPM speed. Ensures that Farnsworth WPM is no faster than WPM.
-     * @type {number} */
+     * @param {number} wpm
+     */
     setWPM(wpm) {
         this._setWPM(wpm);
     }
@@ -70,7 +68,8 @@ export default class MorseCW extends Morse {
 
     /**
      * Set the Farnsworth WPM speed. Ensures that WPM is no slower than Farnsworth WPM.
-     *  @type {number} */
+     * @param {number} fwpm
+     */
     setFWPM(fwpm) {
         this._setFWPM(fwpm);
     }
@@ -122,10 +121,10 @@ export default class MorseCW extends Morse {
      * With the Farnsworth method, the morse characters are played at one
      * speed and the spaces between characters at a slower speed.
      * @param {Array} morseTokens - array of morse tokens corresponding to the ratio element of the dictionary used, e.g. [['..', '.-'], ['--', '...']]
-     * @param {Dict} [lengths=this.lengths] - dictionary mapping element to duration with negative duration for spaces
+     * @param {Object} [lengths=this.lengths] - dictionary mapping element to duration with negative duration for spaces
      * @return {number[]}
      */
-    morseTokens2timing(morseTokens, lengths = this.lengths) {
+    morseTokens2timing(morseTokens, lengths=this.lengths) {
         let timings = [];
         for (let word of morseTokens) {
             for (let char of word) {

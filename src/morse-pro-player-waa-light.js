@@ -19,27 +19,33 @@ import MorsePlayerWAA from './morse-pro-player-waa';
  * The callbacks have an error of +/- 2.6ms
  *
  * @example
- * //TODO: check example
- * import MorseCWWave from 'morse-pro-cw-wave';
+ * import MorseCW from 'morse-pro-cw';
  * import MorsePlayerWAALight from 'morse-pro-player-waa-light';
- * var morseCWWave = new MorseCWWave();
- * morseCWWave.translate("abc");
+ * var morseCW = new MorseCW();
+ * var tokens = morseCW.text2morse("abc");
+ * var timings = morseCW.morseTokens2timing(tokens);
  * var morsePlayerWAALight = new MorsePlayerWAALight();
  * morsePlayerWAALight.soundOnCallback = lightOn;
  * morsePlayerWAALight.soundOffCallback = lightOff;
  * morsePlayerWAALight.soundStoppedCallback = soundStopped;
  * morsePlayerWAALight.volume = 0;
- * morsePlayerWAALight.loadCWWave(morseCWWave);
+ * morsePlayerWAALight.load({timings});
  * morsePlayerWAA.playFromStart();
  */
 export default class MorsePlayerWAALight extends MorsePlayerWAA {
     /**
-     * @param {number} frequency - fallback frequency to use if the loaded sequence does not define any.
-     * @param {function()} sequenceStartCallback - function to call each time the sequence starts.
-     * @param {function()} sequenceEndingCallback - function to call when the sequence is nearing the end.
-     * @param {function()} soundStoppedCallback - function to call when the sequence stops.
-     * @param {function()} soundOnCallback - function to call wth the note number as the argument when a beep starts.
-     * @param {function()} soundOffCallback - function to call with the note number as the argument when a beep stops.
+     * @param {Object} params - lots of optional parameters.
+     * @param {number} params.defaultFrequency - fallback frequency (Hz) to use if the loaded sequence does not define any.
+     * @param {number} params.startPadding - number of ms to wait before playing first note of initial sequence.
+     * @param {number} params.endPadding - number of ms to wait at the end of a sequence before playing the next one (or looping).
+     * @param {function()} params.sequenceStartCallback - function to call each time the sequence starts.
+     * @param {function()} params.sequenceEndingCallback - function to call when the sequence is nearing the end.
+     * @param {function()} params.soundStoppedCallback - function to call when the sequence stops.
+     * @param {function()} params.soundOnCallback - function to call when a note starts.
+     * @param {function()} params.soundOffCallback - function to call when a note stops.
+     * @param {string} params.onSample - URL of the sound file to play at the start of a note.
+     * @param {string} params.offSample - URL of the sound file to play at the end of a note.
+     * @param {string} params.playMode - play mode, either "sine" or "sample".
      */
     constructor({defaultFrequency, startPadding, endPadding, sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback, soundOnCallback, soundOffCallback, onSample, offSample, playMode} = {}) {
         super({defaultFrequency, startPadding, endPadding, sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback, onSample, offSample, playMode});
@@ -47,7 +53,7 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
         if (soundOffCallback !== undefined) this.soundOffCallback = soundOffCallback;
         this._wasOn = false;
         this._count = 0;
-    }
+        }
 
     /**
      * Set up the audio graph, connecting the splitter node to a JSNode in order to analyse the waveform

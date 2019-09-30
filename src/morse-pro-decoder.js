@@ -31,11 +31,13 @@ import MorseCW from './morse-pro-cw';
  */
 export default class MorseDecoder extends MorseCW {
     /**
-     * @param {Array.<string>} options - Dictionary options to load.
-     * @param {number} [wpm=20] - The speed of the Morse in words per minute.
-     * @param {number} [fwpm=wpm] - The Farnsworth speed of the Morse in words per minute.
-     * @param {function()} messageCallback - Callback executed with {message: string, timings: number[], morse: string} when decoder buffer is flushed (every character).
-     * @param {function()} speedCallback - Callback executed with {wpm: number, fwpm: number} if the wpm or fwpm speed changes. The speed in this class doesn't change by itself, but e.g. the fwpm can change if wpm is changed. Returned dictionary has keys 'fwpm' and 'wpm'.
+     * 
+     * @param {Object} params - dictionary of optional parameters.
+     * @param {string[]} params.dictionaryOptions - optional additional dictionaries such as 'prosigns'.
+     * @param {number} params.wpm - speed in words per minute using "PARIS " as the standard word.
+     * @param {number} params.fwpm - farnsworth speed.
+     * @param {function()} params.messageCallback - Callback executed with {message: string, timings: number[], morse: string} when decoder buffer is flushed (every character).
+     * @param {function()} params.speedCallback - Callback executed with {wpm: number, fwpm: number} if the wpm or fwpm speed changes. The speed in this class doesn't change by itself, but e.g. the fwpm can change if wpm is changed. Returned dictionary has keys 'fwpm' and 'wpm'.
     */
     constructor({dictionaryOptions, wpm, fwpm, messageCallback, speedCallback} = {}) {
         super({dictionary:'international', dictionaryOptions, wpm, fwpm});

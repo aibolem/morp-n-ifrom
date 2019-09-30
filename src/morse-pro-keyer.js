@@ -38,9 +38,10 @@ See the Licence for the specific language governing permissions and limitations 
  */
 export default class MorseKeyer {
     /**
-     * @param {function(): number} keyCallback - A function which should return 0, 1, 2, or 3 from the vitual "paddle" depending if nothing, a dit, a dah or both is detected. This implementation will play dits if both keys are detected.
-     * @param {MorseDecoder} decoder - Configured MorseDecoder.
-     * @param {MorsePlayerWAA} player - Configured MorsePlayerWAA.
+     * @param {Object} params - optional parameters.
+     * @param {function(): number} params.keyCallback - A function which should return 0, 1, 2, or 3 from the vitual "paddle" depending if nothing, a dit, a dah or both is detected. This implementation will play dits if both keys are detected.
+     * @param {MorseDecoder} params.decoder - Configured MorseDecoder.
+     * @param {MorsePlayerWAA} params.player - Configured MorsePlayerWAA.
      */
     constructor({keyCallback, decoder, player}) {
         this.keyCallback = keyCallback;

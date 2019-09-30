@@ -15,12 +15,13 @@ See the Licence for the specific language governing permissions and limitations 
  */
 
 import { dictionaries } from "./dictionary/index.js";
-// import { throws } from "assert";
 
 export default class Morse {
     /**
      * 
-     * @param {Map} namedParameters: 'options' is a list of optional additional dictionaries such as 'prosigns'
+     * @param {Object} params - dictionary of optional parameters.
+     * @param {String} [params.dictionary='international'] - which dictionary to use, e.g. 'international' or 'american'.
+     * @param {String[]} [params.dictionaryOptions=[]] - optional additional dictionaries such as 'prosigns'.
      */
     constructor({dictionary='international', dictionaryOptions=[]} = {}) {
         if (dictionary in dictionaries) {
