@@ -64,7 +64,12 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
      */
     _initialiseAudioNodes() {
         // TODO: have this create its own oscillators so that we can get the light signal when using samples
+        // TODO: or just adapt the super class to call soundOn and soundOff callbacks based on the timings - not sure why I didn't do that in the first place? Could be to do with the higher precision of the sound API?!
         super._initialiseAudioNodes();
+        if (this.jsNode) {
+            // if we have already called this method then must make sure to disconnect the old node graph first
+            this.jsNode.disconnect();
+        }
         this.jsNode = this._audioContext.createScriptProcessor(256, 1, 1);
         this.jsNode.connect(this._audioContext.destination);  // otherwise Chrome ignores it
         this.jsNode.onaudioprocess = this._processSound.bind(this);

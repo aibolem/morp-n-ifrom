@@ -60,18 +60,20 @@ export default class MorsePlayerWAA {
         this.loop = false;
         this.fallbackFrequency = defaultFrequency;
         this._frequency = undefined;
-        this.startPadding = startPadding;  // number of ms to wait before playing first note of initial sequence
-        this.endPadding = endPadding;  // number of ms to wait at the end of a sequence before playing the next one (or looping)
+        this.startPadding = startPadding;
+        this.endPadding = endPadding;
 
         this._cTimings = [];
         this._isPlaying = false;
         this._isPaused = false;
         this._volume = 1;
-        this._lookAheadTime = 0.1;  // seconds
-        this._timerInterval = 0.05;  // seconds
+        this._lookAheadTime = 0.1;  // how far to look ahead when scheduling notes (seconds)
+        this._timerInterval = 0.05;  // how often to schedule notes (seconds)
         this._timer = undefined;
         this._stopTimer = undefined;
         this._notPlayedANote = true;
+
+        this._initialiseAudioNodes();
     }
 
     /**
@@ -89,6 +91,10 @@ export default class MorsePlayerWAA {
      * @access private
      */
     _initialiseAudioNodes() {
+        if (this.gainNode) {
+            // if we have already called this method then we must make sure to disconnect the old graph first
+            this.gainNode.disconnect();
+        }
         // cannot work until this._frequency is defined
         this.splitterNode = this._audioContext.createGain();  // this node is here to attach other nodes to in subclass
         this.lowPassNode = this._audioContext.createBiquadFilter();
@@ -216,10 +222,10 @@ export default class MorsePlayerWAA {
 
     /**
      * Load timing sequence which will be played when the current sequence is completed (only one sequence is queued).
-     * @param {number[]} timings - list of millisecond timings; +ve numbers are beeps, -ve numbers are silence
+     * @param {Object} sequence - see load() method for object description
      */
     loadNext(sequence) {
-        this.upNext = sequence;
+        this._upNext = sequence;
     }
 
     /**
@@ -231,7 +237,7 @@ export default class MorsePlayerWAA {
             return;
         }
         this.stop();
-        this._initialiseAudioNodes();
+        // this._initialiseAudioNodes();
         this._nextNote = 0;
         this._isPlaying = true;
         this._isPaused = true;  // pretend we were paused so that play() "resumes" playback
@@ -288,11 +294,11 @@ export default class MorsePlayerWAA {
 
             // if we've got to the end of the sequence, then loop or load next sequence as appropriate
             if (this._nextNote === this.sequenceLength) {
-                if (this.loop || this.upNext !== undefined) {
+                if (this.loop || this._upNext !== undefined) {
                     this._nextNote = 0;
-                    if (this.upNext !== undefined) {
-                        this.load(this.upNext);
-                        this.upNext = undefined;
+                    if (this._upNext !== undefined) {
+                        this.load(this._upNext);
+                        this._upNext = undefined;
                     }
                 }
             }
@@ -306,6 +312,7 @@ export default class MorsePlayerWAA {
         if (this._isPlaying) {
             // TODO: find a better way to immediately kill all the sounds, for instance bringing volume to zero and disconnecting all oscillators
             this._createAudioContextSingleton();
+            this._initialiseAudioNodes();
             this._stop();
         }
     }
@@ -386,13 +393,13 @@ export default class MorsePlayerWAA {
             this._nextNote++;
 
             if (this._nextNote === this.sequenceLength) {
-                if (this.loop || this.upNext !== undefined) {
+                if (this.loop || this._upNext !== undefined) {
                     // increment time base to be the absolute end time of the final element in the sequence
                     this._tZero += this._cTimings[this._nextNote];
                     this._nextNote = 0;
-                    if (this.upNext !== undefined) {
-                        this.load(this.upNext);
-                        this.upNext = undefined;
+                    if (this._upNext !== undefined) {
+                        this.load(this._upNext);
+                        this._upNext = undefined;
                     }
                 }
             }
