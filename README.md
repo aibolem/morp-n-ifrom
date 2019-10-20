@@ -10,6 +10,7 @@
 This Javascript (ES6) library is for manipulating Morse code text and sound. It is the library used in the tools on [Stephen C Phillips's Morse code website](https://morsecode.scphillips.com).
 
 The library can:
+
 * Translate to and from text and Morse code (in the form of '-- --- .-. ... . / -.-. --- -.. .').
 * Understand Morse code prosigns.
 * Generate downloadable RIFF WAVE ('.wav') files of Morse code at given frequency and speed.
@@ -37,6 +38,7 @@ The EUPL is an 'open source' licence: one of many options and one in the 'weak-c
 So basically, if you use the library as-is in some piece of software then that's just fine (though an acknowledgement would be nice) and you can even keep the software closed-source should you wish to. If you *modify the library* **and** *use it in some software that you provide to others*, even if the library is not distributed to the users, then you must provide your modifications to the library back to the community so that everyone can benefit.
 
 More information on the EUPL v1.2:
+
 * [EUPL information](https://joinup.ec.europa.eu/community/eupl/home)
 * [EUPL and Proprietary / Commercial use](https://joinup.ec.europa.eu/community/eupl/news/eupl-and-proprietary/commercial-use)
 * [Compatibility with other licences](https://joinup.ec.europa.eu/community/eupl/og_page/eupl-compatible-open-source-licences)
@@ -48,7 +50,13 @@ If you would like to access this software under a different licence then please 
 
 Documentation on how to use the library is embedded in the source code and can be found [at the ESDoc site](https://doc.esdoc.org/github.com/scp93ch/morse-pro/).
 
+Some diagrams:
+
+* [Class diagram](https://drive.google.com/file/d/17hFelIHgKOMTYb-0M53TiYsC7T2e3c2X/view?usp=sharing)
+* [Audio pipeline](https://drive.google.com/file/d/12OoHQi5AEcyFeeyAa3rWG0MFcmcdj9Pv/view?usp=sharing)
+
 Library overview:
+
 * [morse-pro.js](./src/morse-pro.js): Basic functions to translate Morse code. Includes mapping of characters and prosigns to dots and dashes.
 * [morse-pro-message.js](./src/morse-pro-message.js): MorseMessage class, for conveniently translating to and from Morse code and dealing with errors.
 * [morse-pro-cw.js](./src/morse-pro-cw.js): MorseCW class, to create the on/off timings needed by e.g. sound generators. Understands speed and Farnsworth speed concepts. Extends MorseMessage class.
