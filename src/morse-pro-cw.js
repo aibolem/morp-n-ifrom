@@ -100,7 +100,8 @@ export default class MorseCW extends Morse {
     }
 
     /**
-     * Set the ratio of each element to the base element and recalculate the PARIS parameters
+     * Set the ratio of each element to the base element and recalculate the PARIS parameters.
+     * For the space elements, the ratio is negative.
      * @param {Map} r - a Map from element to ratio (as defined in the 'ratio' element of a dictionary)
      */
     set ratios(r) {
@@ -174,7 +175,7 @@ export default class MorseCW extends Morse {
      * @param {number} ratio
      */
     setFWPMfromRatio(ratio) {
-        ratio = Math.max(ratio, 1);
+        ratio = Math.max(Math.abs(ratio), 1);  // take abs just in case someone passes in something -ve
         this.setFWPM(this._ditsInParis * this.wpm / (this._spacesInParis * ratio + (this._ditsInParis - this._spacesInParis)));
     }
 
