@@ -103,8 +103,8 @@ export var dictionary = {
     morseMatch: new RegExp('^\\s*[\\.\\-_]+[\\.\\-_ \\/\\|]*$'),
 
     displayName: {
-        keys: ['.', '-', 'charSpace', 'wordSpace'],
-        values: ['dit', 'dah', 'intra-character space', 'inter-character space', 'word space']
+        keys: ['.', '-', ' ', 'charSpace', 'wordSpace'],
+        values: ['Dit length', 'Dah length', 'Intra-character space', 'Inter-character space', 'Inter-word space']
     },
 
     // TODO: add accented characters as an option
