@@ -379,7 +379,7 @@ export default class MorsePlayerWAA {
                     bsn = this._audioContext.createBufferSource();
                     bsn.buffer = this._samples[0];
                     bsn.start(start);
-                    bsn.stop(stop);
+                    if (stop) { bsn.stop(stop); }  // if we don't schedule a stop then the sound file plays until it completes
                     bsn.connect(this.splitterNode);
 
                     // start and stop the "off" sound (which is assumed to follow)
