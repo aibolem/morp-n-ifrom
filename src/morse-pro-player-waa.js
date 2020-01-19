@@ -31,14 +31,16 @@ export default class MorsePlayerWAA {
      * @param {number} [params.endPadding=0] - number of ms to wait at the end of a sequence before playing the next one (or looping).
      * @param {function()} params.sequenceStartCallback - function to call each time the sequence starts.
      * @param {function()} params.sequenceEndingCallback - function to call when the sequence is nearing the end.
+     * @param {function()} params.sequenceEndCallback - function to call when the sequence has ended.
      * @param {function()} params.soundStoppedCallback - function to call when the sequence stops.
      * @param {string} params.onSample - URL of the sound file to play at the start of a note.
      * @param {string} params.offSample - URL of the sound file to play at the end of a note.
      * @param {string} [params.playMode="sine"] - play mode, either "sine" or "sample".
      */
-    constructor({defaultFrequency=550, startPadding=0, endPadding=0, sequenceStartCallback, sequenceEndingCallback, soundStoppedCallback, onSample, offSample, playMode='sine'} = {}) {
+    constructor({defaultFrequency=550, startPadding=0, endPadding=0, sequenceStartCallback, sequenceEndingCallback, sequenceEndCallback, soundStoppedCallback, onSample, offSample, playMode='sine'} = {}) {
         if (sequenceStartCallback !== undefined) this.sequenceStartCallback = sequenceStartCallback;
         if (sequenceEndingCallback !== undefined) this.sequenceEndingCallback = sequenceEndingCallback;
+        if (sequenceEndCallback !== undefined) this.sequenceEndCallback = sequenceEndCallback;
         if (soundStoppedCallback !== undefined) this.soundStoppedCallback = soundStoppedCallback;
 
         this.playMode = playMode;
@@ -260,6 +262,7 @@ export default class MorsePlayerWAA {
         // otherwise we really are resuming playback (or pretending we are, and actually playing from start...)
         clearInterval(this._stopTimer);  // if we were going to send a soundStoppedCallback then don't
         clearInterval(this._startTimer);  // ditto
+        clearInterval(this._endTimer);
         clearInterval(this._timer);
         this._isPaused = false;
         // basically set the time base to now but
@@ -374,6 +377,7 @@ export default class MorsePlayerWAA {
                     start2 = this._tZero + this._cTimings[this._nextNote + 1];
                     stop   = this._tZero + this._cTimings[this._nextNote + 2];  // will sometimes be undefined but that's okay
                     stop2  = this._tZero + this._cTimings[this._nextNote + 3];  // TODO: improve this so it handles looping better?
+                    this._soundEndTime = start2;  // the start of the end click. We need to store this for the stop() callback
 
                     // start and stop the "on" sound
                     bsn = this._audioContext.createBufferSource();
@@ -393,7 +397,10 @@ export default class MorsePlayerWAA {
             this._nextNote++;
 
             if (this._nextNote === this.sequenceLength) {
+                // we've just scheduled the last note of a sequence
+                this._endTimer = setTimeout(this.sequenceEndCallback, 1000 * (this._soundEndTime - now));
                 if (this.loop || this._upNext !== undefined) {
+                    // there's more to play
                     // increment time base to be the absolute end time of the final element in the sequence
                     this._tZero += this._cTimings[this._nextNote];
                     this._nextNote = 0;
@@ -477,6 +484,11 @@ export default class MorsePlayerWAA {
      * Called at the point of the last notes of a sequence being scheduled. Designed to provide the opportunity to schedule some more notes.
      */
     sequenceEndingCallback() { }
+
+    /**
+     * Called at the end of the last beep of a sequence.
+     */
+    sequenceEndCallback() { }
 
     /**
      * Called when all sounds have definitely stopped.
