@@ -486,7 +486,7 @@ export default class MorsePlayerWAA {
     sequenceEndingCallback() { }
 
     /**
-     * Called at the end of the last beep of a sequence.
+     * Called at the end of the last beep of a sequence. Does not wait for endPadding.
      */
     sequenceEndCallback() { }
 
@@ -508,10 +508,19 @@ export default class MorsePlayerWAA {
         request.responseType = 'arraybuffer';
         let that = this;
         request.onload = function() {
-            // decode the data
-            that._audioContext.decodeAudioData(request.response).then(function(buffer) {
-                samples[index] = buffer;
-            })
+            // Decode the data and keep a reference to it
+            // Promise-ased syntax does not work for Safari desktop, need to use callback variant
+            // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/decodeAudioData
+            // TODO: find another way to load samples or raise a warning as neither method works on Safari mobile
+            let audioData = request.response;
+            that._audioContext.decodeAudioData(audioData, 
+                function(buffer) {
+                    samples[index] = buffer;
+                },
+                function(e) {
+                    console.log("Error decoding audio data" + e.err);
+                }
+            );
         };
         request.send();
     }
