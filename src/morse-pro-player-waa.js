@@ -74,6 +74,7 @@ export default class MorsePlayerWAA {
         this._timer = undefined;
         this._stopTimer = undefined;
         this._notPlayedANote = true;
+        this._queue = [];
 
         this._initialiseAudioNodes();
     }
@@ -223,11 +224,20 @@ export default class MorsePlayerWAA {
     }
 
     /**
-     * Load timing sequence which will be played when the current sequence is completed (only one sequence is queued).
+     * Load timing sequence which will be played when the current sequence is completed (current queue is deleted).
      * @param {Object} sequence - see load() method for object description
+     * @deprecated - use queue() instead
      */
     loadNext(sequence) {
-        this._upNext = sequence;
+        this._queue = [sequence];
+    }
+
+    /**
+     * Queue up a timing sequence (add to the end of the queue)
+     * @param {Object} sequence - see load() method for object description
+     */
+    queue(sequence) {
+        this._queue.push(sequence);
     }
 
     /**
@@ -297,11 +307,10 @@ export default class MorsePlayerWAA {
 
             // if we've got to the end of the sequence, then loop or load next sequence as appropriate
             if (this._nextNote === this.sequenceLength) {
-                if (this.loop || this._upNext !== undefined) {
+                if (this.loop || this._queue.length > 0) {
                     this._nextNote = 0;
-                    if (this._upNext !== undefined) {
-                        this.load(this._upNext);
-                        this._upNext = undefined;
+                    if (this._queue.length > 0) {
+                        this.load(this._queue.shift());
                     }
                 }
             }
@@ -341,22 +350,26 @@ export default class MorsePlayerWAA {
     _scheduleNotes() {
         // console.log('Scheduling:');
         var oscillator, start, start2, stop, stop2, bsn;
-        var now = this._audioContext.currentTime;
+        var nowAbsolute = this._audioContext.currentTime;
+
         while (this._nextNote < this.sequenceLength &&
-                (this._cTimings[this._nextNote] < now - this._tZero + this._lookAheadTime)) {
+                (this._cTimings[this._nextNote] < (nowAbsolute - this._tZero) + this._lookAheadTime)) {
+
             this._notPlayedANote = false;
-            // console.log('T: ' + Math.round(1000 * now)/1000 + ' (+' + Math.round(1000 * (now - this._tZero))/1000 + ')');
+            var nowRelative = nowAbsolute - this._tZero;
+
+            // console.log('T: ' + Math.round(1000 * nowAbsolute)/1000 + ' (+' + Math.round(1000 * nowRelative)/1000 + ')');
             // console.log(this._nextNote + ': ' +
             //     (this.isNote[this._nextNote] ? 'Note  ' : 'Pause ') +
             //     Math.round(1000 * this._cTimings[this._nextNote])/1000 + ' - ' +
             //     Math.round(1000 * this._cTimings[this._nextNote + 1])/1000 + ' (' +
             //     Math.round(1000 * (this._cTimings[this._nextNote + 1] - this._cTimings[this._nextNote]))/1000 + ')');
-            if (this._nextNote === 0 && !this.sequenceStartCallbackFired) {
+
+            if (this._nextNote === 0) {
                 // when scheduling the first note, schedule a callback as well
                 this._startTimer = setTimeout(function() {
                     this.sequenceStartCallback();
-                }.bind(this), 1000 * (this._tZero + this._cTimings[this._nextNote] - now));
-                this.sequenceStartCallbackFired = true;
+                }.bind(this), 1000 * (this._cTimings[0] - nowRelative));
             }
 
             if (this.isNote[this._nextNote]) {
@@ -398,35 +411,31 @@ export default class MorsePlayerWAA {
 
             if (this._nextNote === this.sequenceLength) {
                 // we've just scheduled the last note of a sequence
-                this._endTimer = setTimeout(this.sequenceEndCallback, 1000 * (this._soundEndTime - now));
-                if (this.loop || this._upNext !== undefined) {
+                this.sequenceEndingCallback();
+                this._endTimer = setTimeout(this.sequenceEndCallback, 1000 * (this._soundEndTime - nowAbsolute));
+                if (this.loop || this._queue.length > 0) {
                     // there's more to play
                     // increment time base to be the absolute end time of the final element in the sequence
-                    this._tZero += this._cTimings[this._nextNote];
+                    this._tZero += this._cTimings[this.sequenceLength];
                     this._nextNote = 0;
-                    if (this._upNext !== undefined) {
-                        this.load(this._upNext);
-                        this._upNext = undefined;
+                    if (this._queue.length > 0) {
+                        this.load(this._queue.shift());
                     }
                 }
             }
         }
 
         if (this._nextNote === this.sequenceLength) {
-            // then all notes have been scheduled and we are not looping
+            // then all notes have been scheduled and we are not looping/going to next in queue
             clearInterval(this._timer);
             // schedule stop() for after when the scheduled sequence ends
             // adding on 3 * lookAheadTime for safety but shouldn't be needed
             this._stopTimer = setTimeout(function() {
                 this._stop();
-            }.bind(this), 1000 * (this._soundEndTime - now + 3 * this._lookAheadTime));
+            }.bind(this), 1000 * (this._soundEndTime - nowAbsolute + 3 * this._lookAheadTime));
             return false;  // indicate that sequence is complete
-        } else if (now - this._tZero + this._timerInterval + this._lookAheadTime > this._cTimings[this.sequenceLength - 1] &&
-                this.sequenceStartCallbackFired) {
-            // then we are going to schedule the last note in the sequence next time
-            this.sequenceEndingCallback();
-            this.sequenceStartCallbackFired = false;
         }
+
         return true;  // indicate there are more notes to schedule
     }
 
