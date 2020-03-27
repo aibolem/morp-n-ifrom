@@ -70,7 +70,7 @@ export default class MorseListener {
         )
     {
         // audio input and output
-        this.audioContext = new window.AudioContext() || new window.webkitAudioContext();
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
         if (spectrogramCallback !== undefined) this.spectrogramCallback = spectrogramCallback;
         if (frequencyFilterCallback !== undefined) this.frequencyFilterCallback = frequencyFilterCallback;

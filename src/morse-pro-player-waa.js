@@ -10,6 +10,8 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
+import morseAudioContext from './morse-pro-audiocontext';
+
 /**
  * Web browser sound player using Web Audio API.
  *
@@ -45,18 +47,10 @@ export default class MorsePlayerWAA {
 
         this.playMode = playMode;
         this._noAudio = false;
-        this._audioContextClass = window.AudioContext || window.webkitAudioContext;
-        if (this._audioContextClass === undefined) {
-            this._noAudio = true;
-            console.log("Web Audio API unavailable");
-            throw (new Error("No AudioContext class defined"));
-        }
-        this._createAudioContextSingleton();
 
-        this._samples = []
         if (onSample !== undefined) {
-            this._loadSound(onSample, this._samples, 0);
-            this._loadSound(offSample, this._samples, 1);
+            morseAudioContext.loadSample(onSample, "onSample");
+            morseAudioContext.loadSample(offSample, "offSample");
         }
 
         this.loop = false;
@@ -75,39 +69,29 @@ export default class MorsePlayerWAA {
         this._stopTimer = undefined;
         this._notPlayedANote = true;
         this._queue = [];
-
-        this._initialiseAudioNodes();
-    }
-
-    /**
-     * Close any existing AudioContext and make a new one (has the side effect of stopping all sounds)
-     */
-    _createAudioContextSingleton() {
-        if (this._audioContext) {
-            this._audioContext.close();
-        }
-        this._audioContext = new this._audioContextClass();
     }
 
     /**
      * Set up the audio graph
      * @access private
      */
-    _initialiseAudioNodes() {
+    _initialiseAudio() {
         if (this.gainNode) {
             // if we have already called this method then we must make sure to disconnect the old graph first
             this.gainNode.disconnect();
         }
+        let ac = morseAudioContext.getAudioContext();
+        // this._createAudioContextSingleton();
         // cannot work until this._frequency is defined
-        this.splitterNode = this._audioContext.createGain();  // this node is here to attach other nodes to in subclass
-        this.lowPassNode = this._audioContext.createBiquadFilter();
+        this.splitterNode = ac.createGain();  // this node is here to attach other nodes to in subclass
+        this.lowPassNode = ac.createBiquadFilter();
         this.lowPassNode.type = "lowpass";
         this.frequency = this._frequency;  // set up filter node
-        this.gainNode = this._audioContext.createGain();  // this node is actually used for volume
+        this.gainNode = ac.createGain();  // this node is actually used for volume
         this.volume = this._volume;  // set up gain node
         this.splitterNode.connect(this.lowPassNode);
         this.lowPassNode.connect(this.gainNode);
-        this.gainNode.connect(this._audioContext.destination);
+        this.gainNode.connect(ac.destination);
         this._notPlayedANote = true;
     }
 
@@ -118,14 +102,15 @@ export default class MorsePlayerWAA {
     set frequency(freq) {
         this._frequency = freq;
         try {
+            let ac = morseAudioContext.getAudioContext();
             if (this._playMode !== 'sample') {
                 // TODO: remove this magic number and make the filter configurable?
-                this.lowPassNode.frequency.setValueAtTime(this._frequency * 1.1, this._audioContext.currentTime);
+                this.lowPassNode.frequency.setValueAtTime(this._frequency * 1.1, ac.currentTime);
             } else {
-                this.lowPassNode.frequency.setValueAtTime(MorsePlayerWAA.HIGH_FREQ, this._audioContext.currentTime);
+                this.lowPassNode.frequency.setValueAtTime(MorsePlayerWAA.HIGH_FREQ, ac.currentTime);
             }
-        } catch(ex) {
-            // getting here means _initialiseAudioNodes() has not yet been called: that's okay
+        } catch (e) {
+            // getting here means _initialiseAudio() has not yet been called: that's okay
         }
     }
 
@@ -156,14 +141,15 @@ export default class MorsePlayerWAA {
     set volume(v) {
         this._volume = Math.min(Math.max(v, 0), 1);
         try {
+            let ac = morseAudioContext.getAudioContext();
             if (this._playMode !== 'sample') {
                 // multiply by 0.813 to reduce gain added by lowpass filter and avoid clipping
-                this.gainNode.gain.setValueAtTime(0.813 * this._volume, this._audioContext.currentTime);
+                this.gainNode.gain.setValueAtTime(0.813 * this._volume, ac.currentTime);
             } else {
-                this.gainNode.gain.setValueAtTime(this._volume, this._audioContext.currentTime);
+                this.gainNode.gain.setValueAtTime(this._volume, ac.currentTime);
             }
-        } catch (ex) {
-            // getting here means _initialiseAudioNodes() has not yet been called: that's okay
+        } catch (e) {
+            // getting here means _initialiseAudio() has not yet been called: that's okay#
         }
     }
 
@@ -249,7 +235,7 @@ export default class MorsePlayerWAA {
             return;
         }
         this.stop();
-        // this._initialiseAudioNodes();
+        this._initialiseAudio();
         this._nextNote = 0;
         this._isPlaying = true;
         this._isPaused = true;  // pretend we were paused so that play() "resumes" playback
@@ -278,7 +264,7 @@ export default class MorsePlayerWAA {
         // basically set the time base to now but
         //    - to work after a pause: subtract the start time of the next note so that it will play immediately
         //    - to avoid clipping the very first note: add on startPadding if notPlayedANote
-        this._tZero = this._audioContext.currentTime -
+        this._tZero = morseAudioContext.getAudioContext().currentTime -
             this._cTimings[this._nextNote] +
             (this._notPlayedANote ? this.startPadding / 1000 : 0);
         // schedule the first note ASAP (directly) and then if there is more to schedule, set up an interval timer
@@ -323,8 +309,7 @@ export default class MorsePlayerWAA {
     stop() {
         if (this._isPlaying) {
             // TODO: find a better way to immediately kill all the sounds, for instance bringing volume to zero and disconnecting all oscillators
-            this._createAudioContextSingleton();
-            this._initialiseAudioNodes();
+            morseAudioContext.closeAudioContext();
             this._stop();
         }
     }
@@ -350,7 +335,8 @@ export default class MorsePlayerWAA {
     _scheduleNotes() {
         // console.log('Scheduling:');
         var oscillator, start, start2, stop, stop2, bsn;
-        var nowAbsolute = this._audioContext.currentTime;
+        let ac = morseAudioContext.getAudioContext();
+        var nowAbsolute = ac.currentTime;
 
         while (this._nextNote < this.sequenceLength &&
                 (this._cTimings[this._nextNote] < (nowAbsolute - this._tZero) + this._lookAheadTime)) {
@@ -378,7 +364,7 @@ export default class MorsePlayerWAA {
                     start = this._tZero + this._cTimings[this._nextNote];
                     stop  = this._tZero + this._cTimings[this._nextNote + 1];
                     this._soundEndTime = stop;  // we need to store this for the stop() callback
-                    oscillator = this._audioContext.createOscillator();
+                    oscillator = ac.createOscillator();
                     oscillator.type = 'sine';
                     oscillator.frequency.setValueAtTime(this._frequency, start);
                     oscillator.start(start);
@@ -392,19 +378,28 @@ export default class MorsePlayerWAA {
                     stop2  = this._tZero + this._cTimings[this._nextNote + 3];  // TODO: improve this so it handles looping better?
                     this._soundEndTime = start2;  // the start of the end click. We need to store this for the stop() callback
 
+                    let sounds = morseAudioContext.getSounds();
                     // start and stop the "on" sound
-                    bsn = this._audioContext.createBufferSource();
-                    bsn.buffer = this._samples[0];
-                    bsn.start(start);
-                    if (stop) { bsn.stop(stop); }  // if we don't schedule a stop then the sound file plays until it completes
-                    bsn.connect(this.splitterNode);
+                    bsn = ac.createBufferSource();
+                    try {
+                        bsn.buffer = sounds["onSample"];
+                        bsn.start(start);
+                        if (stop) { bsn.stop(stop); }  // if we don't schedule a stop then the sound file plays until it completes
+                        bsn.connect(this.splitterNode);
+                    } catch (ex) {
+                        console.log("onSample not decoded yet");
+                    }
 
                     // start and stop the "off" sound (which is assumed to follow)
-                    bsn = this._audioContext.createBufferSource();
-                    bsn.buffer = this._samples[1];
-                    bsn.start(start2);
-                    if (stop2) { bsn.stop(stop2); }  // we won't have the stop time for the final off sound, so just let it run
-                    bsn.connect(this.splitterNode);
+                    bsn = ac.createBufferSource();
+                    try {
+                        bsn.buffer = sounds["offSample"];
+                        bsn.start(start2);
+                        if (stop2) { bsn.stop(stop2); }  // we won't have the stop time for the final off sound, so just let it run
+                        bsn.connect(this.splitterNode);
+                    } catch (ex) {
+                        console.log("offSample not decoded yet");
+                    }
                 }
             }
             this._nextNote++;
@@ -503,34 +498,4 @@ export default class MorsePlayerWAA {
      * Called when all sounds have definitely stopped.
      */
     soundStoppedCallback() { }
-
-    /**
-     * Load the specified sound from a URL
-     * @param {*} url
-     * @param {*} samples
-     * @param {*} index
-     */
-    _loadSound(url, samples, index) {
-        // takes a URL to get the sound from an array and an index to (asynchronously) put the AudioBuffer into
-        let request = new XMLHttpRequest();  // TODO: change to promise style?
-        request.open('GET', url, true);
-        request.responseType = 'arraybuffer';
-        let that = this;
-        request.onload = function() {
-            // Decode the data and keep a reference to it
-            // Promise-ased syntax does not work for Safari desktop, need to use callback variant
-            // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/decodeAudioData
-            // TODO: find another way to load samples or raise a warning as neither method works on Safari mobile
-            let audioData = request.response;
-            that._audioContext.decodeAudioData(audioData, 
-                function(buffer) {
-                    samples[index] = buffer;
-                },
-                function(e) {
-                    console.log("Error decoding audio data" + e.err);
-                }
-            );
-        };
-        request.send();
-    }
 }
