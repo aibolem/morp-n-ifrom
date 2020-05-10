@@ -12,6 +12,7 @@ class MorseAudioContext {
 
     getAudioContext() {
         if (this.audioContext === undefined) {
+            console.log("Creating AudioContext");
             this.audioContext = new this.AudioContext();
             if (this.audioContext.state === "suspended") {
                 this.audioContext.close();
