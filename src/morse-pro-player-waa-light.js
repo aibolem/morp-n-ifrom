@@ -11,6 +11,7 @@ See the Licence for the specific language governing permissions and limitations 
 */
 
 import MorsePlayerWAA from './morse-pro-player-waa';
+import morseAudioContext from './morse-pro-audiocontext';
 
 /**
  * Web browser sound player using Web Audio API.
@@ -63,16 +64,17 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
      * Set up the audio graph, connecting the splitter node to a JSNode in order to analyse the waveform
      * @access private
      */
-    _initialiseAudioNodes() {
+    _initialiseAudio() {
         // TODO: have this create its own oscillators so that we can get the light signal when using samples
         // TODO: or just adapt the super class to call soundOn and soundOff callbacks based on the timings - not sure why I didn't do that in the first place? Could be to do with the higher precision of the sound API?!
-        super._initialiseAudioNodes();
+        super._initialiseAudio();
         if (this.jsNode) {
             // if we have already called this method then must make sure to disconnect the old node graph first
             this.jsNode.disconnect();
         }
-        this.jsNode = this._audioContext.createScriptProcessor(256, 1, 1);
-        this.jsNode.connect(this._audioContext.destination);  // otherwise Chrome ignores it
+        let ac = morseAudioContext.getAudioContext();
+        this.jsNode = ac.createScriptProcessor(256, 1, 1);
+        this.jsNode.connect(ac.destination);  // otherwise Chrome ignores it
         this.jsNode.onaudioprocess = this._processSound.bind(this);
         this.splitterNode.connect(this.jsNode);
     }
