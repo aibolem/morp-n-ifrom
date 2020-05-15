@@ -70,6 +70,7 @@ export default class MorseListener {
         )
     {
         // audio input and output
+        //TODO: switch this to the singleton class
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
         if (spectrogramCallback !== undefined) this.spectrogramCallback = spectrogramCallback;
