@@ -6,13 +6,17 @@ class MorseAudioContext {
             console.log("Web Audio API unavailable");
             throw (new Error("No AudioContext class defined"));
         }
-        this.decodeQueue = [];
         this.sounds = {};
+        this._unlocked = false;
+        let ua = navigator.userAgent.toLowerCase();
+        this.isIOS = (ua.indexOf("iphone") >= 0 && ua.indexOf("like iphone") < 0 || ua.indexOf("ipad") >= 0 && ua.indexOf("like ipad") < 0 || ua.indexOf("ipod") >= 0 && ua.indexOf("like ipod") < 0);
     }
 
     /**
      * Get an AudioContext. The state of the AudioContext may be "suspended".
-     * On Safari and Chrome you will only get a running context upon user interaction.
+     * In Chrome (v83 Windows), Safari (v13.1 Mac Catalina), iOS (v11) you get a running context (and runUnlockedActions executes) upon user interaction.
+     * In Edge (v44.18362.449.0 Windows) you get a running AudioContext straight away but the runUnlockedActions executes.
+     * In Firefox (v75 Windows) you get a suspended AudioContext but it resumes (and runUnlockedActions executes) after a short while without interaction.
      */
     getAudioContext() {
         // console.log("Getting AC");
@@ -21,14 +25,16 @@ class MorseAudioContext {
                 // console.log("AC is running");
                 // return this.audioContext;
             } else {
-                // console.log("AC is suspended");
-                this.audioContext.resume().then(() => {this.useRunningAudioContext()});
+                console.log("AudioContext is suspended");
+                this.audioContext.resume().then(() => {this.runUnlockedActions(1)});
             }
         } else {
-            // console.log("Creating AudioContext");
+            console.log("Creating AudioContext");
             this.audioContext = new this.AudioContext();
             this.audioContext.createGain();  // Can help on Safari. Probably not needed but can't hurt
-            this.audioContext.resume().then(() => {this.useRunningAudioContext()});  // Will only work if using Firefox (and will take a short while) or where this method is called the first time with a user interaction, otherwise will be ignored
+            console.log(`AudioContext state: ${this.audioContext.state}`);
+            // Will only work if using Firefox (and will take a short while) or where this method is called the first time with a user interaction, otherwise will be ignored
+            this.audioContext.resume().then(() => {this.runUnlockedActions(2)});  
         }
         return this.audioContext;
     }
@@ -36,11 +42,28 @@ class MorseAudioContext {
     /**
      * Called when we get a running AudioContext
      */
-    useRunningAudioContext() {
-        // console.log("Flushing decoding queue: " + this.decodeQueue.length);
-        // while (this.decodeQueue.length !== 0) {
-        //     this.decodeSample(this.decodeQueue.pop());
-        // }
+    runUnlockedActions(code) {
+        if (this._unlocked) return;
+        this._unlocked = true;
+        console.log(`AudioContext unlocked (${code})`);
+        // https://github.com/swevans/unmute/blob/master/dev/src/unmute.ts
+        if (this.isIOS) {
+            console.log("Is iOS: pleying HTML audio");
+            let tmp = document.createElement("div");
+            tmp.innerHTML = "<audio x-webkit-airplay='deny'></audio>";
+            let tag = tmp.children.item(0);
+            tag.controls = false;
+            tag.disableRemotePlayback = true;				// Airplay like controls on other devices, prevents casting of the tag
+            tag.preload = "auto";
+            // Set the src to a short bit of url encoded as a silent mp3
+            // NOTE The silence MP3 must be high quality, when web audio sounds are played in parallel the web audio sound is mixed to match the bitrate of the html sound
+            // 0.01 seconds of silence VBR220-260 Joint Stereo 859B
+            tag.src = "data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA//////////////////////////////////////////////////////////////////8AAABhTEFNRTMuMTAwA8MAAAAAAAAAABQgJAUHQQAB9AAAAnGMHkkIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//sQxAADgnABGiAAQBCqgCRMAAgEAH///////////////7+n/9FTuQsQH//////2NG0jWUGlio5gLQTOtIoeR2WX////X4s9Atb/JRVCbBUpeRUq//////////////////9RUi0f2jn/+xDECgPCjAEQAABN4AAANIAAAAQVTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ==";
+            // The str below is a "compressed" version using poor mans huffman encoding, saves about 0.5kb
+            // tag.src = "data:audio/mpeg;base64,//uQx" + poorManHuffman(23, "A") + "WGluZwAAAA8AAAACAAACcQCA" + poorManHuffman(16, "gICA") + poorManHuffman(66, "/") + "8AAABhTEFNRTMuMTAwA8MAAAAAAAAAABQgJAUHQQAB9AAAAnGMHkkI" + poorManHuffman(320, "A") + "//sQxAADgnABGiAAQBCqgCRMAAgEAH" + poorManHuffman(15, "/") + "7+n/9FTuQsQH//////2NG0jWUGlio5gLQTOtIoeR2WX////X4s9Atb/JRVCbBUpeRUq" + poorManHuffman(18, "/") + "9RUi0f2jn/+xDECgPCjAEQAABN4AAANIAAAAQVTEFNRTMuMTAw" + poorManHuffman(97, "V") + "Q==";
+            tag.loop = true;
+            tag.load();
+        }
     }
 
     closeAudioContext() {
@@ -50,8 +73,8 @@ class MorseAudioContext {
         }
     }
 
-    isInitialised() {
-        return this.audioContext !== undefined;
+    isUnlocked() {
+        return this.audioContext && this.audioContext.state === "running";
     }
 
     loadSample(url, key) {
@@ -61,7 +84,7 @@ class MorseAudioContext {
         request.responseType = 'arraybuffer';
         request.onload = () => {
             // Load the data and keep a reference to it
-            console.log("File loaded");
+            // console.log("File loaded");
             this.sounds[key] = request.response;
             this.decodeSample(key);
         };
