@@ -10,7 +10,7 @@ class MorseAudioContext {
         this._unlocked = false;
         let ua = navigator.userAgent.toLowerCase();
         this.isIOS = (ua.indexOf("iphone") >= 0 && ua.indexOf("like iphone") < 0 || ua.indexOf("ipad") >= 0 && ua.indexOf("like ipad") < 0 || ua.indexOf("ipod") >= 0 && ua.indexOf("like ipod") < 0);
-        if (this.isIOS) this.playHTMLaudio();
+        // if (this.isIOS) this.playHTMLaudio();
     }
 
     /**
