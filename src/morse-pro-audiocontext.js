@@ -2,10 +2,12 @@ class MorseAudioContext {
     constructor() {
         this.AudioContext = window.AudioContext || window.webkitAudioContext;
         if (this.AudioContext === undefined) {
-            this.noAudio = true;
+            this.hasAudioContext = false;
             console.log("Web Audio API unavailable");
-            throw (new Error("No AudioContext class defined"));
+            return;
+            // throw (new Error("No AudioContext class defined"));
         }
+        this.hasAudioContext = true;
         this.sounds = {};
         this._unlocked = false;
         let ua = navigator.userAgent.toLowerCase();
@@ -113,6 +115,7 @@ class MorseAudioContext {
     }
 
     init() {
+        if (!this.hasAudioContext) return;
         function startAudio() {
             console.log("Starting audio via user interaction");
             document.removeEventListener("mousedown", startAudio);
