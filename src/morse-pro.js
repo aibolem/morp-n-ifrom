@@ -253,5 +253,14 @@ export default class Morse {
         }
         return ret;
     }
+
+    text2morseClean(text) {
+        let d = this.text2morse(text);
+        d.text = d.text.map((word, i) => word.filter((char, j) => !d.error[i][j]));
+        d.morse = d.morse.map((word, i) => word.filter((char, j) => !d.error[i][j]));
+        d.error = d.error.map(word => word.filter(error => !error));
+        d.hasError = false;
+        return d;
+    }
 }
 

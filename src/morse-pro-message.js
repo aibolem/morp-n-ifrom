@@ -98,6 +98,11 @@ export default class MorseMessage {
         return this.morse;
     }
 
+    cleanText() {
+        this._completeFields(this.morseCWWave.text2morseClean(this.text));
+        return this.text;
+    }
+
     get timings() {
         return this.morseCWWave.morseTokens2timing(this.morseTokens);
     }
