@@ -29,7 +29,7 @@ export default class MorsePlayerWAA {
     /**
      * @param {Object} params - lots of optional parameters.
      * @param {number} [params.defaultFrequency=550] - fallback frequency (Hz) to use if the loaded sequence does not define any.
-     * @param {number} [params.startPadding=0] - number of ms to wait before playing first note of initial sequence.
+     * @param {number} [params.startPadding=0] - number of ms to wait before playing first note after play is pressed
      * @param {number} [params.endPadding=0] - number of ms to wait at the end of a sequence before playing the next one (or looping).
      * @param {function()} params.sequenceStartCallback - function to call each time the sequence starts.
      * @param {function()} params.sequenceEndingCallback - function to call when the sequence is nearing the end.
@@ -67,12 +67,14 @@ export default class MorsePlayerWAA {
         this._timerInterval = 0.05;  // how often to schedule notes (seconds)
         this._timer = undefined;
         this._stopTimer = undefined;
-        this._notPlayedANote = true;
+        // this._notPlayedANote = true;
         this._queue = [];
+
+        this._initialiseAudio();
     }
 
     /**
-     * Set up the audio graph
+     * Set up the audio graph. Should only be called once.
      * @access private
      */
     _initialiseAudio() {
@@ -81,18 +83,21 @@ export default class MorsePlayerWAA {
             this.gainNode.disconnect();
         }
         let ac = morseAudioContext.getAudioContext();
-        // this._createAudioContextSingleton();
         // cannot work until this._frequency is defined
+        this.inputNode = ac.createGain();  // connect all inputs to this. It is there to be destroyed when we want to stop (and then recreated)
         this.splitterNode = ac.createGain();  // this node is here to attach other nodes to in subclass
         this.lowPassNode = ac.createBiquadFilter();
         this.lowPassNode.type = "lowpass";
         this.frequency = this._frequency;  // set up filter node
         this.gainNode = ac.createGain();  // this node is actually used for volume
+        
         this.volume = this._volume;  // set up gain node
+
+        this.inputNode.connect(this.splitterNode);
         this.splitterNode.connect(this.lowPassNode);
         this.lowPassNode.connect(this.gainNode);
         this.gainNode.connect(ac.destination);
-        this._notPlayedANote = true;
+        // this._notPlayedANote = true;
     }
 
     static get HIGH_FREQ() {
@@ -235,7 +240,7 @@ export default class MorsePlayerWAA {
             return;
         }
         this.stop();
-        this._initialiseAudio();
+        // this._initialiseAudio();
         this._nextNote = 0;
         this._isPlaying = true;
         this._isPaused = true;  // pretend we were paused so that play() "resumes" playback
@@ -263,10 +268,11 @@ export default class MorsePlayerWAA {
         this._isPaused = false;
         // basically set the time base to now but
         //    - to work after a pause: subtract the start time of the next note so that it will play immediately
-        //    - to avoid clipping the very first note: add on startPadding if notPlayedANote
+        //    - to avoid clipping the first note: add on startPadding
         this._tZero = morseAudioContext.getAudioContext().currentTime -
             this._cTimings[this._nextNote] +
-            (this._notPlayedANote ? this.startPadding / 1000 : 0);
+            this.startPadding / 1000;
+            // (this._notPlayedANote ? this.startPadding / 1000 : 0);
         // schedule the first note ASAP (directly) and then if there is more to schedule, set up an interval timer
         if (this._scheduleNotes()) {
             this._timer = setInterval(function() {
@@ -309,7 +315,11 @@ export default class MorsePlayerWAA {
     stop() {
         if (this._isPlaying) {
             // TODO: find a better way to immediately kill all the sounds, for instance bringing volume to zero and disconnecting all oscillators
-            morseAudioContext.closeAudioContext();
+            // morseAudioContext.closeAudioContext();
+            let ac = morseAudioContext.getAudioContext();
+            this.inputNode.gain.setValueAtTime(0, ac.currentTime);
+            this.inputNode = ac.createGain();
+            this.inputNode.connect(this.splitterNode);
             this._stop();
         }
     }
@@ -341,7 +351,7 @@ export default class MorsePlayerWAA {
         while (this._nextNote < this.sequenceLength &&
                 (this._cTimings[this._nextNote] < (nowAbsolute - this._tZero) + this._lookAheadTime)) {
 
-            this._notPlayedANote = false;
+            // this._notPlayedANote = false;
             var nowRelative = nowAbsolute - this._tZero;
 
             // console.log('T: ' + Math.round(1000 * nowAbsolute)/1000 + ' (+' + Math.round(1000 * nowRelative)/1000 + ')');
@@ -369,7 +379,7 @@ export default class MorsePlayerWAA {
                     oscillator.frequency.setValueAtTime(this._frequency, start);
                     oscillator.start(start);
                     oscillator.stop(stop);
-                    oscillator.connect(this.splitterNode);
+                    oscillator.connect(this.inputNode);
                 } else {
                     // only other option for 'mode' is 'sample'
                     start  = this._tZero + this._cTimings[this._nextNote];
@@ -385,7 +395,7 @@ export default class MorsePlayerWAA {
                         bsn.buffer = sounds["onSample"];
                         bsn.start(start);
                         if (stop) { bsn.stop(stop); }  // if we don't schedule a stop then the sound file plays until it completes
-                        bsn.connect(this.splitterNode);
+                        bsn.connect(this.inputNode);
                     } catch (ex) {
                         console.log("onSample not decoded yet");
                     }
@@ -396,7 +406,7 @@ export default class MorsePlayerWAA {
                         bsn.buffer = sounds["offSample"];
                         bsn.start(start2);
                         if (stop2) { bsn.stop(stop2); }  // we won't have the stop time for the final off sound, so just let it run
-                        bsn.connect(this.splitterNode);
+                        bsn.connect(this.inputNode);
                     } catch (ex) {
                         console.log("offSample not decoded yet");
                     }
