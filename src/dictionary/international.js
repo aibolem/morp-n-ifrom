@@ -55,7 +55,7 @@ export var dictionary = {
         '&': '. - . . .',
         '+': '. - . - .',
         '!': '- . - . - -',
-        '×': '- . . -',
+        // '×': '- . . -',  # as this is the same as "x" it can end up being the translation from Morse when people would expect "X"
 
         'É': '. . - . .',
     },
