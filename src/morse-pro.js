@@ -125,7 +125,6 @@ export default class Morse {
      * @returns the tidied text
      */
     tidyText(text) {
-        text = text.toUpperCase();
         text = text.trim();
         text = text.replace(/\s+/g, ' ');
         return text;
@@ -239,10 +238,17 @@ export default class Morse {
             let errors = [];
             for (let letter of letters) {
                 let char = '';
-                let error = true;
+                let error = false;
+                // These tests are a little complex because e.g. the american dictionary uses "s" and "S" in the Morse.
+                // You therefore have to test without uppercasing.
+                // The uppercase test is useful though (so added here) so that the case of the input itself doesn't have to be changed.
+                // That's helpful e.g. when someone enters text in the translator that needs cleaning up: the case can be maintained.
                 if (letter in dict) {
                     char = dict[letter];
-                    error = false;
+                } else if (letter.toUpperCase() in dict) {
+                    char = dict[letter.toUpperCase()];
+                } else {
+                    error = true;
                 }
                 chars.push(char);
                 errors.push(error);
