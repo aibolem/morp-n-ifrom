@@ -125,7 +125,7 @@ export default class Morse {
      * @returns the tidied text
      */
     tidyText(text) {
-        // text = text.toUpperCase();
+        text = text.toUpperCase();
         text = text.trim();
         text = text.replace(/\s+/g, ' ');
         return text;
@@ -240,8 +240,8 @@ export default class Morse {
             for (let letter of letters) {
                 let char = '';
                 let error = true;
-                if (letter.toUpperCase() in dict) {
-                    char = dict[letter.toUpperCase()];
+                if (letter in dict) {
+                    char = dict[letter];
                     error = false;
                 }
                 chars.push(char);
