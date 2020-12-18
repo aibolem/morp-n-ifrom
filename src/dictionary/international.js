@@ -105,7 +105,7 @@ export var dictionary = {
         return tokens;
     },
 
-    morseMatch: new RegExp('^\\s*[\\.\\-_]+[\\.\\-_ \\/\\|]*$'),
+    morseMatch: new RegExp('^\\s*[\\.\\-_]+[\\.\\-_\\s\\/\\|]*$'),
 
     displayName: {
         keys: ['.', '-', ' ', 'charSpace', 'wordSpace'],
