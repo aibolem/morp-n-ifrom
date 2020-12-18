@@ -100,18 +100,21 @@ export var dictionary = {
         morse = morse.trim();
         morse = morse.replace(/_/g, '-')
         morse = morse.replace(/\|/g, '/');
-        // morse = morse.replace(/\s+/g, ' ');
-        morse = morse.replace(/\s*\/[\s\/]*/g, '/');
-        morse = morse.replace(/([\.\-]) (?=[\.\-])/g, '$1s');
         morse = morse.replace(/\u2e3a/g, 'd');
         morse = morse.replace(/\u2e3b/g, 'D');
+        morse = morse.replace(/[\r\n\t]+/g, '/');
+        morse = morse.replace(/   +/g, '   ');
+        morse = morse.replace(/([\.\-dD]  )([^ ])/g, '$1 $2');
+        morse = morse.replace(/ *\/[ \/]*/g, '/');
+        morse = morse.replace(/([\.\-dD]) (?=[\.\-dD])/g, '$1s');
+
         let words = morse.split('/');
         let tokens = words.map(word => word.split('   '));
         tokens = tokens.map(letters => letters.map(letter => letter.replace(/([\.\-])(?=[\.\-])/g, '$1 ')));
         return tokens;
     },
 
-    morseMatch: new RegExp('^\\s*[\\.\\-_\u2e3a\u2e3b]+[\\.\\-_\u2e3a\u2e3b \\/\\|]*$'),
+    morseMatch: new RegExp('^\\s*[\\.\\-_\u2e3a\u2e3b]+[\\.\\-_\u2e3a\u2e3b\\s\\/\\|]*$'),
 
     displayName: {
         keys: ['.', '-', 'd', 'D', ' ', 's', 'charSpace', 'wordSpace'],
