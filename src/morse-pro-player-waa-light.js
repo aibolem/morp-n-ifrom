@@ -39,6 +39,7 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
      * @param {number} params.defaultFrequency - fallback frequency (Hz) to use if the loaded sequence does not define any.
      * @param {number} params.startPadding - number of ms to wait before playing first note of initial sequence.
      * @param {number} params.endPadding - number of ms to wait at the end of a sequence before playing the next one (or looping).
+     * @param {number} params.volume - volume of Morse. Takes range [0,1].
      * @param {function()} params.sequenceStartCallback - function to call each time the sequence starts.
      * @param {function()} params.sequenceEndingCallback - function to call when the sequence is nearing the end.
      * @param {function()} params.sequenceEndCallback - function to call when the sequence has ended.
@@ -49,8 +50,8 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
      * @param {string} params.offSample - URL of the sound file to play at the end of a note.
      * @param {string} params.playMode - play mode, either "sine" or "sample".
      */
-    constructor({defaultFrequency, startPadding, endPadding, sequenceStartCallback, sequenceEndingCallback, sequenceEndCallback, soundStoppedCallback, soundOnCallback, soundOffCallback, onSample, offSample, playMode} = {}) {
-        super({defaultFrequency, startPadding, endPadding, sequenceStartCallback, sequenceEndingCallback, sequenceEndCallback, soundStoppedCallback, onSample, offSample, playMode});
+    constructor({defaultFrequency, startPadding, endPadding, volume, sequenceStartCallback, sequenceEndingCallback, sequenceEndCallback, soundStoppedCallback, soundOnCallback, soundOffCallback, onSample, offSample, playMode} = {}) {
+        super({defaultFrequency, startPadding, endPadding, volume, sequenceStartCallback, sequenceEndingCallback, sequenceEndCallback, soundStoppedCallback, onSample, offSample, playMode});
         if (soundOnCallback !== undefined) this.soundOnCallback = soundOnCallback;
         if (soundOffCallback !== undefined) this.soundOffCallback = soundOffCallback;
         this._wasOn = false;

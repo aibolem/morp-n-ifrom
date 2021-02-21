@@ -27,14 +27,14 @@ export default class MorsePlayerXAS {
     /**
      * @param {Object} xaudioServerClass - the XAudioServer class
      */
-    constructor({XAudioServerClass, morseCWWave, startPadding=0, endPadding=1000} = {}) {
+    constructor({XAudioServerClass, morseCWWave, startPadding=0, endPadding=1000, volume=1} = {}) {
         this.XAudioServerClass = XAudioServerClass;
         this.morseCWWave = morseCWWave;
         this.startPadding = startPadding;
         this.endPadding = endPadding;
+        this.volume = volume;
 
         this._isPlaying = false;
-        this._volume = 1;
         this.samplePos = undefined;
         this.noAudio = false;
         this.audioServer = undefined;
@@ -83,6 +83,13 @@ export default class MorsePlayerXAS {
      */
     set volume(v) {
         this._volume = Math.min(Math.max(v, 0), 1);
+        if (this._volume === 0) {
+            this._gain = 0;  // make sure 0 volume is actually silent
+        } else {
+            // see https://teropa.info/blog/2016/08/30/amplitude-and-loudness.html
+            let dbfs = -60 + this._volume * 60;  // changes [0,1] to [-60,0]
+            this._gain = Math.pow(10, dbfs / 20);  // change from decibels to amplitude
+        }
     }
 
     /**
@@ -90,6 +97,13 @@ export default class MorsePlayerXAS {
      */
     get volume() {
         return this._volume;
+    }
+
+    /**
+     * @returns {number} the current gain [0,1]
+     */
+    get gain() {
+        return this._gain;
     }
 
     stop() {
@@ -130,7 +144,7 @@ export default class MorsePlayerXAS {
         this.stop();
         this._isPlaying = true;
         this.samplePos = 0;
-        this.audioServer.changeVolume(this._volume);
+        this.audioServer.changeVolume(this._gain);
     }
 
     hasError() {

@@ -31,6 +31,7 @@ export default class MorsePlayerWAA {
      * @param {number} [params.defaultFrequency=550] - fallback frequency (Hz) to use if the loaded sequence does not define any.
      * @param {number} [params.startPadding=0] - number of ms to wait before playing first note after play is pressed
      * @param {number} [params.endPadding=0] - number of ms to wait at the end of a sequence before playing the next one (or looping).
+     * @param {number} [params.volume=1] - volume of Morse. Takes range [0,1].
      * @param {function()} params.sequenceStartCallback - function to call each time the sequence starts.
      * @param {function()} params.sequenceEndingCallback - function to call when the sequence is nearing the end.
      * @param {function()} params.sequenceEndCallback - function to call when the sequence has ended.
@@ -39,7 +40,7 @@ export default class MorsePlayerWAA {
      * @param {string} params.offSample - URL of the sound file to play at the end of a note.
      * @param {string} [params.playMode="sine"] - play mode, either "sine" or "sample".
      */
-    constructor({defaultFrequency=550, startPadding=0, endPadding=0, sequenceStartCallback, sequenceEndingCallback, sequenceEndCallback, soundStoppedCallback, onSample, offSample, playMode='sine'} = {}) {
+    constructor({defaultFrequency=550, startPadding=0, endPadding=0, volume=1, sequenceStartCallback, sequenceEndingCallback, sequenceEndCallback, soundStoppedCallback, onSample, offSample, playMode='sine'} = {}) {
         if (sequenceStartCallback !== undefined) this.sequenceStartCallback = sequenceStartCallback;
         if (sequenceEndingCallback !== undefined) this.sequenceEndingCallback = sequenceEndingCallback;
         if (sequenceEndCallback !== undefined) this.sequenceEndCallback = sequenceEndCallback;
@@ -58,11 +59,11 @@ export default class MorsePlayerWAA {
         this._frequency = undefined;
         this.startPadding = startPadding;
         this.endPadding = endPadding;
+        this.volume = volume;
 
         this._cTimings = [];
         this._isPlaying = false;
         this._isPaused = false;
-        this._volume = 1;
         this._lookAheadTime = 0.1;  // how far to look ahead when scheduling notes (seconds)
         this._timerInterval = 0.05;  // how often to schedule notes (seconds)
         this._timer = undefined;
@@ -140,19 +141,29 @@ export default class MorsePlayerWAA {
     }
 
     /**
-     * Set the volume for the player
-     * @param {number} v - the volume, clamped to [0,1]
+     * Set the volume for the player. Sets the gain as a side effect.
+     * @param {number} v - the volume, should be in range [0,1]
      */
     set volume(v) {
-        this._volume = Math.min(Math.max(v, 0), 1);
+        let oldGain = this._gain;
+        this._volume = Math.min(Math.max(v, 0), 1);  // clamp into range [0,1]
+        if (this._volume === 0) {
+            this._gain = 0;  // make sure 0 volume is actually silent
+        } else {
+            // see https://teropa.info/blog/2016/08/30/amplitude-and-loudness.html
+            let dbfs = -60 + this._volume * 60;  // changes [0,1] to [-60,0]
+            this._gain = Math.pow(10, dbfs / 20);  // change from decibels to amplitude
+        }
         try {
             let ac = morseAudioContext.getAudioContext();
+            let factor = 1.0;
             if (this._playMode !== 'sample') {
                 // multiply by 0.813 to reduce gain added by lowpass filter and avoid clipping
-                this.gainNode.gain.setValueAtTime(0.813 * this._volume, ac.currentTime);
-            } else {
-                this.gainNode.gain.setValueAtTime(this._volume, ac.currentTime);
+                factor = 0.83;
             }
+            // change volume linearly over 30ms to avoid discontinuities and resultant popping
+            this.gainNode.gain.setValueAtTime(factor * oldGain, ac.currentTime);
+            this.gainNode.gain.linearRampToValueAtTime(factor * this._gain, ac.currentTime + 0.03);
         } catch (e) {
             // getting here means _initialiseAudio() has not yet been called: that's okay#
         }
@@ -163,6 +174,13 @@ export default class MorsePlayerWAA {
      */
     get volume() {
         return this._volume;
+    }
+
+    /**
+     * @returns {number} the current gain [0,1]
+     */
+    get gain() {
+        return this._gain;
     }
 
     // /**
