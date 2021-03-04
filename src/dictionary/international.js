@@ -2,6 +2,8 @@ export var dictionary = {
     id: 'international',
 
     letter: {
+        '×': '- . . -',  // as this is the same as "X" it needs to go before "X" to get the expected translation from -..-
+
         'A': '. -',
         'B': '- . . .',
         'C': '- . - .',
@@ -55,9 +57,6 @@ export var dictionary = {
         '&': '. - . . .',
         '+': '. - . - .',
         '!': '- . - . - -',
-        // '×': '- . . -',  # as this is the same as "x" it can end up being the translation from Morse when people would expect "X"
-
-        'É': '. . - . .',
     },
 
     letterMatch: /^./,
@@ -133,6 +132,40 @@ export var dictionary = {
                 '<SOS>': '. . . - - - . . .'
             },
             letterMatch: /^<...?>|./
+        },
+        accents: {
+            letter: {
+                'À': '. - - . -',
+                'Å': '. - - . -',
+                'Ä': '. - . -',
+                'Ą': '. - . -',
+                'Æ': '. - . -',
+                'Ć': '- . - . .',
+                'Ĉ': '- . - . .',
+                'Ç': '- . - . .',
+                'Đ': '. . - . .',
+                'Ð': '. . - - .',
+                'É': '. . - . .',
+                'È': '. - . . -',
+                'Ę': '. . - . .',
+                'Ĝ': '- - . - .',
+                'Ĥ': '- - - -',
+                'Ĵ': '. - - - .',
+                'Ł': '. - . . -',
+                'Ń': '- - . - -',
+                'Ñ': '- - . - -',
+                'Ó': '- - - .',
+                'Ö': '- - - .',
+                'Ø': '- - - .',
+                'Ś': '. . . - . . .',
+                'Ŝ': '. . . - .',
+                'Š': '- - - -',
+                'Þ': '. - - . .',
+                'Ü': '. . - -',
+                'Ŭ': '. . - -',
+                'Ź': '- - . . - .',
+                'Ż': '- - . . -'
+            }
         }
     }
 }
