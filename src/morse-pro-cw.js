@@ -51,15 +51,17 @@ export default class MorseCW extends Morse {
      * @param {number} wpm
      */
     setWPM(wpm) {
-        this._setWPM(wpm);
-    }
+        this._baseLength = undefined;
+        this._ratios = undefined;
+        this._lengths = undefined;
 
-    _setWPM(wpm) {
         wpm = Math.max(1, wpm || 1);
         this._wpm = wpm;
         this._fwpm = Math.min(this._wpm, this._fwpm);
-        this._baseLength = undefined;
-        this._ratios = undefined;
+
+        let tmp = this.ratios;
+        tmp = this.baseLength;
+        return wpm;
     }
 
     /** @type {number} */
@@ -67,24 +69,29 @@ export default class MorseCW extends Morse {
         return this._wpm;
     }
 
+    testWPMmatchesRatio() {
+        return this.ratios['-'] == this.dictionary.ratio['-'] && this.ratios[' '] == this.dictionary.ratio[' '];
+    }
+
     /**
      * Set the Farnsworth WPM speed. Ensures that WPM is no slower than Farnsworth WPM.
      * @param {number} fwpm
      */
     setFWPM(fwpm) {
-        this._setFWPM(fwpm);
-    }
-
-    _setFWPM(fwpm) {
         fwpm = Math.max(1, fwpm || 1);
         this._fwpm = fwpm;
-        this._wpm = Math.max(this._wpm, this._fwpm);
-        this._ratios = undefined;
+        this.setWPM(Math.max(this._wpm, this._fwpm))
+        
+        return fwpm;
     }
 
     /** @type {number} */
     get fwpm() {
         return this._fwpm;
+    }
+
+    testFWPMmatchesRatio() {
+        return this.ratios['wordSpace'] / this.ratios['charSpace'] == this.dictionary.ratio['wordSpace'] / this.dictionary.ratio['charSpace'];
     }
 
     /** @type {number[]} */
@@ -100,15 +107,37 @@ export default class MorseCW extends Morse {
     }
 
     /**
-     * Set the ratio of each element to the base element and recalculate the PARIS parameters.
+     * Set the ratio of each element and normalise to the base element/
      * For the space elements, the ratio is negative.
      * @param {Map} r - a Map from element to ratio (as defined in the 'ratio' element of a dictionary)
      */
     set ratios(r) {
+        this._wpm = undefined;
+        this._fwpm = undefined;
+        this._lengths = undefined;
+
         this._ratios = {};
         Object.assign(this._ratios, r);
         for (let element in this._ratios) {
             this._ratios[element] /= this._ratios[this._baseElement];
+        }
+    }
+
+    setRatio(element, ratio) {
+        let tmp = this.ratios;
+        this._ratios[element] = ratio;
+        this._lengths = undefined;
+
+        if (this.testWPMmatchesRatio()) {
+            this._setWPMfromBaseLength();
+            if (this.testFWPMmatchesRatio()) {
+                this._setFWPMfromRatio();
+            } else {
+                this._fwpm = undefined;
+            }    
+        } else {
+            this._wpm = undefined;
+            this._fwpm = undefined;
         }
     }
 
@@ -163,6 +192,14 @@ export default class MorseCW extends Morse {
     }
 
     /**
+     * Force the WPM to match the base length without changing anything else
+     * @param {number} ditLen
+     */
+    _setWPMfromBaseLength() {
+        this._wpm = (MS_IN_MINUTE / this._ditsInParis) / this._baseLength;
+    }
+
+    /**
      * Set the WPM given dit length in ms
      * @param {number} ditLen
      */
@@ -171,12 +208,21 @@ export default class MorseCW extends Morse {
     }
 
     /** 
+     * Force the FWPM to match the ditlen:fditlen ratio without changing anything else
+     * @param {number} ratio
+     */
+    _setFWPMfromRatio() {
+        let ratio = Math.abs(this.lengths['.'] / (this.lengths['charSpace'] / 3));
+        this._fwpm = this._ditsInParis * this._wpm / (this._spacesInParis * ratio + (this._ditsInParis - this._spacesInParis));
+    }
+
+    /** 
      * Set the Farnsworth WPM given ratio of dit length / Farnsworth dit length
      * @param {number} ratio
      */
-    setFWPMfromRatio(ratio) {
+     setFWPMfromRatio(ratio) {
         ratio = Math.max(Math.abs(ratio), 1);  // take abs just in case someone passes in something -ve
-        this.setFWPM(this._ditsInParis * this.wpm / (this._spacesInParis * ratio + (this._ditsInParis - this._spacesInParis)));
+        this.setFWPM(this._ditsInParis * this._wpm / (this._spacesInParis * ratio + (this._ditsInParis - this._spacesInParis)));
     }
 
     /**
@@ -184,27 +230,39 @@ export default class MorseCW extends Morse {
      * @return {number}
      */
     get baseLength() {
-        this._baseLength = this._baselength || (MS_IN_MINUTE / this._ditsInParis) / this._wpm;
+        this._baseLength = this._baseLength || (MS_IN_MINUTE / this._ditsInParis) / this._wpm;
         return this._baseLength;
     }
 
-    set baseLength(v) {
-        this._baseLength = v;
-        this.setWPMfromDitLen(v);
-    }
+    // set baseLength(v) {
+    //     this._baseLength = Math.abs(v);
+    //     this.setWPMfromDitLen(v);
+    // }
 
     /**
      * Calculate and return the millisecond duration of each element, using negative durations for spaces.
      * @returns Map
      */
     get lengths() {
-        let lengths = {};
-        Object.assign(lengths, this.ratios);
-        let ditLen = this.baseLength;
-        for (let element in lengths) {
-            lengths[element] *= ditLen;
+        if (this._lengths === undefined) {
+            this._lengths = {};
+            Object.assign(this._lengths, this.ratios);
+            for (let element in this._lengths) {
+                this._lengths[element] *= this._baseLength;
+            }
         }
-        return lengths;
+        return this._lengths;  // this is just a cache for speed, the ratios define the lengths
+    }
+
+    setLength(element, length) {
+        if (element == this._baseElement) {
+            this._lengths = undefined;
+            this._wpm = undefined;
+            this._fwpm = undefined;
+
+            this._baseLength = length;
+        }
+        this.setRatio(element, length / this._baseLength);
     }
 
     /** 
