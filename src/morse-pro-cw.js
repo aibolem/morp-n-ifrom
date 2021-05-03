@@ -91,7 +91,8 @@ export default class MorseCW extends Morse {
     }
 
     testFWPMmatchesRatio() {
-        return this.ratios['wordSpace'] / this.ratios['charSpace'] == this.dictionary.ratio['wordSpace'] / this.dictionary.ratio['charSpace'];
+        // need to test approximately here otherwise with the rounding errors introduced in the web page input it would never return true
+        return Math.abs((this.ratios['wordSpace'] / this.dictionary.ratio['wordSpace']) / (this.ratios['charSpace'] / this.dictionary.ratio['charSpace']) - 1) < 0.001;
     }
 
     /** @type {number[]} */
@@ -179,6 +180,8 @@ export default class MorseCW extends Morse {
      * @return {number}
      */
     get farnsworthRatio() {
+        // Compute fditlen / ditlen
+        // This should be >1 and it is what you need to multiply the standard charSpace and wordSpace ratios by to get the adjusted farnsworth ratios
         // "PARIS " is 31 units for the characters and 19 units for the inter-character spaces and inter-word space
         // One unit takes 1 * 60 / (50 * wpm)
         // The 31 units should take 31 * 60 / (50 * wpm) seconds at wpm
@@ -208,16 +211,16 @@ export default class MorseCW extends Morse {
     }
 
     /** 
-     * Force the FWPM to match the ditlen:fditlen ratio without changing anything else
+     * Force the FWPM to match the fditlen/ditlen ratio without changing anything else
      * @param {number} ratio
      */
     _setFWPMfromRatio() {
-        let ratio = Math.abs(this.lengths['.'] / (this.lengths['charSpace'] / 3));
+        let ratio = Math.abs((this.lengths['charSpace'] / 3) / this.lengths['.']);
         this._fwpm = this._ditsInParis * this._wpm / (this._spacesInParis * ratio + (this._ditsInParis - this._spacesInParis));
     }
 
     /** 
-     * Set the Farnsworth WPM given ratio of dit length / Farnsworth dit length
+     * Set the Farnsworth WPM given ratio of fditlength / ditlength
      * @param {number} ratio
      */
      setFWPMfromRatio(ratio) {
@@ -233,11 +236,6 @@ export default class MorseCW extends Morse {
         this._baseLength = this._baseLength || (MS_IN_MINUTE / this._ditsInParis) / this._wpm;
         return this._baseLength;
     }
-
-    // set baseLength(v) {
-    //     this._baseLength = Math.abs(v);
-    //     this.setWPMfromDitLen(v);
-    // }
 
     /**
      * Calculate and return the millisecond duration of each element, using negative durations for spaces.
