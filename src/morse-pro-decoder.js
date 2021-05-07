@@ -75,7 +75,7 @@ export default class MorseDecoder extends MorseCW {
      * @param {number} wpm - Speed in words per minute.
      */
     setWPM(wpm) {
-        super._setWPM(wpm);
+        super.setWPM(wpm);
         this._clearThresholds();
         this.speedCallback({wpm: this.wpm, fwpm: this.fwpm});
     }
@@ -86,7 +86,7 @@ export default class MorseDecoder extends MorseCW {
      * @param {number} fwpm - Speed in words per minute.
      */
     setFWPM(fwpm) {
-        super._setFWPM(fwpm);
+        super.setFWPM(fwpm);
         this._clearThresholds();
         this.speedCallback({wpm: this.wpm, fwpm: this.fwpm});
     }
@@ -99,7 +99,7 @@ export default class MorseDecoder extends MorseCW {
     set ditLen(dit) {
         this._fditLen = Math.max(dit, this._fditLen || 1);
         this.setWPMfromDitLen(dit);
-        this.setFWPMfromRatio(dit / this._fditLen);
+        this._setFWPMfromRatio(dit / this._fditLen);
         this._clearThresholds();
     }
 
