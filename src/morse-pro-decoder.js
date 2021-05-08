@@ -46,7 +46,7 @@ export default class MorseDecoder extends MorseCW {
         this.timings = [];  // all the ms timings received, all +ve
         this.characters = [];  // all the decoded characters ('.', '-', etc)
         this.unusedTimes = [];
-        this.noiseThreshold = 1;  // a duration <= noiseThreshold is assumed to be an error
+        this.noiseThreshold = 5.4;  // a duration <= noiseThreshold is assumed to be an error. Timestep with 256 FFT 5.3ms.
         this.morse = "";  // string of morse
         this.message = "";  // string of decoded message
     }
@@ -191,6 +191,7 @@ export default class MorseDecoder extends MorseCW {
         } else {
             this.unusedTimes = [];
         }
+        // console.log(`timings ${u} / morse ${m}`);
         this.messageCallback({
             timings: u,
             morse: m,
