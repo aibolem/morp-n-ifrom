@@ -79,26 +79,38 @@ export default class MorsePlayerWAA {
      * @access private
      */
     _initialiseAudio() {
-        if (this.gainNode) {
+        if (this.splitterNode) {
             // if we have already called this method then we must make sure to disconnect the old graph first
-            this.gainNode.disconnect();
+            this.splitterNode.disconnect();
         }
         let ac = morseAudioContext.getAudioContext();
+        let now = ac.currentTime;
         // cannot work until this._frequency is defined
-        this.inputNode = ac.createGain();  // connect all inputs to this. It is there to be destroyed when we want to stop (and then recreated)
-        this.splitterNode = ac.createGain();  // this node is here to attach other nodes to in subclass
-        this.lowPassNode = ac.createBiquadFilter();
-        this.lowPassNode.type = "lowpass";
-        this.frequency = this._frequency;  // set up filter node
-        this.gainNode = ac.createGain();  // this node is actually used for volume
-        
-        this.volume = this._volume;  // set up gain node
 
-        this.inputNode.connect(this.splitterNode);
-        this.splitterNode.connect(this.lowPassNode);
-        this.lowPassNode.connect(this.gainNode);
-        this.gainNode.connect(ac.destination);
-        // this._notPlayedANote = true;
+        this.oscillatorNode = ac.createOscillator();
+        this.oscillatorNode.type = "sine";
+        this.oscillatorNode.start(now);
+
+        this.onOffNode = ac.createGain();
+        this.onOffNode.gain.setValueAtTime(0, now);
+
+        this.bandpassNode = ac.createBiquadFilter();
+        this.bandpassNode.type = "bandpass";
+        this.bandpassNode.Q.setValueAtTime(1, now);
+
+        this.splitterNode = ac.createGain();  // this node is here to attach other nodes to in subclass
+        this.splitterNode.gain.setValueAtTime(1, now);
+
+        this.volumeNode = ac.createGain();  // this node is actually used for volume
+        
+        this.oscillatorNode.connect(this.onOffNode);
+        this.onOffNode.connect(this.bandpassNode);
+        this.bandpassNode.connect(this.splitterNode);
+        this.splitterNode.connect(this.volumeNode);
+        this.volumeNode.connect(ac.destination);
+
+        this.frequency = this._frequency;  // set up oscillator and bandpass nodes
+        this.volume = this._volume;  // set up gain node
     }
 
     static get HIGH_FREQ() {
@@ -108,13 +120,9 @@ export default class MorsePlayerWAA {
     set frequency(freq) {
         this._frequency = freq;
         try {
-            let ac = morseAudioContext.getAudioContext();
-            if (this._playMode !== 'sample') {
-                // TODO: remove this magic number and make the filter configurable?
-                this.lowPassNode.frequency.setValueAtTime(this._frequency * 1.1, ac.currentTime);
-            } else {
-                this.lowPassNode.frequency.setValueAtTime(MorsePlayerWAA.HIGH_FREQ, ac.currentTime);
-            }
+            let now = morseAudioContext.getAudioContext().currentTime;
+            this.oscillatorNode.frequency.setValueAtTime(freq, now);
+            this.bandpassNode.frequency.setValueAtTime(freq, now);
         } catch (e) {
             // getting here means _initialiseAudio() has not yet been called: that's okay
         }
@@ -155,17 +163,12 @@ export default class MorsePlayerWAA {
             this._gain = Math.pow(10, dbfs / 20);  // change from decibels to amplitude
         }
         try {
-            let ac = morseAudioContext.getAudioContext();
-            let factor = 1.0;
-            if (this._playMode !== 'sample') {
-                // multiply by 0.813 to reduce gain added by lowpass filter and avoid clipping
-                factor = 0.83;
-            }
+            let now = morseAudioContext.getAudioContext().currentTime;
             // change volume linearly over 30ms to avoid discontinuities and resultant popping
-            this.gainNode.gain.setValueAtTime(factor * oldGain, ac.currentTime);
-            this.gainNode.gain.linearRampToValueAtTime(factor * this._gain, ac.currentTime + 0.03);
+            this.volumeNode.gain.setValueAtTime(oldGain, now);
+            this.volumeNode.gain.linearRampToValueAtTime(this._gain, now + 0.03);
         } catch (e) {
-            // getting here means _initialiseAudio() has not yet been called: that's okay#
+            // getting here means _initialiseAudio() has not yet been called: that's okay
         }
     }
 
@@ -332,12 +335,9 @@ export default class MorsePlayerWAA {
      */
     stop() {
         if (this._isPlaying) {
-            // TODO: find a better way to immediately kill all the sounds, for instance bringing volume to zero and disconnecting all oscillators
-            // morseAudioContext.closeAudioContext();
-            let ac = morseAudioContext.getAudioContext();
-            this.inputNode.gain.setValueAtTime(0, ac.currentTime);
-            this.inputNode = ac.createGain();
-            this.inputNode.connect(this.splitterNode);
+            let now = morseAudioContext.getAudioContext().currentTime;
+            this.onOffNode.gain.linearRampToValueAtTime(0, now + 0.03);
+            this.onOffNode.gain.cancelScheduledValues();
             this._stop();
         }
     }
@@ -392,12 +392,8 @@ export default class MorsePlayerWAA {
                     start = this._tZero + this._cTimings[this._nextNote];
                     stop  = this._tZero + this._cTimings[this._nextNote + 1];
                     this._soundEndTime = stop;  // we need to store this for the stop() callback
-                    oscillator = ac.createOscillator();
-                    oscillator.type = 'sine';
-                    oscillator.frequency.setValueAtTime(this._frequency, start);
-                    oscillator.start(start);
-                    oscillator.stop(stop);
-                    oscillator.connect(this.inputNode);
+                    this.onOffNode.gain.setTargetAtTime(1, start - 0.0015, 0.001);
+                    this.onOffNode.gain.setTargetAtTime(0, stop - 0.0015, 0.001);
                 } else {
                     // only other option for 'mode' is 'sample'
                     start  = this._tZero + this._cTimings[this._nextNote];
@@ -413,7 +409,7 @@ export default class MorsePlayerWAA {
                         bsn.buffer = sounds["onSample"];
                         bsn.start(start);
                         if (stop) { bsn.stop(stop); }  // if we don't schedule a stop then the sound file plays until it completes
-                        bsn.connect(this.inputNode);
+                        bsn.connect(this.splitterNode);
                     } catch (ex) {
                         console.log("onSample not decoded yet");
                     }
@@ -424,7 +420,7 @@ export default class MorsePlayerWAA {
                         bsn.buffer = sounds["offSample"];
                         bsn.start(start2);
                         if (stop2) { bsn.stop(stop2); }  // we won't have the stop time for the final off sound, so just let it run
-                        bsn.connect(this.inputNode);
+                        bsn.connect(this.splitterNode);
                     } catch (ex) {
                         console.log("offSample not decoded yet");
                     }
