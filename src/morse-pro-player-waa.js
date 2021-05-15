@@ -336,8 +336,8 @@ export default class MorsePlayerWAA {
     stop() {
         if (this._isPlaying) {
             let now = morseAudioContext.getAudioContext().currentTime;
+            this.onOffNode.gain.cancelScheduledValues(now);
             this.onOffNode.gain.linearRampToValueAtTime(0, now + 0.03);
-            this.onOffNode.gain.cancelScheduledValues();
             this._stop();
         }
     }
@@ -362,9 +362,9 @@ export default class MorsePlayerWAA {
      */
     _scheduleNotes() {
         // console.log('Scheduling:');
-        var oscillator, start, start2, stop, stop2, bsn;
+        let start, start2, stop, stop2, bsn;
         let ac = morseAudioContext.getAudioContext();
-        var nowAbsolute = ac.currentTime;
+        let nowAbsolute = ac.currentTime;
 
         while (this._nextNote < this.sequenceLength &&
                 (this._cTimings[this._nextNote] < (nowAbsolute - this._tZero) + this._lookAheadTime)) {
