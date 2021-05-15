@@ -66,9 +66,10 @@ export default class MorsePlayerWAA {
         this._isPaused = false;
         this._lookAheadTime = 0.1;  // how far to look ahead when scheduling notes (seconds)
         this._timerInterval = 0.05;  // how often to schedule notes (seconds)
-        this._timer = undefined;
-        this._stopTimer = undefined;
-        // this._notPlayedANote = true;
+        this._timer = undefined;  // timer for scheduling notes, repeats at _timerInterval
+        this._startTimer = undefined;  // timer to send sequenceStartCallback
+        this._endTimer = undefined;  // timer to send sequenceEndCallback
+        this._stopTimer = undefined;  // timer to send soundStoppedCallback
         this._queue = [];
 
         this._initialiseAudio();
@@ -85,16 +86,15 @@ export default class MorsePlayerWAA {
         }
         let ac = morseAudioContext.getAudioContext();
         let now = ac.currentTime;
-        // cannot work until this._frequency is defined
 
-        this.oscillatorNode = ac.createOscillator();
+        this.oscillatorNode = ac.createOscillator();  // make an oscillator at the right frequency, always on
         this.oscillatorNode.type = "sine";
         this.oscillatorNode.start(now);
 
-        this.onOffNode = ac.createGain();
+        this.onOffNode = ac.createGain();  // modulate the oscillator with an on/off gain node
         this.onOffNode.gain.setValueAtTime(0, now);
 
-        this.bandpassNode = ac.createBiquadFilter();
+        this.bandpassNode = ac.createBiquadFilter();  // cleans up the waveform
         this.bandpassNode.type = "bandpass";
         this.bandpassNode.Q.setValueAtTime(1, now);
 
@@ -111,10 +111,6 @@ export default class MorsePlayerWAA {
 
         this.frequency = this._frequency;  // set up oscillator and bandpass nodes
         this.volume = this._volume;  // set up gain node
-    }
-
-    static get HIGH_FREQ() {
-        return 20000;
     }
 
     set frequency(freq) {
