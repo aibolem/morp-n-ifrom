@@ -90,7 +90,7 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
         var input = event.inputBuffer.getChannelData(0);
         var sum = 0;
         for (var i = 0; i < input.length; i++) {
-            sum += Math.abs(input[i]) < SMALL_AMPLITUDE;
+            sum += Math.abs(input[i]) > SMALL_AMPLITUDE;
         }
         var on = (sum > 128);  // is more than half the buffer non-zero?
         if (on && !this._wasOn) {
