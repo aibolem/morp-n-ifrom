@@ -77,10 +77,17 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
             this.jsNode.disconnect();
         }
         let ac = morseAudioContext.getAudioContext();
+
+        this.muteLightNode = ac.createGain();  // used to temporarily mute the light (e.g. if just sound is needed)
+
         this.jsNode = ac.createScriptProcessor(256, 1, 1);
         this.jsNode.connect(ac.destination);  // otherwise Chrome ignores it
         this.jsNode.onaudioprocess = this._processSound.bind(this);
-        this.splitterNode.connect(this.jsNode);
+
+        this.splitterNode.connect(this.muteLightNode);
+        this.muteLightNode.connect(this.jsNode);
+
+        this.muteLight(false);
     }
 
     /**
@@ -113,6 +120,11 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
      */
     _off() {
         this.soundOffCallback();
+    }
+
+    muteLight(mute) {
+        let now = morseAudioContext.getAudioContext().currentTime;
+        this.muteLightNode.gain.setValueAtTime(mute ? 0 : 1, now);
     }
 
     /**

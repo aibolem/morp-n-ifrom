@@ -103,14 +103,18 @@ export default class MorsePlayerWAA {
 
         this.volumeNode = ac.createGain();  // this node is actually used for volume
         
+        this.muteAudioNode = ac.createGain();  // used to temporarily mute the sound (e.g. if just light is needed)
+
         this.oscillatorNode.connect(this.onOffNode);
         this.onOffNode.connect(this.bandpassNode);
         this.bandpassNode.connect(this.splitterNode);
         this.splitterNode.connect(this.volumeNode);
-        this.volumeNode.connect(ac.destination);
+        this.volumeNode.connect(this.muteAudioNode);
+        this.muteAudioNode.connect(ac.destination);
 
         this.frequency = this._frequency;  // set up oscillator and bandpass nodes
         this.volume = this._volume;  // set up gain node
+        this.muteAudio(false);
     }
 
     set frequency(freq) {
@@ -180,6 +184,11 @@ export default class MorsePlayerWAA {
      */
     get gain() {
         return this._gain;
+    }
+
+    muteAudio(mute) {
+        let now = morseAudioContext.getAudioContext().currentTime;
+        this.muteAudioNode.gain.linearRampToValueAtTime(mute ? 0 : 1, now + 0.03);
     }
 
     // /**
