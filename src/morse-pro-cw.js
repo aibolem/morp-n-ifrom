@@ -244,12 +244,25 @@ export default class MorseCW extends Morse {
     get lengths() {
         if (this._lengths === undefined) {
             this._lengths = {};
+            this._maxLength = 0;
             Object.assign(this._lengths, this.ratios);
             for (let element in this._lengths) {
                 this._lengths[element] *= this._baseLength;
+                this._maxLength = Math.max(this._maxLength, this._lengths[element]);
             }
         }
         return this._lengths;  // this is just a cache for speed, the ratios define the lengths
+    }
+
+    /**
+     * Return the length of the longest beep in milliseconds.
+     * @returns {number}
+     */
+    get maxLength() {
+        if (this._lengths === undefined) {
+            let tmp = this.lengths;
+        }
+        return this._maxLength;
     }
 
     setLength(element, length) {
