@@ -1,5 +1,5 @@
 /*!
-This code is © Copyright Stephen C. Phillips, 2018.
+This code is © Copyright Stephen C. Phillips, 2021.
 Email: steve@scphillips.com
 */
 /*
@@ -13,6 +13,8 @@ See the Licence for the specific language governing permissions and limitations 
 /**
  * A class to 'listen' for Morse code from the microphone or an audio file, filter the sound and pass timings to a decoder to convert to text.
  */
+
+ import morseAudioContext from './morse-pro-audiocontext';
 
  //TOOD: change constructor so that it uses a dictionary of parameters
 
@@ -70,8 +72,7 @@ export default class MorseListener {
         )
     {
         // audio input and output
-        //TODO: switch this to the singleton class
-        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        this.audioContext = morseAudioContext.getAudioContext();  // must have already been init()
 
         if (spectrogramCallback !== undefined) this.spectrogramCallback = spectrogramCallback;
         if (frequencyFilterCallback !== undefined) this.frequencyFilterCallback = frequencyFilterCallback;
