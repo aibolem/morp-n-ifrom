@@ -57,7 +57,8 @@ export default class MorsePlayerWAA {
         this.loop = false;
         this.fallbackFrequency = defaultFrequency;
         this._frequency = undefined;
-        this._startPadding = startPadding;
+        this.startPadding = startPadding;
+        this._initialStartPadding = 200;  // ms
         this.endPadding = endPadding;
         this.volume = volume;
 
@@ -294,8 +295,10 @@ export default class MorsePlayerWAA {
         // basically set the time base to now but
         //    - to work after a pause: subtract the start time of the next note so that it will play immediately
         //    - to avoid clipping the first note: add on startPadding
-        this._tZero = morseAudioContext.getAudioContext().currentTime - this._cTimings[this._nextNote] + this._startPadding / 1000;
-        this._startPadding = 0;  // only use it once
+        this._tZero = morseAudioContext.getAudioContext().currentTime - 
+            this._cTimings[this._nextNote] + 
+            Math.max(this.startPadding, this._initialStartPadding) / 1000;
+        this._initialStartPadding = 0;  // only use it once
         // schedule the first note ASAP (directly) and then if there is more to schedule, set up an interval timer
         if (this._scheduleNotes()) {
             this._timer = setInterval(function() {
