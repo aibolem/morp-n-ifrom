@@ -34,6 +34,7 @@ export default class MorseAdaptiveDecoder extends MorseDecoder {
     /**
      * 
      * @param {Object} params - dictionary of optional parameters.
+     * @param {string} [params.dictionary='international'] - optional dictionary to use. Must have same timing as 'international'.
      * @param {string[]} params.dictionaryOptions - optional additional dictionaries such as 'prosigns'.
      * @param {number} params.wpm - speed in words per minute using "PARIS " as the standard word.
      * @param {number} params.fwpm - farnsworth speed.
@@ -41,8 +42,8 @@ export default class MorseAdaptiveDecoder extends MorseDecoder {
      * @param {function()} params.speedCallback - Callback executed with {wpm: number, fwpm: number} if the wpm or fwpm speed changes. The speed in this class doesn't change by itself, but e.g. the fwpm can change if wpm is changed. Returned dictionary has keys 'fwpm' and 'wpm'.
      * @param {number} [bufferSize=30] - Size of the buffer to average over
      */
-    constructor({dictionaryOptions, wpm, fwpm, messageCallback, speedCallback, bufferSize=30} = {}) {
-        super({dictionaryOptions, wpm, fwpm, messageCallback, speedCallback});
+    constructor({dictionary='international', dictionaryOptions, wpm, fwpm, messageCallback, speedCallback, bufferSize=30} = {}) {
+        super({dictionary, dictionaryOptions, wpm, fwpm, messageCallback, speedCallback});
         this.bufferSize = bufferSize;
         this.ditLengths = [];
         this.fditLengths = [];

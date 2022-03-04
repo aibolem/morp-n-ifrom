@@ -18,76 +18,84 @@ import { dictionaries } from "./dictionary/index.js";
 
 export default class Morse {
     /**
-     * 
+     *
      * @param {Object} params - dictionary of optional parameters.
-     * @param {String} [params.dictionary='international'] - which dictionary to use, e.g. 'international' or 'american'.
-     * @param {String[]} [params.dictionaryOptions=[]] - optional additional dictionaries such as 'prosigns'.
+     * @param {String} [params.dictionary='international'] - which dictionary to use, e.g. 'international' or 'american'. Can optionally take a list of dictionary strings.
+     * @param {String[]} [params.dictionaryOptions=[]] - optional additional dictionaries such as 'prosigns'. Will look these up in the merged dictionary formed of the list of dictionaries.
      */
     constructor({dictionary='international', dictionaryOptions=[]} = {}) {
-        if (dictionary in dictionaries) {
-            this.dictionary = dictionaries[dictionary];
-        } else {
-            throw "No dictionary called '" + dictionary + "'";
+        if (typeof dictionary === 'string') {
+            dictionary = [dictionary];
         }
+        this.setDictionariesAndOptions(dictionary, dictionaryOptions);
+    }
 
-        //TODO: need to keep an ordered list of dicts so we can rebuild when one is removed and they can override each other
+    setDictionariesAndOptions(dictList, optionList) {
+        this.dictionaries = dictList;
+        this.options = optionList;
+        this._loadDictionaries();
+    }
+
+    /**
+     * Set the list of dictionaries to use.
+     * @param {List} dictList - list of dictionary names
+     */
+    setDictionaries(dictList) {
+        this.dictionaries = dictList;
+        this._loadDictionaries();
+    }
+
+    /**
+     * Set the list of dictionary options to use.
+     * @param {List} optionList - list of dictionary option names. Looked up in merged dictionary
+     */
+    setOptions(optionList) {
+        this.options = optionList;
+        this._loadDictionaries()
+    }
+
+    _loadDictionaries() {
+        // Clear any existing mappings:
         this.text2morseD = {};
         this.morse2textD = {};
-        this.addDict({letter:{'':''}});
-        this.addDict(this.dictionary);
-        this.letterMatch = this.dictionary.letterMatch;
-        for (let i = 0; i < dictionaryOptions.length; i++) {
-            this.addOption(dictionaryOptions[i]);
+        // Set up sensible default:
+        this._addDictionary({
+            letter:{'':''},
+            letterMatch:/^./
+        });
+        // Load in all dictionaries:
+        for (let d of this.dictionaries) {
+            if (d in dictionaries) {
+                let dict = dictionaries[d]  // switch to the imported dict
+                this._addDictionary(dict);
+            } else {
+                throw `No dictionary called '${d}'`;
+            }
+        }
+        // Overlay any options:
+        for (let optName of this.options) {
+            if (this.dictionary.options[optName] !== undefined) {
+                this._addDictionary(this.dictionary.options[optName])
+            } else {
+                throw `No option '${optName}' in '${this.dictionary.id}'`;
+            }
         }
     }
 
     /**
-     * Add an additional dictionary to the one being used for translation.
+     * Load in a dictionary.
      * Dictionary needs 'letter' and (optional) 'letterMatch' keys.
-     * @param {Object} dict 
+     * @param {Object} dict
      */
-    addDict(dict) {
-        let letters = dict.letter
+    _addDictionary(dict) {
+        this.dictionary = {...this.dictionary, ...dict};  // overwrite any existing keys with the new dict
+
+        let letters = dict.letter;
         for (let letter in letters) {
+            // overwrite any existing letter keys
             this.text2morseD[letter] = letters[letter];
             this.morse2textD[letters[letter]] = letter;
         }
-        if (dict.letterMatch) {
-            // TODO: here we switch to a special letter match regexp if it exists. This is not really going to work if there is more than one option
-            this.letterMatch = dict.letterMatch;
-        }
-    }
-
-    addOption(optName) {
-        if (this.dictionary.options[optName] !== undefined) {
-            this.addDict(this.dictionary.options[optName])
-        } else {
-            throw "No option '" + optName + "' in '" + this.dictionary.id + "'";
-        }
-        
-    }
-
-    //TODO: sort this out. removeDict doesn't work the same as addDict and cannot remove the base dict
-
-    /**
-     * Remove an additional dictionary to the one being used for translation.
-     * Either takes a named dictionary to be found as a key in this.dictionary.options or an actual dictionary with letter and letterMatch keys.
-     * @param {String or Map} dict 
-     */
-    removeDict(dict) {
-        if (typeof dict === 'string') {
-            dict = this.dictionary.options[dict];
-        }
-        let letters = dict.letter;
-        for (let letter in letters) {
-            delete this.text2morseD[letter];
-            delete this.morse2textD[letters[letter]];
-        }
-        this.letterMatch = this.dictionary.letterMatch;  // revert to base letterMatch regexp
-    }
-
-    removeOption(optName) {
-        this.removeDict(this.dictionary.options[optName])
     }
 
     /**
@@ -112,11 +120,10 @@ export default class Morse {
                         tokens[i][j] = errorPrefix + tokens[i][j] + errorSuffix;
                     }
                 }
-            }    
+            }
         }
         let words = tokens.map(word => word.join(charSpace));
-        let sentence = words.join(wordSpace);
-        return sentence;
+        return words.join(wordSpace);
     }
 
     /**
@@ -141,7 +148,7 @@ export default class Morse {
         for (let word of words) {
             let letters = [];
             while (word.length) {
-                let letter = word.match(this.letterMatch)[0];
+                let letter = word.match(this.dictionary.letterMatch)[0];
                 word = word.substr(letter.length);
                 letters.push(letter);
             }
@@ -174,7 +181,7 @@ export default class Morse {
     }
 
     /**
-     * 
+     *
      * @param {Array} textTokens - list of lists of text tokens
      * @returns Map - text: text tokens, morse: morse tokens, error: error tokens, hasError Boolean
      */
@@ -198,13 +205,13 @@ export default class Morse {
     }
 
     displayMorse(morseTokens) {
-        return this.display(morseTokens, 
+        return this.display(morseTokens,
             this.dictionary.display.join.charSpace, this.dictionary.display.join.wordSpace, this.dictionary.display.morse);
     }
 
     displayMorseErrors(morseTokens, errorTokens, prefix, suffix) {
-        return this.display(morseTokens, 
-            this.dictionary.display.join.charSpace, this.dictionary.display.join.wordSpace, this.dictionary.display.morse, 
+        return this.display(morseTokens,
+            this.dictionary.display.join.charSpace, this.dictionary.display.join.wordSpace, this.dictionary.display.morse,
             errorTokens, prefix, suffix);
     }
 

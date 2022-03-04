@@ -33,14 +33,15 @@ export default class MorseDecoder extends MorseCW {
     /**
      * 
      * @param {Object} params - dictionary of optional parameters.
+     * @param {string} [params.dictionary='international'] - optional dictionary to use. Must have same timing as 'international'.
      * @param {string[]} params.dictionaryOptions - optional additional dictionaries such as 'prosigns'.
      * @param {number} params.wpm - speed in words per minute using "PARIS " as the standard word.
      * @param {number} params.fwpm - farnsworth speed.
      * @param {function()} params.messageCallback - Callback executed with {message: string, timings: number[], morse: string} when decoder buffer is flushed (every character).
      * @param {function()} params.speedCallback - Callback executed with {wpm: number, fwpm: number} if the wpm or fwpm speed changes. The speed in this class doesn't change by itself, but e.g. the fwpm can change if wpm is changed. Returned dictionary has keys 'fwpm' and 'wpm'.
     */
-    constructor({dictionaryOptions, wpm, fwpm, messageCallback, speedCallback} = {}) {
-        super({dictionary:'international', dictionaryOptions, wpm, fwpm});
+    constructor({dictionary='international', dictionaryOptions, wpm, fwpm, messageCallback, speedCallback} = {}) {
+        super({dictionary, dictionaryOptions, wpm, fwpm});
         if (messageCallback !== undefined) this.messageCallback = messageCallback;
         if (speedCallback !== undefined) this.speedCallback = speedCallback;  // function receives dictionary with wpm and fwpm set when the speed changes
         this.timings = [];  // all the ms timings received, all +ve
