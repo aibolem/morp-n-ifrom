@@ -27,7 +27,7 @@ class MorseAudioContext {
             if (this.audioContext.state === "running") {
                 // console.log("AC is running");
             } else {
-                console.log("AudioContext is suspended");
+                // console.log("AudioContext is suspended");
                 this.audioContext.resume().then(() => {this.runUnlockedActions(1)});
             }
         } else {
