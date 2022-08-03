@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.0.0">
+  <zoom_level>8</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>328</x>
+      <y>408</y>
+      <w>168</w>
+      <h>288</h>
+    </coordinates>
+    <panel_attributes>MorsePlayerWAA
+--
++ playMode
++ loop
++ fallbackFrequency
++ startPadding
++ endPadding
++ volume
++ frequency
++ sequenceStartCallback
++ sequenceEndingCallback
++ sequenceEndCallback
++ soundStoppedCallback
+--
++ muteAudio()
++ load()
++ loadNext()
++ queue()
++ playFromStart()
++ play()
++ pause()
++ stop()
++ hasError()
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>328</x>
+      <y>256</y>
+      <w>168</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>MorsePlayerWAALight
+--
++ soundOnCallback
++ soundOffCallback
+--
++ muteLight()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>400</x>
+      <y>344</y>
+      <w>24</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>560</x>
+      <y>256</y>
+      <w>168</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>MorseKeyerIambic
+--
++ ditGoesFirst
++ iambicA
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>560</x>
+      <y>408</y>
+      <w>168</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>MorseKeyer
+--
++ keyCallback
++ ditLen
++ fDitLen
+--
++ start()
++ stop()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>632</x>
+      <y>344</y>
+      <w>24</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>96</x>
+      <y>256</y>
+      <w>168</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>MorseListenerAdaptive
+--
++ lockFrequency
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>96</x>
+      <y>408</y>
+      <w>168</w>
+      <h>288</h>
+    </coordinates>
+    <panel_attributes>MorseListener
+--
++ fftSize
++ volumeFilterMin
++ volumeFilterMax
++ frequencyFilterMin
++ frequencyFilterMax
++ volumeThreshold
++ flushTime
++ spectrogramCallback
++ frequencyFilterCallback
++ volumeFilterCallback
++ volumeThresholdCallback
++ micSuccessCallback
++ micErrorCallback
++ fileLoadCallback
++ fileErrorCallback
++ EOFCallback
+--
++ startListening()
++ loadArrayBuffer()
++ playArrayBuffer()
++ stop()
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>176</x>
+      <y>344</y>
+      <w>24</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>488</x>
+      <y>456</y>
+      <w>88</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>90.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>792</x>
+      <y>256</y>
+      <w>168</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>MorseDecoderAdaptive
+--
++ bufferSize
++ lockSpeed
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>792</x>
+      <y>408</y>
+      <w>168</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>MorseDecoder
+--
++ messageCallback
++ speedCallback
+--
++ addTiming()
++ flush()
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>864</x>
+      <y>344</y>
+      <w>24</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>720</x>
+      <y>456</y>
+      <w>88</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;90.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>256</x>
+      <y>472</y>
+      <w>552</w>
+      <h>272</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;10.0;50.0;320.0;630.0;320.0;630.0;10.0;670.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>792</x>
+      <y>552</y>
+      <w>168</w>
+      <h>224</h>
+    </coordinates>
+    <panel_attributes>MorseCW
+--
++ wpm
++ fwpm
+--
++ testWPMmatchesRatio()
++ testFWPMmatchesRatio()
++ setRatio()
++ morseTokens2timing()
++ getDuration()
++ setWPMfromDitLen()
++ setFWPMfromRatio()
++ setLength()
++ get baseLength()
++ get lengths()
++ get maxLength()
++ get wordSpace()
++ get farnsworthRatio()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>864</x>
+      <y>496</y>
+      <w>24</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>560</x>
+      <y>48</y>
+      <w>168</w>
+      <h>136</h>
+    </coordinates>
+    <panel_attributes>_Singleton:MorseAudioContext_
+--
+
+--
++ getAudioContext()
++ closeAudioContext()
++ isUnlocked()
++ loadSample()
++ decodeSample()
++ getSounds()
++ init()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>256</x>
+      <y>104</y>
+      <w>320</w>
+      <h>360</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;430.0;50.0;430.0;50.0;10.0;380.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>400</x>
+      <y>128</y>
+      <w>176</w>
+      <h>144</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;160.0;10.0;10.0;200.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>488</x>
+      <y>152</y>
+      <w>88</w>
+      <h>312</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;370.0;50.0;370.0;50.0;10.0;90.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>792</x>
+      <y>808</y>
+      <w>168</w>
+      <h>272</h>
+    </coordinates>
+    <panel_attributes>Morse
+--
++ dictionaries
++ options
+--
++ setDictionaries()
++ setOptions()
++ display()
++ tidyText()
++ tokeniseRawText()
++ tokeniseText()
++ displayText()
++ displayTextErrors()
++ textTokens2morse
++ text2morse()
++ tokeniseMorse()
++ displayMorse()
++ displayMorseErrors()
++ morseTokens2text()
++ morse2text()
++ looksLikeMorse()
++ text2morseClean()
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>864</x>
+      <y>768</y>
+      <w>24</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>560</x>
+      <y>808</y>
+      <w>168</w>
+      <h>168</h>
+    </coordinates>
+    <panel_attributes>_Object:Dictionary_
+--
++ id
++ letter
++ letterMatch
++ ratio
++ baseElement
++ frequency
++ display
++ tokeniseMorse
++ morseMatch
++ displayName
++ options
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>720</x>
+      <y>872</y>
+      <w>88</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>90.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1256</x>
+      <y>408</y>
+      <w>168</w>
+      <h>264</h>
+    </coordinates>
+    <panel_attributes>MorseMessage
+--
++ rawInput
++ inputWasMorse
++ text
++ textTokens
++ morse
++ morseTokens
++ errors
++ hasError
+--
++ translate()
++ loadMorse()
++ loadText()
++ cleanText()
++ get timings()
++ get wave()
++ getInputErrorString()
++ getOutputErrorString()
++ getTextErrorString()
++ getMorseErrorString()
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1016</x>
+      <y>408</y>
+      <w>168</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>MorseCWWave
+--
++ frequency
++ sampleRate
+--
++ getSample()
++ getWAASample
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>904</x>
+      <y>488</y>
+      <w>216</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;80.0;10.0;50.0;250.0;50.0;250.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1176</x>
+      <y>456</y>
+      <w>96</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>100.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+</diagram>
