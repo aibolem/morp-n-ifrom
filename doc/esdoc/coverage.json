@@ -1,0 +1,376 @@
+{
+  "coverage": "42.24%",
+  "expectCount": 374,
+  "actualCount": 158,
+  "files": {
+    "src/dictionary/american.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        1
+      ]
+    },
+    "src/dictionary/arabic.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        1
+      ]
+    },
+    "src/dictionary/cyrillic-ukraine.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        1
+      ]
+    },
+    "src/dictionary/cyrillic.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        1
+      ]
+    },
+    "src/dictionary/hebrew.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        1
+      ]
+    },
+    "src/dictionary/index.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        8
+      ]
+    },
+    "src/dictionary/international.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        1
+      ]
+    },
+    "src/morse-pro-audiocontext.js": {
+      "expectCount": 18,
+      "actualCount": 2,
+      "undocumentLines": [
+        1,
+        2,
+        3,
+        5,
+        11,
+        12,
+        14,
+        35,
+        53,
+        74,
+        81,
+        85,
+        99,
+        112,
+        116,
+        131
+      ]
+    },
+    "src/morse-pro-compat.js": {
+      "expectCount": 5,
+      "actualCount": 5,
+      "undocumentLines": []
+    },
+    "src/morse-pro-cw-compat.js": {
+      "expectCount": 12,
+      "actualCount": 10,
+      "undocumentLines": [
+        44,
+        46
+      ]
+    },
+    "src/morse-pro-cw-wave.js": {
+      "expectCount": 6,
+      "actualCount": 6,
+      "undocumentLines": []
+    },
+    "src/morse-pro-cw.js": {
+      "expectCount": 33,
+      "actualCount": 20,
+      "undocumentLines": [
+        15,
+        42,
+        43,
+        54,
+        55,
+        56,
+        59,
+        60,
+        72,
+        93,
+        127,
+        245,
+        266
+      ]
+    },
+    "src/morse-pro-decoder-adaptive.js": {
+      "expectCount": 9,
+      "actualCount": 3,
+      "undocumentLines": [
+        47,
+        48,
+        49,
+        53,
+        110,
+        113
+      ]
+    },
+    "src/morse-pro-decoder.js": {
+      "expectCount": 32,
+      "actualCount": 17,
+      "undocumentLines": [
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        59,
+        60,
+        63,
+        68,
+        101,
+        107,
+        121,
+        305,
+        306
+      ]
+    },
+    "src/morse-pro-keyer-iambic.js": {
+      "expectCount": 7,
+      "actualCount": 2,
+      "undocumentLines": [
+        23,
+        33,
+        34,
+        67,
+        68
+      ]
+    },
+    "src/morse-pro-keyer.js": {
+      "expectCount": 14,
+      "actualCount": 7,
+      "undocumentLines": [
+        47,
+        48,
+        49,
+        52,
+        53,
+        54,
+        96
+      ]
+    },
+    "src/morse-pro-listener-adaptive.js": {
+      "expectCount": 9,
+      "actualCount": 3,
+      "undocumentLines": [
+        42,
+        43,
+        44,
+        48,
+        49,
+        78
+      ]
+    },
+    "src/morse-pro-listener.js": {
+      "expectCount": 52,
+      "actualCount": 15,
+      "undocumentLines": [
+        21,
+        75,
+        87,
+        89,
+        90,
+        91,
+        92,
+        93,
+        97,
+        110,
+        112,
+        113,
+        115,
+        134,
+        154,
+        168,
+        169,
+        173,
+        192,
+        212,
+        216,
+        225,
+        229,
+        232,
+        244,
+        267,
+        358,
+        359,
+        386,
+        387,
+        388,
+        389,
+        390,
+        391,
+        392,
+        393,
+        394
+      ]
+    },
+    "src/morse-pro-message.js": {
+      "expectCount": 22,
+      "actualCount": 3,
+      "undocumentLines": [
+        37,
+        38,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        78,
+        87,
+        94,
+        101,
+        106,
+        110,
+        128,
+        136,
+        140
+      ]
+    },
+    "src/morse-pro-player-waa-light.js": {
+      "expectCount": 15,
+      "actualCount": 7,
+      "undocumentLines": [
+        39,
+        60,
+        61,
+        81,
+        83,
+        125,
+        146,
+        147
+      ]
+    },
+    "src/morse-pro-player-waa.js": {
+      "expectCount": 60,
+      "actualCount": 26,
+      "undocumentLines": [
+        50,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        91,
+        95,
+        98,
+        102,
+        105,
+        107,
+        121,
+        132,
+        142,
+        148,
+        158,
+        160,
+        231,
+        236,
+        265,
+        293,
+        394
+      ]
+    },
+    "src/morse-pro-player-xas.js": {
+      "expectCount": 23,
+      "actualCount": 6,
+      "undocumentLines": [
+        31,
+        32,
+        33,
+        34,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        85,
+        87,
+        109,
+        143,
+        150,
+        154,
+        158
+      ]
+    },
+    "src/morse-pro-util-datauri.js": {
+      "expectCount": 2,
+      "actualCount": 2,
+      "undocumentLines": []
+    },
+    "src/morse-pro-util-riffwave.js": {
+      "expectCount": 6,
+      "actualCount": 2,
+      "undocumentLines": [
+        27,
+        31,
+        42,
+        98
+      ]
+    },
+    "src/morse-pro-wpm.js": {
+      "expectCount": 14,
+      "actualCount": 12,
+      "undocumentLines": [
+        30,
+        88
+      ]
+    },
+    "src/morse-pro.js": {
+      "expectCount": 28,
+      "actualCount": 10,
+      "undocumentLines": [
+        19,
+        33,
+        34,
+        35,
+        57,
+        59,
+        60,
+        91,
+        179,
+        198,
+        203,
+        207,
+        212,
+        218,
+        228,
+        233,
+        237,
+        270
+      ]
+    }
+  }
+}

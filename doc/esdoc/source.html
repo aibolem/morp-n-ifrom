@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href>
+  <title data-ice="title">Source | morse-pro</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files."><meta property="twitter:card" content="summary"><meta property="twitter:title" content="morse-pro"><meta property="twitter:description" content="Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files."></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a href="https://gitlab.com/scphillips/morse-pro.git">Repository</a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-audiocontext.js~MorseAudioContext.html">MorseAudioContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw-compat.js~MorseCW.html">MorseCW</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw-wave.js~MorseCWWave.html">MorseCWWave</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw.js~MorseCW.html">MorseCW</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-decoder-adaptive.js~MorseAdaptiveDecoder.html">MorseAdaptiveDecoder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-decoder.js~MorseDecoder.html">MorseDecoder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-keyer-iambic.js~MorseIambicKeyer.html">MorseIambicKeyer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-keyer.js~MorseKeyer.html">MorseKeyer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-listener-adaptive.js~MorseAdaptiveListener.html">MorseAdaptiveListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-listener.js~MorseListener.html">MorseListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-message.js~MorseMessage.html">MorseMessage</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-waa-light.js~MorsePlayerWAALight.html">MorsePlayerWAALight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-waa.js~MorsePlayerWAA.html">MorsePlayerWAA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-xas.js~MorsePlayerXAS.html">MorsePlayerXAS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro.js~Morse.html">Morse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-looksLikeMorse">looksLikeMorse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-morse2text">morse2text</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-text2ditdah">text2ditdah</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-text2morse">text2morse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-tidyMorse">tidyMorse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDataURI">getDataURI</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getData">getData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getMIMEType">getMIMEType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-charSpace">charSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-dahLength">dahLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ditLength">ditLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ditSpace">ditSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fditLength">fditLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fwpm">fwpm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ratio">ratio</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-wordSpace">wordSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-wpm">wpm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-morseAudioContext">morseAudioContext</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#dictionary">dictionary</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionaries">dictionaries</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1>Source <img data-ice="coverageBadge" src="./badge.svg"><span data-ice="totalCoverageCount" class="total-coverage-count">158/374</span></h1>
+
+<table class="files-summary" data-ice="files" data-use-coverage="true">
+  <thead>
+    <tr>
+      <td>File</td>
+      <td>Identifier</td>
+      <td class="coverage">Document</td>
+      <td style="display: none;">Size</td>
+      <td style="display: none;">Lines</td>
+      <td style="display: none;">Updated</td>
+    </tr>
+  </thead>
+  <tbody>
+    
+  <tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/dictionary/american.js.html#errorLines=1">src/dictionary/american.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></td>
+      <td class="coverage"><span data-ice="coverage">0 %</span><span data-ice="coverageCount" class="coverage-count">0/1</span></td>
+      <td style="display: none;" data-ice="size">3214 byte</td>
+      <td style="display: none;" data-ice="lines">126</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 12:44:47 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/dictionary/arabic.js.html#errorLines=1">src/dictionary/arabic.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></td>
+      <td class="coverage"><span data-ice="coverage">0 %</span><span data-ice="coverageCount" class="coverage-count">0/1</span></td>
+      <td style="display: none;" data-ice="size">3120 byte</td>
+      <td style="display: none;" data-ice="lines">121</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 12:44:47 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/dictionary/cyrillic-ukraine.js.html#errorLines=1">src/dictionary/cyrillic-ukraine.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></td>
+      <td class="coverage"><span data-ice="coverage">0 %</span><span data-ice="coverageCount" class="coverage-count">0/1</span></td>
+      <td style="display: none;" data-ice="size">3007 byte</td>
+      <td style="display: none;" data-ice="lines">119</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 12:44:47 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/dictionary/cyrillic.js.html#errorLines=1">src/dictionary/cyrillic.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></td>
+      <td class="coverage"><span data-ice="coverage">0 %</span><span data-ice="coverageCount" class="coverage-count">0/1</span></td>
+      <td style="display: none;" data-ice="size">2945 byte</td>
+      <td style="display: none;" data-ice="lines">117</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 12:44:47 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/dictionary/hebrew.js.html#errorLines=1">src/dictionary/hebrew.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></td>
+      <td class="coverage"><span data-ice="coverage">0 %</span><span data-ice="coverageCount" class="coverage-count">0/1</span></td>
+      <td style="display: none;" data-ice="size">2933 byte</td>
+      <td style="display: none;" data-ice="lines">114</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 12:44:47 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/dictionary/index.js.html#errorLines=8">src/dictionary/index.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="variable/index.html#static-variable-dictionaries">dictionaries</a></span></td>
+      <td class="coverage"><span data-ice="coverage">0 %</span><span data-ice="coverageCount" class="coverage-count">0/1</span></td>
+      <td style="display: none;" data-ice="size">593 byte</td>
+      <td style="display: none;" data-ice="lines">15</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 12:44:47 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/dictionary/international.js.html#errorLines=1">src/dictionary/international.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></td>
+      <td class="coverage"><span data-ice="coverage">0 %</span><span data-ice="coverageCount" class="coverage-count">0/1</span></td>
+      <td style="display: none;" data-ice="size">4963 byte</td>
+      <td style="display: none;" data-ice="lines">174</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 12:44:47 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/morse-pro-audiocontext.js.html#errorLines=1,11,112,116,12,131,14,2,3,35,5,53,74,81,85,99">src/morse-pro-audiocontext.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="class/src/morse-pro-audiocontext.js~MorseAudioContext.html">MorseAudioContext</a></span>
+<span><a href="variable/index.html#static-variable-morseAudioContext">morseAudioContext</a></span></td>
+      <td class="coverage"><span data-ice="coverage">11 %</span><span data-ice="coverageCount" class="coverage-count">2/18</span></td>
+      <td style="display: none;" data-ice="size">6957 byte</td>
+      <td style="display: none;" data-ice="lines">131</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 12:44:47 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/morse-pro-compat.js.html">src/morse-pro-compat.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="function/index.html#static-function-looksLikeMorse">looksLikeMorse</a></span>
+<span><a href="function/index.html#static-function-morse2text">morse2text</a></span>
+<span><a href="function/index.html#static-function-text2ditdah">text2ditdah</a></span>
+<span><a href="function/index.html#static-function-text2morse">text2morse</a></span>
+<span><a href="function/index.html#static-function-tidyMorse">tidyMorse</a></span></td>
+      <td class="coverage"><span data-ice="coverage">100 %</span><span data-ice="coverageCount" class="coverage-count">5/5</span></td>
+      <td style="display: none;" data-ice="size">5599 byte</td>
+      <td style="display: none;" data-ice="lines">149</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 15:51:42 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/morse-pro-cw-compat.js.html#errorLines=44,46">src/morse-pro-cw-compat.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="class/src/morse-pro-cw-compat.js~MorseCW.html">MorseCW</a></span></td>
+      <td class="coverage"><span data-ice="coverage">83 %</span><span data-ice="coverageCount" class="coverage-count">10/12</span></td>
+      <td style="display: none;" data-ice="size">5050 byte</td>
+      <td style="display: none;" data-ice="lines">145</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 15:50:54 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/morse-pro-cw-wave.js.html">src/morse-pro-cw-wave.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="class/src/morse-pro-cw-wave.js~MorseCWWave.html">MorseCWWave</a></span></td>
+      <td class="coverage"><span data-ice="coverage">100 %</span><span data-ice="coverageCount" class="coverage-count">6/6</span></td>
+      <td style="display: none;" data-ice="size">7695 byte</td>
+      <td style="display: none;" data-ice="lines">159</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 12:44:47 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/morse-pro-cw.js.html#errorLines=127,15,245,266,42,43,54,55,56,59,60,72,93">src/morse-pro-cw.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="class/src/morse-pro-cw.js~MorseCW.html">MorseCW</a></span></td>
+      <td class="coverage"><span data-ice="coverage">60 %</span><span data-ice="coverageCount" class="coverage-count">20/33</span></td>
+      <td style="display: none;" data-ice="size">11132 byte</td>
+      <td style="display: none;" data-ice="lines">284</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 14:23:01 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/morse-pro-decoder-adaptive.js.html#errorLines=110,113,47,48,49,53">src/morse-pro-decoder-adaptive.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="class/src/morse-pro-decoder-adaptive.js~MorseAdaptiveDecoder.html">MorseAdaptiveDecoder</a></span></td>
+      <td class="coverage"><span data-ice="coverage">33 %</span><span data-ice="coverageCount" class="coverage-count">3/9</span></td>
+      <td style="display: none;" data-ice="size">4860 byte</td>
+      <td style="display: none;" data-ice="lines">118</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 12:44:47 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/morse-pro-decoder.js.html#errorLines=101,107,121,305,306,47,48,49,50,51,52,59,60,63,68">src/morse-pro-decoder.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="class/src/morse-pro-decoder.js~MorseDecoder.html">MorseDecoder</a></span></td>
+      <td class="coverage"><span data-ice="coverage">53 %</span><span data-ice="coverageCount" class="coverage-count">17/32</span></td>
+      <td style="display: none;" data-ice="size">11787 byte</td>
+      <td style="display: none;" data-ice="lines">307</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 15:47:04 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/morse-pro-keyer-iambic.js.html#errorLines=23,33,34,67,68">src/morse-pro-keyer-iambic.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="class/src/morse-pro-keyer-iambic.js~MorseIambicKeyer.html">MorseIambicKeyer</a></span></td>
+      <td class="coverage"><span data-ice="coverage">28 %</span><span data-ice="coverageCount" class="coverage-count">2/7</span></td>
+      <td style="display: none;" data-ice="size">3206 byte</td>
+      <td style="display: none;" data-ice="lines">71</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 12:44:47 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/morse-pro-keyer.js.html#errorLines=47,48,49,52,53,54,96">src/morse-pro-keyer.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="class/src/morse-pro-keyer.js~MorseKeyer.html">MorseKeyer</a></span></td>
+      <td class="coverage"><span data-ice="coverage">50 %</span><span data-ice="coverageCount" class="coverage-count">7/14</span></td>
+      <td style="display: none;" data-ice="size">5814 byte</td>
+      <td style="display: none;" data-ice="lines">147</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 12:44:47 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/morse-pro-listener-adaptive.js.html#errorLines=42,43,44,48,49,78">src/morse-pro-listener-adaptive.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="class/src/morse-pro-listener-adaptive.js~MorseAdaptiveListener.html">MorseAdaptiveListener</a></span></td>
+      <td class="coverage"><span data-ice="coverage">33 %</span><span data-ice="coverageCount" class="coverage-count">3/9</span></td>
+      <td style="display: none;" data-ice="size">3300 byte</td>
+      <td style="display: none;" data-ice="lines">82</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 12:44:47 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/morse-pro-listener.js.html#errorLines=110,112,113,115,134,154,168,169,173,192,21,212,216,225,229,232,244,267,358,359,386,387,388,389,390,391,392,393,394,75,87,89,90,91,92,93,97">src/morse-pro-listener.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="class/src/morse-pro-listener.js~MorseListener.html">MorseListener</a></span></td>
+      <td class="coverage"><span data-ice="coverage">28 %</span><span data-ice="coverageCount" class="coverage-count">15/52</span></td>
+      <td style="display: none;" data-ice="size">19816 byte</td>
+      <td style="display: none;" data-ice="lines">416</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 12:44:47 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/morse-pro-message.js.html#errorLines=101,106,110,128,136,140,37,38,40,41,42,43,44,45,46,47,78,87,94">src/morse-pro-message.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="class/src/morse-pro-message.js~MorseMessage.html">MorseMessage</a></span></td>
+      <td class="coverage"><span data-ice="coverage">13 %</span><span data-ice="coverageCount" class="coverage-count">3/22</span></td>
+      <td style="display: none;" data-ice="size">4966 byte</td>
+      <td style="display: none;" data-ice="lines">143</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 12:44:47 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/morse-pro-player-waa-light.js.html#errorLines=125,146,147,39,60,61,81,83">src/morse-pro-player-waa-light.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="class/src/morse-pro-player-waa-light.js~MorsePlayerWAALight.html">MorsePlayerWAALight</a></span></td>
+      <td class="coverage"><span data-ice="coverage">46 %</span><span data-ice="coverageCount" class="coverage-count">7/15</span></td>
+      <td style="display: none;" data-ice="size">6924 byte</td>
+      <td style="display: none;" data-ice="lines">148</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 15:37:52 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/morse-pro-player-waa.js.html#errorLines=102,105,107,121,132,142,148,158,160,231,236,265,293,394,50,57,58,59,60,61,62,65,66,67,68,69,70,71,72,73,74,91,95,98">src/morse-pro-player-waa.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="class/src/morse-pro-player-waa.js~MorsePlayerWAA.html">MorsePlayerWAA</a></span></td>
+      <td class="coverage"><span data-ice="coverage">43 %</span><span data-ice="coverageCount" class="coverage-count">26/60</span></td>
+      <td style="display: none;" data-ice="size">22634 byte</td>
+      <td style="display: none;" data-ice="lines">525</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 15:37:27 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/morse-pro-player-xas.js.html#errorLines=109,143,150,154,158,31,32,33,34,37,38,39,40,41,42,85,87">src/morse-pro-player-xas.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="class/src/morse-pro-player-xas.js~MorsePlayerXAS.html">MorsePlayerXAS</a></span></td>
+      <td class="coverage"><span data-ice="coverage">26 %</span><span data-ice="coverageCount" class="coverage-count">6/23</span></td>
+      <td style="display: none;" data-ice="size">6024 byte</td>
+      <td style="display: none;" data-ice="lines">166</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 12:44:47 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/morse-pro-util-datauri.js.html">src/morse-pro-util-datauri.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="function/index.html#static-function-getDataURI">getDataURI</a></span></td>
+      <td class="coverage"><span data-ice="coverage">100 %</span><span data-ice="coverageCount" class="coverage-count">2/2</span></td>
+      <td style="display: none;" data-ice="size">2058 byte</td>
+      <td style="display: none;" data-ice="lines">72</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 12:44:47 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/morse-pro-util-riffwave.js.html#errorLines=27,31,42,98">src/morse-pro-util-riffwave.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="function/index.html#static-function-getData">getData</a></span>
+<span><a href="function/index.html#static-function-getMIMEType">getMIMEType</a></span></td>
+      <td class="coverage"><span data-ice="coverage">33 %</span><span data-ice="coverageCount" class="coverage-count">2/6</span></td>
+      <td style="display: none;" data-ice="size">3693 byte</td>
+      <td style="display: none;" data-ice="lines">100</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 12:44:47 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/morse-pro-wpm.js.html#errorLines=30,88">src/morse-pro-wpm.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="function/index.html#static-function-charSpace">charSpace</a></span>
+<span><a href="function/index.html#static-function-dahLength">dahLength</a></span>
+<span><a href="function/index.html#static-function-ditLength">ditLength</a></span>
+<span><a href="function/index.html#static-function-ditSpace">ditSpace</a></span>
+<span><a href="function/index.html#static-function-fditLength">fditLength</a></span>
+<span><a href="function/index.html#static-function-fwpm">fwpm</a></span>
+<span><a href="function/index.html#static-function-ratio">ratio</a></span>
+<span><a href="function/index.html#static-function-wordSpace">wordSpace</a></span>
+<span><a href="function/index.html#static-function-wpm">wpm</a></span></td>
+      <td class="coverage"><span data-ice="coverage">85 %</span><span data-ice="coverageCount" class="coverage-count">12/14</span></td>
+      <td style="display: none;" data-ice="size">4059 byte</td>
+      <td style="display: none;" data-ice="lines">113</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 12:44:47 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/morse-pro.js.html#errorLines=179,19,198,203,207,212,218,228,233,237,270,33,34,35,57,59,60,91">src/morse-pro.js</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="class/src/morse-pro.js~Morse.html">Morse</a></span></td>
+      <td class="coverage"><span data-ice="coverage">35 %</span><span data-ice="coverageCount" class="coverage-count">10/28</span></td>
+      <td style="display: none;" data-ice="size">10525 byte</td>
+      <td style="display: none;" data-ice="lines">279</td>
+      <td style="display: none;" data-ice="updated">2022-08-03 12:44:47 (UTC)</td>
+    </tr>
+</tbody>
+</table>
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

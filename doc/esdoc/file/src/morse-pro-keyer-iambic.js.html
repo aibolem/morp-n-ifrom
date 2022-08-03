@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/morse-pro-keyer-iambic.js | morse-pro</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files."><meta property="twitter:card" content="summary"><meta property="twitter:title" content="morse-pro"><meta property="twitter:description" content="Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files."></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a href="https://gitlab.com/scphillips/morse-pro.git">Repository</a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-audiocontext.js~MorseAudioContext.html">MorseAudioContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw-compat.js~MorseCW.html">MorseCW</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw-wave.js~MorseCWWave.html">MorseCWWave</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw.js~MorseCW.html">MorseCW</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-decoder-adaptive.js~MorseAdaptiveDecoder.html">MorseAdaptiveDecoder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-decoder.js~MorseDecoder.html">MorseDecoder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-keyer-iambic.js~MorseIambicKeyer.html">MorseIambicKeyer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-keyer.js~MorseKeyer.html">MorseKeyer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-listener-adaptive.js~MorseAdaptiveListener.html">MorseAdaptiveListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-listener.js~MorseListener.html">MorseListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-message.js~MorseMessage.html">MorseMessage</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-waa-light.js~MorsePlayerWAALight.html">MorsePlayerWAALight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-waa.js~MorsePlayerWAA.html">MorsePlayerWAA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-xas.js~MorsePlayerXAS.html">MorsePlayerXAS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro.js~Morse.html">Morse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-looksLikeMorse">looksLikeMorse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-morse2text">morse2text</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-text2ditdah">text2ditdah</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-text2morse">text2morse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-tidyMorse">tidyMorse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDataURI">getDataURI</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getData">getData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getMIMEType">getMIMEType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-charSpace">charSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-dahLength">dahLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ditLength">ditLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ditSpace">ditSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fditLength">fditLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fwpm">fwpm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ratio">ratio</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-wordSpace">wordSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-wpm">wpm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-morseAudioContext">morseAudioContext</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#dictionary">dictionary</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionaries">dictionaries</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/morse-pro-keyer-iambic.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/*!
+This code is &#xA9; Copyright Stephen C. Phillips, 2019.
+Email: steve@scphillips.com
+*/
+/*
+Licensed under the EUPL, Version 1.2 or &#x2013; as soon they will be approved by the European Commission - subsequent versions of the EUPL (the &quot;Licence&quot;);
+You may not use this work except in compliance with the Licence.
+You may obtain a copy of the Licence at: https://joinup.ec.europa.eu/community/eupl/
+Unless required by applicable law or agreed to in writing, software distributed under the Licence is distributed on an &quot;AS IS&quot; basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the Licence for the specific language governing permissions and limitations under the Licence.
+*/
+
+import MorseKeyer from &apos;./morse-pro-keyer&apos;;
+
+/*
+    The Morse iambic keyer tests for input on a timer, plays the appropriate tone and passes the data to a decoder.
+    If both keys are detected at once then this class alternates between dit and dah.
+    If iambic B mode is selected then if both keys were pressed and are then release, an additional dit or dah is sent.
+    Set &apos;ditGoesFirst&apos; to define whether to play dit or dah first.
+    Arguments: see MorseKeyer
+*/
+
+export default class MorseIambicKeyer extends MorseKeyer {
+    /**
+     * @param {Object} params - optional parameters.
+     * @param {function(): number} params.keyCallback - A function which should return 0, 1, 2, or 3 from the vitual &quot;paddle&quot; depending if nothing, a dit, a dah or both is detected. This implementation will play dits if both keys are detected.
+     * @param {MorseDecoder} params.decoder - Configured MorseDecoder.
+     * @param {MorsePlayerWAA} params.player - Configured MorsePlayerWAA.
+     * @param {boolean} [params.iambicA=true] - if true then use iambic A mode, otherwise use iambic B mode (which sends an additional dit or dah when squeeze is released).
+     */
+    constructor({keyCallback, decoder, player, iambicA=true}) {
+        super({keyCallback, decoder, player});
+        this.ditGoesFirst = true;  // if the initial signal is 3 then alternate but play a dit first
+        this.iambicA = iambicA;
+    }
+
+    /**
+     * @override
+     * @access private
+     */
+    _ditOrDah(input) {
+        var ditOrDah = undefined;
+        switch(input) {
+            case 0:
+                if (!this.iambicA) {
+                    // iambic B mode
+                    if (this._lastInput === 3) {
+                        // gone from both to nothing
+                        // once paddles are released, send one more dit or dah
+                        ditOrDah = !this._lastDitOrDah;
+                    }
+                }
+                break;
+            case 1:
+                ditOrDah = true;
+                break;
+            case 2:
+                ditOrDah = false;
+                break;
+            case 3:
+                if (this._lastDitOrDah === undefined) {
+                    ditOrDah = this.ditGoesFirst;
+                } else {
+                    ditOrDah = !this._lastDitOrDah;
+                }
+        }
+        this._lastDitOrDah = ditOrDah;
+        this._lastInput = input;
+        return ditOrDah;
+    }
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

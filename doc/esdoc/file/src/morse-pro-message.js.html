@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/morse-pro-message.js | morse-pro</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files."><meta property="twitter:card" content="summary"><meta property="twitter:title" content="morse-pro"><meta property="twitter:description" content="Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files."></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a href="https://gitlab.com/scphillips/morse-pro.git">Repository</a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-audiocontext.js~MorseAudioContext.html">MorseAudioContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw-compat.js~MorseCW.html">MorseCW</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw-wave.js~MorseCWWave.html">MorseCWWave</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw.js~MorseCW.html">MorseCW</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-decoder-adaptive.js~MorseAdaptiveDecoder.html">MorseAdaptiveDecoder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-decoder.js~MorseDecoder.html">MorseDecoder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-keyer-iambic.js~MorseIambicKeyer.html">MorseIambicKeyer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-keyer.js~MorseKeyer.html">MorseKeyer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-listener-adaptive.js~MorseAdaptiveListener.html">MorseAdaptiveListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-listener.js~MorseListener.html">MorseListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-message.js~MorseMessage.html">MorseMessage</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-waa-light.js~MorsePlayerWAALight.html">MorsePlayerWAALight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-waa.js~MorsePlayerWAA.html">MorsePlayerWAA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-xas.js~MorsePlayerXAS.html">MorsePlayerXAS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro.js~Morse.html">Morse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-looksLikeMorse">looksLikeMorse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-morse2text">morse2text</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-text2ditdah">text2ditdah</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-text2morse">text2morse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-tidyMorse">tidyMorse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDataURI">getDataURI</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getData">getData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getMIMEType">getMIMEType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-charSpace">charSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-dahLength">dahLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ditLength">ditLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ditSpace">ditSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fditLength">fditLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fwpm">fwpm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ratio">ratio</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-wordSpace">wordSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-wpm">wpm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-morseAudioContext">morseAudioContext</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#dictionary">dictionary</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionaries">dictionaries</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/morse-pro-message.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/*!
+This code is &#xA9; Copyright Stephen C. Phillips, 2018.
+Email: steve@scphillips.com
+*/
+/*
+Licensed under the EUPL, Version 1.2 or &#x2013; as soon they will be approved by the European Commission - subsequent versions of the EUPL (the &quot;Licence&quot;);
+You may not use this work except in compliance with the Licence.
+You may obtain a copy of the Licence at: https://joinup.ec.europa.eu/community/eupl/
+Unless required by applicable law or agreed to in writing, software distributed under the Licence is distributed on an &quot;AS IS&quot; basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the Licence for the specific language governing permissions and limitations under the Licence.
+*/
+
+/**
+ * Class for conveniently translating to and from Morse code.
+ * Deals with error handling.
+ * Works out if the input is Morse code or not.
+ *
+ * @example
+ * import MorseMessage from &apos;morse-pro-message&apos;;
+ * import MorseCWWave from &apos;morse-pro-cw-wave&apos;;
+ * let morseCWWave = new MorseCWWave();
+ * let morseMessage = new MorseMessage(morseCWWave);
+ * let output;
+ * try {
+ *     output = morseMessage.translate(&quot;abc&quot;);
+ * catch (ex) {
+ *     // output will be best attempt at translation
+ *     // to understand the detail of where the error is, look at morseMessage.errors or display getErrorString()
+ * }
+ * if (morseMessage.inputWasMorse) {
+ *     // do something
+ * }
+ * // get the Morse code waveform
+ * let wave = morseMessage.wave;
+ */
+export default class MorseMessage {
+    constructor(morseCWWave) {
+        this.morseCWWave = morseCWWave;
+        // this.player = morsePlayer;
+        this.rawInput = undefined;
+        this.inputWasMorse = undefined;
+        this.text = undefined;
+        this.textTokens = undefined;
+        this.morse = undefined;
+        this.morseTokens = undefined;
+        this.errors = undefined;
+        this.hasError = undefined;
+        // this.volumes = undefined;
+        // this.frequencies = undefined;
+    }
+
+    /**
+     * Translate to or from Morse.
+     * @param {string} input - alphanumeric text or morse code to translate
+     * @param {boolean} isMorse - whether the input is Morse code or not (if not set then the looksLikeMorse method will be used)
+     * @throws Error if there was something untranslatable
+     */
+    translate(input, isMorse) {
+        if (typeof isMorse === &quot;undefined&quot;) {
+            // make a guess: could be wrong if someone wants to translate &quot;.&quot; into Morse for instance
+            isMorse = this.morseCWWave.looksLikeMorse(input);
+        }
+
+        let ret;
+        if (isMorse) {
+            ret = this.loadMorse(input);
+        } else {
+            ret = this.loadText(input);
+        }
+
+        if (this.hasError) {
+            throw new Error(&quot;Error in input: &quot; + &apos;[&apos; + input + &apos;]&apos;);
+        }
+
+        return ret;
+    }
+
+    _completeFields(d) {
+        this.morseTokens = d.morse;
+        this.textTokens = d.text;
+        this.errors = d.error;
+        this.hasError = d.hasError; 
+        this.text = this.morseCWWave.displayText(this.textTokens);
+        this.morse = this.morseCWWave.displayMorse(this.morseTokens);
+    }
+
+    loadMorse(input) {
+        this.rawInput = input;
+        this.inputWasMorse = true;
+        this._completeFields(this.morseCWWave.morse2text(input));
+        return this.text;
+    }
+
+    loadText(input) {
+        this.rawInput = input;
+        this.inputWasMorse = false;
+        this._completeFields(this.morseCWWave.text2morse(input));
+        return this.morse;
+    }
+
+    cleanText() {
+        this._completeFields(this.morseCWWave.text2morseClean(this.text));
+        return this.text;
+    }
+
+    get timings() {
+        return this.morseCWWave.morseTokens2timing(this.morseTokens);
+    }
+
+    get wave() {
+        return this.morseCWWave.getSample(this.timings, 50);
+    }
+
+    /**
+     * 
+     * @param {String} prefix - this is placed before each input token that had an error
+     * @param {String} suffix - this is placed after each input token that had an error
+     * @param {Map} escapeMap - any token matching a key in this map is replaced by the value (e.g. {&apos;&gt;&apos;: &apos;&amp;gt;&apos;, &apos;&lt;&apos;: &apos;&amp;lt;&apos;})
+     */
+    getInputErrorString(prefix, suffix, escapeMap={}) {
+        if (this.inputWasMorse) {
+            return this.getMorseErrorString(prefix, suffix);
+        } else {
+            return this.getTextErrorString(prefix, suffix, escapeMap);
+        }
+    }
+
+    getOutputErrorString(prefix, suffix, escapeMap={}) {
+        if (!this.inputWasMorse) {
+            return this.getMorseErrorString(prefix, suffix);
+        } else {
+            return this.getTextErrorString(prefix, suffix, escapeMap);
+        }
+    }
+
+    getTextErrorString(prefix, suffix, escapeMap={}) {
+        return this.morseCWWave.displayTextErrors(this.textTokens, escapeMap, this.errors, prefix, suffix);
+    }
+
+    getMorseErrorString(prefix, suffix) {
+        return this.morseCWWave.displayMorseErrors(this.morseTokens, this.errors, prefix, suffix);
+    }
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>
