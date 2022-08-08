@@ -67,7 +67,7 @@
     ]
   },
   "scripts": {
-    "clean": "rimraf lib doc/esdoc",
+    "clean": "rimraf lib",
     "prebuild": "npm run clean -s",
     "build": "babel src -d lib",
     "prepare": "npm run build",
