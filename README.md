@@ -1,9 +1,6 @@
-[![Build](https://img.shields.io/travis/scp93ch/morse-pro.svg)](https://travis-ci.org/scp93ch/morse-pro)
-[![Coverage](https://img.shields.io/coveralls/scp93ch/morse-pro.svg)](https://coveralls.io/github/scp93ch/morse-pro?branch=master)
 [![Version](https://img.shields.io/npm/v/morse-pro.svg)](https://www.npmjs.com/package/morse-pro)
 [![Downloads](https://img.shields.io/npm/dm/morse-pro.svg)](https://www.npmjs.com/package/morse-pro)
 [![License](https://img.shields.io/npm/l/morse-pro.svg)](https://joinup.ec.europa.eu/community/eupl/home)
-[![Documentation](https://doc.esdoc.org/github.com/scp93ch/morse-pro/badge.svg)](https://doc.esdoc.org/github.com/scp93ch/morse-pro/)
 
 # Introduction
 
@@ -49,12 +46,12 @@ If you would like to access this software under a different licence then please 
 
 # Documentation
 
-Documentation on how to use the library is embedded in the source code and can be found [at the ESDoc site](https://doc.esdoc.org/github.com/scp93ch/morse-pro/).
+Documentation on how to use the library is embedded in the source code and can be found [in the esdoc folder](./doc/esdoc/).
 
 Some diagrams:
 
-* [Class diagram](https://drive.google.com/file/d/17hFelIHgKOMTYb-0M53TiYsC7T2e3c2X/view?usp=sharing)
-* [Audio pipeline](https://drive.google.com/file/d/12OoHQi5AEcyFeeyAa3rWG0MFcmcdj9Pv/view?usp=sharing)
+* [Class diagram](./doc/classes.svg)
+* [Audio pipeline](./doc/audio-pipeline.svg)
 
 ## Library Overview
 
@@ -98,11 +95,3 @@ Deprecated and compatibility:
 * [morse-pro-wpm.js](./src/morse-pro-wpm.js): DEPRECATED. Constants and functions for computing the speed (and Farnsworth speed) of Morse code.
 * [morse-pro-compat.js](./src/morse-pro-compat.js): compatibility class for v2
 * [morse-pro-cw-compat.js](./src/morse-pro-cw-compat.js): compatibility class for v2
-
-# Tests
-
-Some key tests are now included, see [Coveralls](https://coveralls.io/github/scp93ch/morse-pro?branch=master). This library is used for the software on https://morsecode.scphillips.com and is tested there.
-
-# Contact
-
-Please email me at steve@morsecode.world with any questions or ideas.

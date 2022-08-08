@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [3.0.0] - 2022-08-02
 
-This release contains many breaking changes and bug fixes, mostly documented below. Many classes now take their constructor parameters as a dictionary (object) with defaults, but this refactoring is not quite complete. Notable additions are the generalisation of the translation to support variants of Morse code other than International, and the addition of the playback of American (railroad) Morse via sound samples. Also, a single class to reliably obtain the AudioContext class required to use the Web Audio API has been added.
+This release contains many breaking changes and bug fixes, mostly documented below. It has not reached a particular milestone, but a release is needed. Many classes now take their constructor parameters as a dictionary (object) with defaults, but this refactoring is not quite complete. Notable additions are the generalisation of the translation to support variants of Morse code other than International, and the addition of the playback of American (railroad) Morse via sound samples. Also, a single class to reliably obtain the AudioContext class required to use the Web Audio API has been added.
 
 ### Added
 
@@ -13,81 +13,84 @@ This release contains many breaking changes and bug fixes, mostly documented bel
     - accented characters added
     - sexed quotes added
     - new lines treated the same as other whitespace
-- morse-pro
+- `morse-pro`
   - methods to load and unload dictionaries
-- morse-pro-audiocontext
+- `morse-pro-audiocontext`
   - new singleton class to obtain AudioContext object reliably and load samples, supporting multiple browser implementations
-- morse-pro-compat
+- `morse-pro-compat`
   - new compatibility class to support v2 library code
-- morse-pro-cw-compat
+- `morse-pro-cw-compat`
   - new compatibility class to support v2 library code
-- morse-pro-message
-  - loadMorse(), loadText(), cleanText(), getInputErrorString(), getOutputErrorString(), getTextErrorString(), getMorseErrorString() methods
-- morse-pro-player-waa
+- `morse-pro-message`
+  - `loadMorse()`, `loadText()`, `cleanText()`, `getInputErrorString()`, `getOutputErrorString()`, `getTextErrorString()`, `getMorseErrorString()` methods
+- `morse-pro-player-waa`
   - better volume control, using internal gain value
   - support for American (railroad) Morse via sound-on and sound-off audio samples
-  - queue() method to queue up the next sequence
-  - muteAudio() method to mute the audio but still continue playing (e.g. via vibration or light)
-- morse-pro-player-light
-  - muteLight() method
-- morse-pro-player-xas
+  - `queue()` method to queue up the next sequence
+  - `muteAudio()` method to mute the audio but still continue playing (e.g. via vibration or light)
+- `morse-pro-player-light`
+  - `muteLight()` method
+- `morse-pro-player-xas`
   - volume and gain control
-  - load() method now takes a list of timings
+  - `load()` method now takes a list of timings
 
 ### Changed
 
-- morse-pro
+- `morse-pro`
   - text to morse dictionary removed from here and put into separate dictionary file
   - input is now not converted to upper case
-- morse-pro-cw
+- `morse-pro-cw`
   - class constructor takes all parameters via a dictionary with defaults
-  - now extends Morse class instead of MorseMessage
+  - now extends `Morse` class instead of `MorseMessage`
   - pretty much the whole class has changed in order to use dictionaries
-- morse-pro-cw-wave
+- `morse-pro-cw-wave`
   - class constructor takes all parameters via a dictionary with defaults
-- morse-pro-decoder
+- `morse-pro-decoder`
   - class constructor takes all parameters via a dictionary with defaults
-  - wpm and fwpm properties are now setWPM() and setFWPM() methods
-- morse-pro-decoder-adaptive
+  - `wpm` and `fwpm` properties are now `setWPM()` and `setFWPM()` methods
+- `morse-pro-decoder-adaptive`
   - class constructor takes all parameters via a dictionary with defaults
-- morse-pro-keyer
+- `morse-pro-keyer`
   - class constructor takes all parameters via a dictionary: now uses a configured decoder and player object
-- morse-pro-keyer-iambic
+- `morse-pro-keyer-iambic`
   - class constructor takes all parameters via a dictionary with defaults
-- morse-pro-player-waa
+- `morse-pro-player-waa`
   - class constructor takes all parameters via a dictionary with defaults
   - audio graph has improved bandpass filter
   - volume changes happen over a few milliseconds to remove audio artifacts
   - stopping the sound happens over a few milliseconds to remove audio artifacts
-- morse-pro-player-waa-light
+- `morse-pro-player-waa-light`
   - class constructor takes all parameters via a dictionary with defaults
 
 ### Deprecated
 
-- morse-pro-wpm
+- `morse-pro-wpm`
   - calculations of sound durations are now handled via dictionary files
 
 ### Removed
 
-- morse-pro-message
-  - clearError() method
-- morse-pro-player-waa
-  - loadCWWave() method
-  - loadNextCWWave() method
-- morse-pro-player-xas
-  - loadCWWave() method
+- `morse-pro-message`
+  - `clearError()` method
+- `morse-pro-player-waa`
+  - `loadCWWave()` method
+  - `loadNextCWWave()` method
+- `morse-pro-player-xas`
+  - `loadCWWave()` method
+- tests
+  - all tests removed as they were primarily testing only legacy code and getting them to run was difficult
+- `Vagrantfile`
 
 ### Fixed
 
-- morse-pro-decoder
+- `morse-pro-decoder`
   - noise threshold increased (had been set too small)
-- morse-pro-message
+- `morse-pro-message`
   - 50ms of nothing is added to the end of a sound file to avoid the end being clipped on playback
-- morse-pro-player-waa
-  - sequenceEndingCallback is called more reliably
+- `morse-pro-player-waa`
+  - `sequenceEndingCallback` is called more reliably
   - 200ms start-up delay (minimum) is applied the very first time and then the user's confugured delay is used
-- morse-pro-player-waa-light
-  - SMALL_AMPLITUDE constant added to ignore some noise
+- `morse-pro-player-waa-light`
+  - `SMALL_AMPLITUDE` constant added to ignore some noise
 
 ## [2.0.0] - 2019-01-02
 
