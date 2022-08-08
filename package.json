@@ -1,6 +1,6 @@
 {
   "name": "morse-pro",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files.",
   "keywords": [
     "morse code",
