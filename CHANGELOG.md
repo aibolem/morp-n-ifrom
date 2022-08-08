@@ -2,7 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## [3.0.0] - 2022-08-02
+## [3.0.1] - 2022-08-08
+
+### Fixed
+
+- generated esdoc is now not deleted when publishing to npm
+
+## [3.0.0] - 2022-08-08
 
 This release contains many breaking changes and bug fixes, mostly documented below. It has not reached a particular milestone, but a release is needed. Many classes now take their constructor parameters as a dictionary (object) with defaults, but this refactoring is not quite complete. Notable additions are the generalisation of the translation to support variants of Morse code other than International, and the addition of the playback of American (railroad) Morse via sound samples. Also, a single class to reliably obtain the AudioContext class required to use the Web Audio API has been added.
 
