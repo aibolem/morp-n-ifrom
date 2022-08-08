@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/morse-pro-cw.js | morse-pro</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files."><meta property="twitter:card" content="summary"><meta property="twitter:title" content="morse-pro"><meta property="twitter:description" content="Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files."></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a href="https://gitlab.com/scphillips/morse-pro.git">Repository</a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-audiocontext.js~MorseAudioContext.html">MorseAudioContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw-compat.js~MorseCW.html">MorseCW</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw-wave.js~MorseCWWave.html">MorseCWWave</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw.js~MorseCW.html">MorseCW</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-decoder-adaptive.js~MorseAdaptiveDecoder.html">MorseAdaptiveDecoder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-decoder.js~MorseDecoder.html">MorseDecoder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-keyer-iambic.js~MorseIambicKeyer.html">MorseIambicKeyer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-keyer.js~MorseKeyer.html">MorseKeyer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-listener-adaptive.js~MorseAdaptiveListener.html">MorseAdaptiveListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-listener.js~MorseListener.html">MorseListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-message.js~MorseMessage.html">MorseMessage</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-waa-light.js~MorsePlayerWAALight.html">MorsePlayerWAALight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-waa.js~MorsePlayerWAA.html">MorsePlayerWAA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-xas.js~MorsePlayerXAS.html">MorsePlayerXAS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro.js~Morse.html">Morse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-looksLikeMorse">looksLikeMorse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-morse2text">morse2text</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-text2ditdah">text2ditdah</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-text2morse">text2morse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-tidyMorse">tidyMorse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDataURI">getDataURI</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getData">getData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getMIMEType">getMIMEType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-charSpace">charSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-dahLength">dahLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ditLength">ditLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ditSpace">ditSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fditLength">fditLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fwpm">fwpm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ratio">ratio</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-wordSpace">wordSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-wpm">wpm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-morseAudioContext">morseAudioContext</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#dictionary">dictionary</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionaries">dictionaries</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/morse-pro-cw.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/*!
+This code is &#xA9; Copyright Stephen C. Phillips, 2018.
+Email: steve@scphillips.com
+*/
+/*
+Licensed under the EUPL, Version 1.2 or &#x2013; as soon they will be approved by the European Commission - subsequent versions of the EUPL (the &quot;Licence&quot;);
+You may not use this work except in compliance with the Licence.
+You may obtain a copy of the Licence at: https://joinup.ec.europa.eu/community/eupl/
+Unless required by applicable law or agreed to in writing, software distributed under the Licence is distributed on an &quot;AS IS&quot; basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the Licence for the specific language governing permissions and limitations under the Licence.
+*/
+
+import Morse from &apos;./morse-pro&apos;;
+
+const MS_IN_MINUTE = 60000;  /** number of milliseconds in 1 minute */
+
+/**
+ * Class to create the on/off timings needed by e.g. sound generators. Timings are in milliseconds; &quot;off&quot; timings are negative.
+ *
+ * @example
+ * import MorseCW from &apos;morse-pro-cw&apos;;
+ * var morseCW = new MorseCW();
+ * var tokens = morseCW.text2morse(&quot;abc&quot;);
+ * var timings = morseCW.morseTokens2timing(tokens);
+ */
+export default class MorseCW extends Morse {
+    /**
+     * @param {Object} params - dictionary of optional parameters.
+     * @param {string} [params.dictionary=&apos;international&apos;] - which dictionary to use, e.g. &apos;international&apos; or &apos;american&apos;.
+     * @param {string[]} [params.dictionaryOptions=[]] - optional additional dictionaries such as &apos;prosigns&apos;.
+     * @param {number} [params.wpm=20] - speed in words per minute using &quot;PARIS &quot; as the standard word.
+     * @param {number} [params.fwpm=wpm] - farnsworth speed.
+     */
+    constructor({dictionary, dictionaryOptions, wpm=20, fwpm=wpm} = {}) {
+        super({dictionary, dictionaryOptions});
+        /** The element of the dictionary that the ratios are based off */
+        this._baseElement = this.dictionary.baseElement;
+        /** In initialise the ratios based on the dictionary but enable them to be changed thereafter */
+        this.ratios = this.dictionary.ratio;  // actually does a copy from the dict so we can reset if needed
+        /** Compute ditsInParis and spacesInParis while we have original ratio */
+        let parisMorseTokens = this.textTokens2morse(this.tokeniseRawText(&apos;PARIS&apos;)).morse;
+        this._ditsInParis = this.getDuration(this.morseTokens2timing(parisMorseTokens, this.ratios)) + Math.abs(this.ratios.wordSpace);
+        this._spacesInParis = Math.abs((4 * this.ratios.charSpace) + this.ratios.wordSpace);
+        /** Initialise wpm and fwpm (this potentially changes the ratios) */
+        this.setWPM(wpm);
+        this.setFWPM(fwpm);
+    }
+
+    /** 
+     * Set the WPM speed. Ensures that Farnsworth WPM is no faster than WPM.
+     * @param {number} wpm
+     */
+    setWPM(wpm) {
+        this._baseLength = undefined;
+        this._ratios = undefined;
+        this._lengths = undefined;
+
+        wpm = Math.max(1, wpm || 1);
+        this._wpm = wpm;
+        this._fwpm = Math.min(this._wpm, this._fwpm);
+
+        let tmp = this.ratios;
+        tmp = this.baseLength;
+        return wpm;
+    }
+
+    /** @type {number} */
+    get wpm() {
+        return this._wpm;
+    }
+
+    testWPMmatchesRatio() {
+        return this.ratios[&apos;-&apos;] == this.dictionary.ratio[&apos;-&apos;] &amp;&amp; this.ratios[&apos; &apos;] == this.dictionary.ratio[&apos; &apos;];
+    }
+
+    /**
+     * Set the Farnsworth WPM speed. Ensures that WPM is no slower than Farnsworth WPM.
+     * @param {number} fwpm
+     */
+    setFWPM(fwpm) {
+        fwpm = Math.max(1, fwpm || 1);
+        this._fwpm = fwpm;
+        this.setWPM(Math.max(this._wpm, this._fwpm))
+        
+        return fwpm;
+    }
+
+    /** @type {number} */
+    get fwpm() {
+        return this._fwpm;
+    }
+
+    testFWPMmatchesRatio() {
+        // need to test approximately here otherwise with the rounding errors introduced in the web page input it would never return true
+        return Math.abs((this.ratios[&apos;wordSpace&apos;] / this.dictionary.ratio[&apos;wordSpace&apos;]) / (this.ratios[&apos;charSpace&apos;] / this.dictionary.ratio[&apos;charSpace&apos;]) - 1) &lt; 0.001;
+    }
+
+    /** @type {number[]} */
+    get ratios() {
+        if (this._ratios === undefined) {
+            this._ratios = {};
+            Object.assign(this._ratios, this.dictionary.ratio);
+            let farnsworthRatio = this.farnsworthRatio;
+            this._ratios[&apos;charSpace&apos;] *= farnsworthRatio;
+            this._ratios[&apos;wordSpace&apos;] *= farnsworthRatio;
+        }
+        return this._ratios;
+    }
+
+    /**
+     * Set the ratio of each element and normalise to the base element/
+     * For the space elements, the ratio is negative.
+     * @param {Map} r - a Map from element to ratio (as defined in the &apos;ratio&apos; element of a dictionary)
+     */
+    set ratios(r) {
+        this._wpm = undefined;
+        this._fwpm = undefined;
+        this._lengths = undefined;
+
+        this._ratios = {};
+        Object.assign(this._ratios, r);
+        for (let element in this._ratios) {
+            this._ratios[element] /= this._ratios[this._baseElement];
+        }
+    }
+
+    setRatio(element, ratio) {
+        let tmp = this.ratios;
+        this._ratios[element] = ratio;
+        this._lengths = undefined;
+
+        if (this.testWPMmatchesRatio()) {
+            this._setWPMfromBaseLength();
+            if (this.testFWPMmatchesRatio()) {
+                this._setFWPMfromRatio();
+            } else {
+                this._fwpm = undefined;
+            }    
+        } else {
+            this._wpm = undefined;
+            this._fwpm = undefined;
+        }
+    }
+
+    /**
+     * Return an array of millisecond timings.
+     * With the Farnsworth method, the morse characters are played at one
+     * speed and the spaces between characters at a slower speed.
+     * @param {Array} morseTokens - array of morse tokens corresponding to the ratio element of the dictionary used, e.g. [[&apos;..&apos;, &apos;.-&apos;], [&apos;--&apos;, &apos;...&apos;]]
+     * @param {Object} [lengths=this.lengths] - dictionary mapping element to duration with negative duration for spaces
+     * @return {number[]}
+     */
+    morseTokens2timing(morseTokens, lengths=this.lengths) {
+        let timings = [];
+        for (let word of morseTokens) {
+            for (let char of word) {
+                timings = timings.concat(char.split(&apos;&apos;).map(symbol =&gt; lengths[symbol]));
+                timings = timings.concat(lengths.charSpace);
+            }
+            timings.pop()
+            timings = timings.concat(lengths.wordSpace);
+        }
+        timings.pop();
+        return timings;
+    }
+
+    /**
+     * Add up all the millisecond timings in a list
+     * @param {Array} timings - list of millisecond timings (-ve for spaces)
+     */
+    getDuration(timings) {
+        return timings.reduce(
+            (accumulator, currentValue) =&gt; accumulator + Math.abs(currentValue),
+            0
+        );
+    }
+
+    /**
+     * Get the Farnsworth dit length to dit length ratio
+     * @return {number}
+     */
+    get farnsworthRatio() {
+        // Compute fditlen / ditlen
+        // This should be &gt;1 and it is what you need to multiply the standard charSpace and wordSpace ratios by to get the adjusted farnsworth ratios
+        // &quot;PARIS &quot; is 31 units for the characters and 19 units for the inter-character spaces and inter-word space
+        // One unit takes 1 * 60 / (50 * wpm)
+        // The 31 units should take 31 * 60 / (50 * wpm) seconds at wpm
+        // &quot;PARIS &quot; should take 50 * 60 / (50 * fwpm) to transmit at fwpm, or 60 / fwpm  seconds at fwpm
+        // Keeping the time for the characters constant,
+        // The spaces need to take: (60 / fwpm) - [31 * 60 / (50 * wpm)] seconds in total
+        // The spaces are 4 inter-character spaces of 3 units and 1 inter-word space of 7 units. Their ratio must be maintained.
+        // A space unit is: [(60 / fwpm) - [31 * 60 / (50 * wpm)]] / 19 seconds
+        // Comparing that to 60 / (50 * wpm) gives a ratio of (50.wpm - 31.fwpm) / 19.fwpm
+        return (this._ditsInParis * this._wpm - (this._ditsInParis - this._spacesInParis) * this._fwpm) / (this._spacesInParis * this._fwpm);
+    }
+
+    /**
+     * Force the WPM to match the base length without changing anything else
+     */
+    _setWPMfromBaseLength() {
+        this._wpm = (MS_IN_MINUTE / this._ditsInParis) / this._baseLength;
+    }
+
+    /**
+     * Set the WPM given dit length in ms
+     * @param {number} ditLen
+     */
+    setWPMfromDitLen(ditLen) {
+        this.setWPM((MS_IN_MINUTE / this._ditsInParis) / ditLen);
+    }
+
+    /** 
+     * Force the FWPM to match the fditlen/ditlen ratio without changing anything else
+     */
+    _setFWPMfromRatio() {
+        let ratio = Math.abs((this.lengths[&apos;charSpace&apos;] / 3) / this.lengths[&apos;.&apos;]);
+        this._fwpm = this._ditsInParis * this._wpm / (this._spacesInParis * ratio + (this._ditsInParis - this._spacesInParis));
+    }
+
+    /** 
+     * Set the Farnsworth WPM given ratio of fditlength / ditlength
+     * @param {number} ratio
+     */
+     setFWPMfromRatio(ratio) {
+        ratio = Math.max(Math.abs(ratio), 1);  // take abs just in case someone passes in something -ve
+        this.setFWPM(this._ditsInParis * this._wpm / (this._spacesInParis * ratio + (this._ditsInParis - this._spacesInParis)));
+    }
+
+    /**
+     * Get the length of the base element (i.e. a dit) in milliseconds
+     * @return {number}
+     */
+    get baseLength() {
+        this._baseLength = this._baseLength || (MS_IN_MINUTE / this._ditsInParis) / this._wpm;
+        return this._baseLength;
+    }
+
+    /**
+     * Calculate and return the millisecond duration of each element, using negative durations for spaces.
+     * @returns Map
+     */
+    get lengths() {
+        if (this._lengths === undefined) {
+            this._lengths = {};
+            this._maxLength = 0;
+            Object.assign(this._lengths, this.ratios);
+            for (let element in this._lengths) {
+                this._lengths[element] *= this._baseLength;
+                this._maxLength = Math.max(this._maxLength, this._lengths[element]);
+            }
+        }
+        return this._lengths;  // this is just a cache for speed, the ratios define the lengths
+    }
+
+    /**
+     * Return the length of the longest beep in milliseconds.
+     * @returns {number}
+     */
+    get maxLength() {
+        if (this._lengths === undefined) {
+            let tmp = this.lengths;
+        }
+        return this._maxLength;
+    }
+
+    setLength(element, length) {
+        if (element == this._baseElement) {
+            this._lengths = undefined;
+            this._wpm = undefined;
+            this._fwpm = undefined;
+
+            this._baseLength = length;
+        }
+        this.setRatio(element, length / this._baseLength);
+    }
+
+    /** 
+     * Get the absolute duration of the space between words in ms.
+     * @type {number}
+     */
+    get wordSpace() {
+        return Math.abs(this.lengths.wordSpace);
+    }
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

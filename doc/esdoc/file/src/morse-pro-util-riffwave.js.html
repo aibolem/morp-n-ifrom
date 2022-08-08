@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/morse-pro-util-riffwave.js | morse-pro</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files."><meta property="twitter:card" content="summary"><meta property="twitter:title" content="morse-pro"><meta property="twitter:description" content="Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files."></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a href="https://gitlab.com/scphillips/morse-pro.git">Repository</a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-audiocontext.js~MorseAudioContext.html">MorseAudioContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw-compat.js~MorseCW.html">MorseCW</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw-wave.js~MorseCWWave.html">MorseCWWave</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw.js~MorseCW.html">MorseCW</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-decoder-adaptive.js~MorseAdaptiveDecoder.html">MorseAdaptiveDecoder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-decoder.js~MorseDecoder.html">MorseDecoder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-keyer-iambic.js~MorseIambicKeyer.html">MorseIambicKeyer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-keyer.js~MorseKeyer.html">MorseKeyer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-listener-adaptive.js~MorseAdaptiveListener.html">MorseAdaptiveListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-listener.js~MorseListener.html">MorseListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-message.js~MorseMessage.html">MorseMessage</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-waa-light.js~MorsePlayerWAALight.html">MorsePlayerWAALight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-waa.js~MorsePlayerWAA.html">MorsePlayerWAA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-xas.js~MorsePlayerXAS.html">MorsePlayerXAS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro.js~Morse.html">Morse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-looksLikeMorse">looksLikeMorse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-morse2text">morse2text</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-text2ditdah">text2ditdah</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-text2morse">text2morse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-tidyMorse">tidyMorse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDataURI">getDataURI</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getData">getData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getMIMEType">getMIMEType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-charSpace">charSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-dahLength">dahLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ditLength">ditLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ditSpace">ditSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fditLength">fditLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fwpm">fwpm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ratio">ratio</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-wordSpace">wordSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-wpm">wpm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-morseAudioContext">morseAudioContext</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#dictionary">dictionary</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionaries">dictionaries</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/morse-pro-util-riffwave.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/*
+* RIFFWAVE adapted from RIFFWAVE.js v0.03 - Audio encoder for HTML5 &lt;audio&gt; elements.
+* Copyleft 2011 by Pedro Ladaria &lt;pedro.ladaria at Gmail dot com&gt;
+* Public Domain
+*/
+
+/*
+* Adaptation by Stephen C. Phillips, 2013-2017.
+* Email: steve@scphillips.com
+* Public Domain
+*/
+
+/**
+ * Utility to create RIFF WAVE file data.
+ *
+ * @example
+ * import MorseCWWave from &apos;morse-pro-cw-wave&apos;;
+ * import * as RiffWave from &apos;morse-pro-util-riffwave&apos;;
+ * var morseCWWave = new MorseCWWave();
+ * morseCWWave.translate(&quot;abc&quot;);
+ * var wav = RiffWave.getData(morseCWWave.getSample());  // returns byte array of WAV file
+  */
+var u32ToArray = function(i) {
+    return [i&amp;0xFF, (i&gt;&gt;8)&amp;0xFF, (i&gt;&gt;16)&amp;0xFF, (i&gt;&gt;24)&amp;0xFF];
+};
+
+var u16ToArray = function(i) {
+    return [i&amp;0xFF, (i&gt;&gt;8)&amp;0xFF];
+};
+
+var split16bitArray = function(data) {
+    var r = [];
+    var j = 0;
+    var len = data.length;
+    for (var i=0; i&lt;len; i++) {
+        r[j++] = data[i] &amp; 0xFF;
+        r[j++] = (data[i]&gt;&gt;8) &amp; 0xFF;
+    }
+    return r;
+};
+
+var fToU8 = function(data) {
+    var r = [];
+    for (var i = 0; i &lt; data.length; i++) {
+        r[i] = Math.max(Math.min(128 + Math.round(127 * data[i]), 255), 0);
+    }
+    return r;
+}
+
+/**
+ * Convert PCM data to WAV file data.
+ * @param {number[]} data - waveform data, expected to be in (and clamped to) range [-1,1]
+ * @param {number} [sampleRate=8000] - the sample rate of the waveform in Hz
+ * @param {number} [bitsPerSample=8] - number of bits to store each data point (8 or 16)
+ * @return {number[]} - array of bytes representing the WAV file
+ */
+export function getData(data, sampleRate = 8000, bitsPerSample = 8) {
+    data = fToU8(data);
+
+    var header = {                            // OFFS SIZE NOTES
+        chunkId      : [0x52,0x49,0x46,0x46], // 0    4    &quot;RIFF&quot; = 0x52494646
+        chunkSize    : 0,                     // 4    4    36+SubChunk2Size = 4+(8+SubChunk1Size)+(8+SubChunk2Size)
+        format       : [0x57,0x41,0x56,0x45], // 8    4    &quot;WAVE&quot; = 0x57415645
+        subChunk1Id  : [0x66,0x6d,0x74,0x20], // 12   4    &quot;fmt &quot; = 0x666d7420
+        subChunk1Size: 16,                    // 16   4    16 for PCM
+        audioFormat  : 1,                     // 20   2    PCM = 1
+        numChannels  : 1,                     // 22   2    Mono = 1, Stereo = 2...
+        sampleRate   : sampleRate,            // 24   4    8000, 44100...
+        byteRate     : 0,                     // 28   4    SampleRate*NumChannels*BitsPerSample/8
+        blockAlign   : 0,                     // 32   2    NumChannels*BitsPerSample/8
+        bitsPerSample: bitsPerSample,         // 34   2    8 bits = 8, 16 bits = 16
+        subChunk2Id  : [0x64,0x61,0x74,0x61], // 36   4    &quot;data&quot; = 0x64617461
+        subChunk2Size: 0                      // 40   4    data size = NumSamples*NumChannels*BitsPerSample/8
+    };
+
+    header.blockAlign = (header.numChannels * header.bitsPerSample) &gt;&gt; 3;
+    header.byteRate = header.blockAlign * header.sampleRate;
+    header.subChunk2Size = data.length * (header.bitsPerSample &gt;&gt; 3);
+    header.chunkSize = 36 + header.subChunk2Size;
+
+    return header.chunkId.concat(
+        u32ToArray(header.chunkSize),
+        header.format,
+        header.subChunk1Id,
+        u32ToArray(header.subChunk1Size),
+        u16ToArray(header.audioFormat),
+        u16ToArray(header.numChannels),
+        u32ToArray(header.sampleRate),
+        u32ToArray(header.byteRate),
+        u16ToArray(header.blockAlign),
+        u16ToArray(header.bitsPerSample),
+        header.subChunk2Id,
+        u32ToArray(header.subChunk2Size),
+        (header.bitsPerSample == 16) ? split16bitArray(data) : data
+    );
+}
+
+export function getMIMEType() {
+    return &quot;audio/wav&quot;;
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

@@ -29,7 +29,7 @@ import morseAudioContext from './morse-pro-audiocontext';
  * morsePlayerWAALight.soundOnCallback = lightOn;
  * morsePlayerWAALight.soundOffCallback = lightOff;
  * morsePlayerWAALight.soundStoppedCallback = soundStopped;
- * morsePlayerWAALight.volume = 0;
+ * morsePlayerWAALight.muteAudio(true);
  * morsePlayerWAALight.load({timings});
  * morsePlayerWAA.playFromStart();
  */

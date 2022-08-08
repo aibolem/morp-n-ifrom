@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/morse-pro-cw-wave.js | morse-pro</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files."><meta property="twitter:card" content="summary"><meta property="twitter:title" content="morse-pro"><meta property="twitter:description" content="Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files."></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a href="https://gitlab.com/scphillips/morse-pro.git">Repository</a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-audiocontext.js~MorseAudioContext.html">MorseAudioContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw-compat.js~MorseCW.html">MorseCW</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw-wave.js~MorseCWWave.html">MorseCWWave</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw.js~MorseCW.html">MorseCW</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-decoder-adaptive.js~MorseAdaptiveDecoder.html">MorseAdaptiveDecoder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-decoder.js~MorseDecoder.html">MorseDecoder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-keyer-iambic.js~MorseIambicKeyer.html">MorseIambicKeyer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-keyer.js~MorseKeyer.html">MorseKeyer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-listener-adaptive.js~MorseAdaptiveListener.html">MorseAdaptiveListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-listener.js~MorseListener.html">MorseListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-message.js~MorseMessage.html">MorseMessage</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-waa-light.js~MorsePlayerWAALight.html">MorsePlayerWAALight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-waa.js~MorsePlayerWAA.html">MorsePlayerWAA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-xas.js~MorsePlayerXAS.html">MorsePlayerXAS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro.js~Morse.html">Morse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-looksLikeMorse">looksLikeMorse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-morse2text">morse2text</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-text2ditdah">text2ditdah</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-text2morse">text2morse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-tidyMorse">tidyMorse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDataURI">getDataURI</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getData">getData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getMIMEType">getMIMEType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-charSpace">charSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-dahLength">dahLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ditLength">ditLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ditSpace">ditSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fditLength">fditLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fwpm">fwpm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ratio">ratio</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-wordSpace">wordSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-wpm">wpm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-morseAudioContext">morseAudioContext</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#dictionary">dictionary</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionaries">dictionaries</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/morse-pro-cw-wave.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/*!
+This code is &#xA9; Copyright Stephen C. Phillips, 2018.
+Email: steve@scphillips.com
+*/
+/*
+Licensed under the EUPL, Version 1.2 or &#x2013; as soon they will be approved by the European Commission - subsequent versions of the EUPL (the &quot;Licence&quot;);
+You may not use this work except in compliance with the Licence.
+You may obtain a copy of the Licence at: https://joinup.ec.europa.eu/community/eupl/
+Unless required by applicable law or agreed to in writing, software distributed under the Licence is distributed on an &quot;AS IS&quot; basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the Licence for the specific language governing permissions and limitations under the Licence.
+*/
+
+import MorseCW from &apos;./morse-pro-cw&apos;;
+
+/**
+ * Class to create sine-wave samples of standard CW Morse.
+ *
+ * @example
+ * import MorseCWWave from &apos;morse-pro-cw-wave&apos;;
+ * var morseCW = new MorseCW();
+ * var tokens = morseCW.text2morse(&quot;abc&quot;);
+ * var timings = morseCW.morseTokens2timing(tokens);
+ * var sample = morseCWWave.getSample(timings);
+ */
+export default class MorseCWWave extends MorseCW {
+    /**
+     * @param {Object} params - dictionary of optional parameters.
+     * @param {string} params.dictionary - which dictionary to use, e.g. &apos;international&apos; or &apos;american&apos;.
+     * @param {string[]} params.dictionaryOptions - optional additional dictionaries such as &apos;prosigns&apos;.
+     * @param {number} params.wpm - speed in words per minute using &quot;PARIS &quot; as the standard word.
+     * @param {number} params.fwpm - farnsworth speed.
+     * @param {number} [params.frequency=550] - frequency of wave in Hz
+     * @param {number} [params.sampleRate=8000] - sample rate for the waveform in Hz
+     */
+    constructor({dictionary, dictionaryOptions, wpm, fwpm, frequency=550, sampleRate=8000} = {}) {
+        super({dictionary, dictionaryOptions, wpm, fwpm});
+        // TODO: make this.frequency a fallback and replace with arrays of freq and volume to go with timings array when making a sample
+        /** @type {number} */
+        this.frequency = frequency;  // frequency of wave in Hz
+        /** @type {number} */
+        this.sampleRate = sampleRate;  // sample rate for the waveform in Hz
+    }
+
+    /**
+     * Get a sample waveform, not using Web Audio API (synchronous).
+     * @param {number[]} timings - millisecond timings, +ve numbers representing sound, -ve for no sound (+ve/-ve can be in any order)
+    // TODO * @param {number[]} frequencies - frequencies of elements in Hz.
+    // TODO * @param {number[]} volumes - volumes of elements in Hz.
+    // TODO: remove endpadding?
+     * @param {number} [endPadding=0] - how much silence in ms to add to the end of the waveform.
+     * @return {number[]} an array of floats in range [-1, 1] representing the wave-form.
+     */
+    getSample(timings, endPadding = 0) {
+        var sample = [];
+        if (timings.length === 0) {
+            return [];
+        }
+        // add minimum of 5ms silence to the end to ensure the filtered signal can finish cleanly
+        if (timings[timings.length - 1] &gt; 0) {
+            timings.push(-Math.max(5, endPadding));
+        } else {
+            timings[timings.length - 1] = -Math.max(5, endPadding, -timings[timings.length - 1]);
+        }
+
+        /*
+            Compute lowpass biquad filter coefficients using method from Chromium
+        */
+
+        // set lowpass frequency cutoff to 1.5 x wave frequency
+        var lowpassFreq = (this.frequency * 1.5) / this.sampleRate;
+        var q = Math.SQRT1_2;
+      
+        var sin = Math.sin(2 * Math.PI * lowpassFreq);
+        var cos = Math.cos(2 * Math.PI * lowpassFreq);
+        var alpha = sin / (2 * Math.pow(10, q / 20));
+      
+        var a0 =  1 + alpha;
+
+        var b0 = ((1 - cos) * 0.5) / a0;
+        var b1 = (1 - cos) / a0;
+        var b2 = ((1 - cos) * 0.5) / a0;
+        var a1 = (-2 * cos) / a0;
+        var a2 = (1 - alpha) / a0;
+
+        /*
+            Compute filtered signal
+        */
+
+        var step = Math.PI * 2 * this.frequency / this.sampleRate;
+        var on, duration;
+        var x0, x1 = 0, x2 = 0;
+        var y0, y1 = 0, y2 = 0;
+        var gain = 0.813;  // empirically, the lowpass filter outputs waveform of magnitude 1.23, so need to scale it down to avoid clipping
+        for (var t = 0; t &lt; timings.length; t += 1) {
+            duration = this.sampleRate * Math.abs(timings[t]) / 1000;
+            on = timings[t] &gt; 0 ? 1 : 0;
+            for (var i = 0; i &lt; duration; i += 1) {
+                x0 = on * Math.sin(i * step);  // the input signal
+                y0 = b0 * x0 + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2;
+                sample.push(y0 * gain);
+                x2 = x1;
+                x1 = x0;
+                y2 = y1;
+                y1 = y0;
+            }
+        }
+        return sample;
+    }
+
+    /**
+     * Get a sample waveform using Web Audio API (asynchronous).
+     * @param {number[]} timings - millisecond timings, +ve numbers representing sound, -ve for no sound (+ve/-ve can be in any order)
+    // TODO * @param {number[]} frequencies - frequencies of elements in Hz.
+    // TODO * @param {number[]} volumes - volumes of elements in Hz.
+    // TODO: remove endpadding?
+     * @param {number} [endPadding=0] - how much silence in ms to add to the end of the waveform.
+     * @return {Promise(number[])} a Promise resolving to an array of floats in range [-1, 1] representing the wave-form.
+     */
+    getWAASample(timings, endPadding = 0) {
+        // add minimum of 5ms silence to the end to ensure the filtered signal can finish cleanly
+        if (timings[timings.length - 1] &gt; 0) {
+            timings.push(-Math.max(5, endPadding));
+        } else {
+            timings[timings.length - 1] = -Math.max(5, endPadding, -timings[timings.length - 1]);
+        }
+        var offlineAudioContextClass = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+        if (offlineAudioContextClass === undefined) {
+            throw new Error(&quot;No OfflineAudioContext class defined&quot;);
+        }
+        // buffer length is the Morse duration + 5ms to let the lowpass filter end cleanly
+        var offlineCtx = new offlineAudioContextClass(1, this.sampleRate * (this.getDuration() + endPadding) / 1000, this.sampleRate);
+        var gainNode = offlineCtx.createGain();
+        // empirically, the lowpass filter outputs waveform of magnitude 1.23, so need to scale it down to avoid clipping
+        gainNode.gain.setValueAtTime(0.813, 0);
+        var lowPassNode = offlineCtx.createBiquadFilter();
+        lowPassNode.type = &quot;lowpass&quot;;
+        lowPassNode.frequency.setValueAtTime(this.frequency * 1.1, 0);  // TODO: remove this magic number and make the filter configurable?
+        gainNode.connect(lowPassNode);
+        lowPassNode.connect(offlineCtx.destination);
+        var t = 0;
+        var oscillator;
+        var duration;
+        for (var i = 0; i &lt; timings.length; i++) {
+            duration = Math.abs(timings[i]) / 1000;
+            if (timings[i] &gt; 0) {  // -ve timings are silence
+                oscillator = offlineCtx.createOscillator();
+                oscillator.type = &apos;sine&apos;;
+                oscillator.frequency.setValueAtTime(this.frequency, t);
+                oscillator.start(t);
+                oscillator.stop(t + duration);
+                oscillator.connect(gainNode);
+            }
+            t += duration;
+        }
+        return offlineCtx.startRendering().then(function(renderedBuffer) {
+            return renderedBuffer.getChannelData(0);
+        });
+    }
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

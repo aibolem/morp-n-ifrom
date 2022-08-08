@@ -22,6 +22,7 @@ import Morse from "./morse-pro.js";
  * @param {string} text - alphanumeric message
  * @param {boolean} useProsigns - true if prosigns are to be used (default is true)
  * @return {{message: string, morse: string, hasError: boolean}}
+ * @deprecated
  */
 export function text2morse(text, useProsigns = true) {
     let ret = {
@@ -63,6 +64,7 @@ export function text2morse(text, useProsigns = true) {
  * @param {string} text - alphanumeric message
  * @param {boolean} useProsigns - true if prosigns are to be used (default is true)
  * @return {string}
+ * @deprecated
  */
 export function text2ditdah(text, useProsigns) {
     // TODO: deal with errors in the translation
@@ -84,10 +86,11 @@ export function text2ditdah(text, useProsigns) {
  * A single '/' may be returned by this function.
  * @param {string} morse - Morse code matching [.-_/| ]*
  * @return {string} Morse code in canonical form matching [.-/ ]*
+ * @deprecated
  */
-export function tidyMorse(input) {
-    let morse = new Morse();
-    return morse.displayMorse(morse.tokeniseMorse(input));
+export function tidyMorse(morse) {
+    let morseInstance = new Morse();
+    return morseInstance.displayMorse(morseInstance.tokeniseMorse(morse));
 }
 
 /**
@@ -96,20 +99,21 @@ export function tidyMorse(input) {
  * @param {string} morse - morse message using [.-_/| ] characters
  * @param {boolean} useProsigns - true if prosigns are to be used (default is true)
  * @return {{message: string, morse: string, hasError: boolean}}
+ * @deprecated
  */
-export function morse2text(input, useProsigns = true) {
+export function morse2text(morse, useProsigns = true) {
     let ret = {
         morse: "",
         message: "",
         hasError: false
     };
-    if (input === "") {
+    if (morse === "") {
         return ret;
     }
 
-    let morse = new Morse({dictionary: 'international', useProsigns});
-    let morseTokens = morse.tokeniseMorse(input);
-    let tme = morse.morseTokens2text(morseTokens);
+    let morseInstance = new Morse({dictionary: 'international', useProsigns});
+    let morseTokens = morseInstance.tokeniseMorse(morse);
+    let tme = morseInstance.morseTokens2text(morseTokens);
     // console.log(tme);
 
     for (let w = 0; w < tme.morse.length; w++) {
@@ -137,6 +141,7 @@ export function morse2text(input, useProsigns = true) {
  * Determine whether a string is most likely morse code.
  * @param {string} input - the text
  * @return {boolean} - true if the string only has Morse characters in after executing tidyMorse
+ * @deprecated
  */
 export function looksLikeMorse(input) {
     let morse = new Morse({dictionary: 'international'});

@@ -1,18 +1,16 @@
-[![Build](https://img.shields.io/travis/scp93ch/morse-pro.svg)](https://travis-ci.org/scp93ch/morse-pro)
-[![Coverage](https://img.shields.io/coveralls/scp93ch/morse-pro.svg)](https://coveralls.io/github/scp93ch/morse-pro?branch=master)
 [![Version](https://img.shields.io/npm/v/morse-pro.svg)](https://www.npmjs.com/package/morse-pro)
 [![Downloads](https://img.shields.io/npm/dm/morse-pro.svg)](https://www.npmjs.com/package/morse-pro)
 [![License](https://img.shields.io/npm/l/morse-pro.svg)](https://joinup.ec.europa.eu/community/eupl/home)
-[![Documentation](https://doc.esdoc.org/github.com/scp93ch/morse-pro/badge.svg)](https://doc.esdoc.org/github.com/scp93ch/morse-pro/)
 
 # Introduction
 
-This Javascript (ES6) library is for manipulating Morse code text and sound. It is the library used in the tools on [Stephen C Phillips's Morse code website](https://morsecode.scphillips.com).
+This Javascript (ES6) library is for manipulating Morse code text and sound. It is the library used in the tools on [Morse Code World](https://morsecode.world).
 
 The library can:
 
 * Translate to and from text and Morse code (in the form of '-- --- .-. ... . / -.-. --- -.. .').
 * Understand Morse code prosigns.
+* Translate and play International, American (railroad), Arabic, Cyrillic, Cyrillic-Ukraine, Hebrew variants.
 * Generate downloadable RIFF WAVE ('.wav') files of Morse code at given frequency and speed.
 * Make use of the "Farnsworth speed" concept of extending the gaps between characters and words.
 * Generate in-browser sounds using the Web Audio API and falling back to other methods such as Flash for older browsers.
@@ -48,36 +46,52 @@ If you would like to access this software under a different licence then please 
 
 # Documentation
 
-Documentation on how to use the library is embedded in the source code and can be found [at the ESDoc site](https://doc.esdoc.org/github.com/scp93ch/morse-pro/).
+Documentation on how to use the library is embedded in the source code and can be found [in the esdoc folder](./doc/esdoc/).
 
 Some diagrams:
 
-* [Class diagram](https://drive.google.com/file/d/17hFelIHgKOMTYb-0M53TiYsC7T2e3c2X/view?usp=sharing)
-* [Audio pipeline](https://drive.google.com/file/d/12OoHQi5AEcyFeeyAa3rWG0MFcmcdj9Pv/view?usp=sharing)
+* [Class diagram](./doc/classes.svg)
+* [Audio pipeline](./doc/audio-pipeline.svg)
 
-Library overview:
+## Library Overview
 
-* [morse-pro.js](./src/morse-pro.js): Basic functions to translate Morse code. Includes mapping of characters and prosigns to dots and dashes.
+Basics:
+
+* [morse-pro.js](./src/morse-pro.js): Morse class, providing basic functions to translate Morse code and manage translation dictionaries.
 * [morse-pro-message.js](./src/morse-pro-message.js): MorseMessage class, for conveniently translating to and from Morse code and dealing with errors.
-* [morse-pro-cw.js](./src/morse-pro-cw.js): MorseCW class, to create the on/off timings needed by e.g. sound generators. Understands speed and Farnsworth speed concepts. Extends MorseMessage class.
+* [dictionary](./src/dictionary): mappings from characters to dots and dashes and configuration of timing and translation
+
+Audio:
+
+* [morse-pro-cw.js](./src/morse-pro-cw.js): MorseCW class, to create the on/off timings needed by e.g. sound generators. Understands speed and Farnsworth speed concepts. Extends Morse class.
 * [morse-pro-cw-wave.js](./src/morse-pro-cw-wave.js): MorseCWWave class, to create sine-wave samples of standard CW Morse. Extends MorseCW.
-* [morse-player-xas.js](./src/morse-player-xas.js): MorsePlayerXAS class, to play sounds in older web browsers (e.g. IE) using XAudioJS. Can play MorseCWWave instances.
-* [morse-player-waa.js](./src/morse-player-waa.js): MorsePlayerWAA class, to play sounds in a web browser using the Web Audio API. Can play MorseCWWave instances.
-* [morse-player-waa-light.js](./src/morse-player-waa-light.js): MorsePlayerWAALight class. Extends MorsePlayerWAA to provide callbacks when the sound goes on or off and when the sound ends.Can be used to turn a light on or off in time with the Morse sound.
-* [morse-pro-decoder.js](./src/morse-pro-decoder.js): MorseDecoder class which converts from timings to Morse code.
-* [morse-pro-decoder-adaptive.js](./src/morse-pro-decoder-adaptive.js): MorseDecoderAdaptive class, converts from timings to Morse code and adapts to changing speed.
-* [morse-pro-keyer.js](./src/morse-pro-keyer.js): MorseKeyer class, tests for input (e.g. from the keyboard) using a timer, plays the appropriate tone and passes the data to a MorseDecoder instance.
+* [morse-pro-audiocontext.js](./src/morse-pro-audiocontext.js): MorseAudioContext singleton class to reliably obtain the web audio API AudioContext instance and load sound samples.
+* [morse-player-waa.js](./src/morse-player-waa.js): MorsePlayerWAA class, to play sounds in a web browser using the Web Audio API.
+* [morse-player-waa-light.js](./src/morse-player-waa-light.js): MorsePlayerWAALight class. Extends MorsePlayerWAA to provide callbacks when the sound goes on or off and when the sound ends. Can be used to turn a light on or off in time with the Morse sound.
+* [morse-player-xas.js](./src/morse-player-xas.js): MorsePlayerXAS class, to play sounds in older web browsers (e.g. IE) using XAudioJS.
+
+Decoders:
+
+* [morse-pro-decoder.js](./src/morse-pro-decoder.js): MorseDecoder class which converts from timings to Morse code. Extends MorseCW.
+* [morse-pro-decoder-adaptive.js](./src/morse-pro-decoder-adaptive.js): MorseDecoderAdaptive class, converts from timings to Morse code and adapts to changing speed. Extends MorseDecoder.
+
+Keyers:
+
+* [morse-pro-keyer.js](./src/morse-pro-keyer.js): MorseKeyer class, tests for input (e.g. from the keyboard) using a timer, plays the appropriate tone via a MorsePlayer instance and passes the data to a MorseDecoder instance.
 * [morse-pro-keyer-iambic.js](./src/morse-pro-keyer-iambic.js): MorseKeyerIambic class extends MorseKeyer, will alternate between dit and dah if both keys are pressed together.
+
+Listeners:
+
 * [morse-pro-listener.js](./src/morse-pro-listener.js): MorseListener class, analyses audio from the microphone or a sound file to pick out Morse code timings which are passed into a MorseDecoder instance.
-* [morse-pro-listener-adaptive.js](./src/morse-pro-listener-adaptive.js): MorseListenerAdaptive class extends MorseListener, adapts to changing frequency.
+* [morse-pro-listener-adaptive.js](./src/morse-pro-listener-adaptive.js): MorseListenerAdaptive class extends MorseListener, adapts to changing frequency (pitch).
+
+Utilities:
+
 * [morse-pro-util-datauri.js](./src/morse-pro-util-datauri.js): Function to create a data URI.
 * [morse-pro-util-riffwave.js](./src/morse-pro-util-riffwave.js): Function to create a RIFF WAVE (.wav) file from a MorseCWWave instance.
-* [morse-pro-wpm.js](./src/morse-pro-wpm.js): Useful constants and functions for computing the speed (and Farnsworth speed) of Morse code.
 
-# Tests
+Deprecated and compatibility:
 
-Some key tests are now included, see [Coveralls](https://coveralls.io/github/scp93ch/morse-pro?branch=master). This library is used for the software on https://morsecode.scphillips.com and is tested there.
-
-# Contact
-
-Please email me at steve@scphillips.com with any questions or ideas.
+* [morse-pro-wpm.js](./src/morse-pro-wpm.js): DEPRECATED. Constants and functions for computing the speed (and Farnsworth speed) of Morse code.
+* [morse-pro-compat.js](./src/morse-pro-compat.js): compatibility class for v2
+* [morse-pro-cw-compat.js](./src/morse-pro-cw-compat.js): compatibility class for v2

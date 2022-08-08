@@ -187,19 +187,14 @@ export default class MorsePlayerWAA {
         return this._gain;
     }
 
+    /**
+     * Mutes or unmutes the audio (leaving the volume setting alone)
+     * @param {Boolean} mute - true to mute, false to unmute
+     */
     muteAudio(mute) {
         let now = morseAudioContext.getAudioContext().currentTime;
         this.muteAudioNode.gain.linearRampToValueAtTime(mute ? 0 : 1, now + 0.03);
     }
-
-    // /**
-    //  * Convenience method to help playing directly from a MorseCWWave instance. Uses the CWWave timings and frequency.
-    //  * @param {Object} cwWave - a MorseCWWave instance
-    //  */
-    // loadCWWave(cwWave) {
-    //     this.load(cwWave.getTimings());
-    //     this.frequency = cwWave.frequency;
-    // }
 
     /**
      * Load timing sequence, replacing any existing sequence.

@@ -196,7 +196,6 @@ export default class MorseCW extends Morse {
 
     /**
      * Force the WPM to match the base length without changing anything else
-     * @param {number} ditLen
      */
     _setWPMfromBaseLength() {
         this._wpm = (MS_IN_MINUTE / this._ditsInParis) / this._baseLength;
@@ -212,7 +211,6 @@ export default class MorseCW extends Morse {
 
     /** 
      * Force the FWPM to match the fditlen/ditlen ratio without changing anything else
-     * @param {number} ratio
      */
     _setFWPMfromRatio() {
         let ratio = Math.abs((this.lengths['charSpace'] / 3) / this.lengths['.']);

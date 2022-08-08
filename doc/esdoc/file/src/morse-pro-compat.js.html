@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/morse-pro-compat.js | morse-pro</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files."><meta property="twitter:card" content="summary"><meta property="twitter:title" content="morse-pro"><meta property="twitter:description" content="Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files."></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a href="https://gitlab.com/scphillips/morse-pro.git">Repository</a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-audiocontext.js~MorseAudioContext.html">MorseAudioContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw-compat.js~MorseCW.html">MorseCW</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw-wave.js~MorseCWWave.html">MorseCWWave</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw.js~MorseCW.html">MorseCW</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-decoder-adaptive.js~MorseAdaptiveDecoder.html">MorseAdaptiveDecoder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-decoder.js~MorseDecoder.html">MorseDecoder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-keyer-iambic.js~MorseIambicKeyer.html">MorseIambicKeyer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-keyer.js~MorseKeyer.html">MorseKeyer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-listener-adaptive.js~MorseAdaptiveListener.html">MorseAdaptiveListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-listener.js~MorseListener.html">MorseListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-message.js~MorseMessage.html">MorseMessage</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-waa-light.js~MorsePlayerWAALight.html">MorsePlayerWAALight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-waa.js~MorsePlayerWAA.html">MorsePlayerWAA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-xas.js~MorsePlayerXAS.html">MorsePlayerXAS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro.js~Morse.html">Morse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-looksLikeMorse">looksLikeMorse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-morse2text">morse2text</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-text2ditdah">text2ditdah</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-text2morse">text2morse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-tidyMorse">tidyMorse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDataURI">getDataURI</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getData">getData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getMIMEType">getMIMEType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-charSpace">charSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-dahLength">dahLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ditLength">ditLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ditSpace">ditSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fditLength">fditLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fwpm">fwpm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ratio">ratio</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-wordSpace">wordSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-wpm">wpm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-morseAudioContext">morseAudioContext</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#dictionary">dictionary</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionaries">dictionaries</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/morse-pro-compat.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/*!
+This code is &#xA9; Copyright Stephen C. Phillips, 2018.
+Email: steve@scphillips.com
+*/
+/*
+Licensed under the EUPL, Version 1.2 or &#x2013; as soon they will be approved by the European Commission - subsequent versions of the EUPL (the &quot;Licence&quot;);
+You may not use this work except in compliance with the Licence.
+You may obtain a copy of the Licence at: https://joinup.ec.europa.eu/community/eupl/
+Unless required by applicable law or agreed to in writing, software distributed under the Licence is distributed on an &quot;AS IS&quot; basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the Licence for the specific language governing permissions and limitations under the Licence.
+*/
+
+/**
+ * Basic methods to translate Morse code.
+ */
+
+import Morse from &quot;./morse-pro.js&quot;;
+
+/**
+ * Translate text to morse in &apos;..- .. / --&apos; form.
+ * If something in the text is untranslatable then it is surrounded by hash-signs (&apos;#&apos;) and a hash is placed in the morse.
+ * @param {string} text - alphanumeric message
+ * @param {boolean} useProsigns - true if prosigns are to be used (default is true)
+ * @return {{message: string, morse: string, hasError: boolean}}
+ * @deprecated
+ */
+export function text2morse(text, useProsigns = true) {
+    let ret = {
+        morse: &quot;&quot;,
+        message: &quot;&quot;,
+        hasError: false
+    };
+    if (text === &quot;&quot;) {
+        return ret;
+    }
+
+    let morse = new Morse({dictionary: &apos;international&apos;, useProsigns});
+    let textTokens = morse.tokeniseText(text);
+    let tme = morse.textTokens2morse(textTokens);
+
+    for (let w = 0; w &lt; tme.text.length; w++) {
+        for (let c = 0; c &lt; tme.text[w].length; c++) {
+            let t = tme.text[w][c];
+            let m = tme.morse[w][c];
+            if (tme.error[w][c]) {
+                ret.message += &quot;#&quot; + t + &quot;#&quot;;
+                ret.morse += &quot;# &quot;;
+            } else {
+                ret.message += t;
+                ret.morse += m.replace(/ /g, &apos;&apos;) + &quot; &quot;;
+            }
+        }
+        ret.message += &apos; &apos;;
+        ret.morse += &apos;/ &apos;;
+    }
+    ret.message = ret.message.slice(0, ret.message.length - 1);
+    ret.morse = ret.morse.slice(0, ret.morse.length - 3);
+    ret.hasError = tme.hasError;
+    return ret;
+}
+
+/**
+ * Translate text to morse in &apos;Di-di-dah dah&apos; form.
+ * @param {string} text - alphanumeric message
+ * @param {boolean} useProsigns - true if prosigns are to be used (default is true)
+ * @return {string}
+ * @deprecated
+ */
+export function text2ditdah(text, useProsigns) {
+    // TODO: deal with errors in the translation
+    var ditdah = text2morse(text, useProsigns).morse + &apos; &apos;; // get the dots and dashes
+    ditdah = ditdah.replace(/\./g, &apos;di~&apos;).replace(/\-/g, &apos;dah~&apos;); // do the basic job
+    ditdah = ditdah.replace(/~/g, &apos;-&apos;); // replace placeholder with dash
+    ditdah = ditdah.replace(/\- /g, &apos; &apos;); // remove trailing dashes
+    ditdah = ditdah.replace(/di /g, &apos;dit &apos;); // use &apos;dit&apos; at end of letter
+    ditdah = ditdah.replace(/ \/ /g, &apos;, &apos;); // do punctuation
+    ditdah = ditdah.replace(/^d/, &apos;D&apos;); // do capitalisation
+    ditdah = ditdah.replace(/ $/, &apos;&apos;); // remove the space we added
+    ditdah = ditdah.replace(/([th])$/, &apos;$1.&apos;); // add full-stop if there is anything there
+    return ditdah;
+}
+
+/**
+ * Canonicalise morse text.
+ * Canonical form matches [.-/ ]*, has single spaces between characters, has words separated by &apos; / &apos;, and has no spaces at the start or end.
+ * A single &apos;/&apos; may be returned by this function.
+ * @param {string} morse - Morse code matching [.-_/| ]*
+ * @return {string} Morse code in canonical form matching [.-/ ]*
+ * @deprecated
+ */
+export function tidyMorse(morse) {
+    let morseInstance = new Morse();
+    return morseInstance.displayMorse(morseInstance.tokeniseMorse(morse));
+}
+
+/**
+ * Translate morse to text. Canonicalise the morse first.
+ * If something in the morse is untranslatable then it is surrounded by hash-signs (&apos;#&apos;) and a hash is placed in the text.
+ * @param {string} morse - morse message using [.-_/| ] characters
+ * @param {boolean} useProsigns - true if prosigns are to be used (default is true)
+ * @return {{message: string, morse: string, hasError: boolean}}
+ * @deprecated
+ */
+export function morse2text(morse, useProsigns = true) {
+    let ret = {
+        morse: &quot;&quot;,
+        message: &quot;&quot;,
+        hasError: false
+    };
+    if (morse === &quot;&quot;) {
+        return ret;
+    }
+
+    let morseInstance = new Morse({dictionary: &apos;international&apos;, useProsigns});
+    let morseTokens = morseInstance.tokeniseMorse(morse);
+    let tme = morseInstance.morseTokens2text(morseTokens);
+    // console.log(tme);
+
+    for (let w = 0; w &lt; tme.morse.length; w++) {
+        for (let c = 0; c &lt; tme.morse[w].length; c++) {
+            let t = tme.text[w][c];
+            let m = tme.morse[w][c].replace(/ /g, &apos;&apos;);
+            if (tme.error[w][c]) {
+                ret.message += &quot;#&quot;;
+                ret.morse += &quot;#&quot; + m + &quot;# &quot;;
+            } else {
+                ret.message += t;
+                ret.morse += m + &quot; &quot;;
+            }
+        }
+        ret.message += &apos; &apos;;
+        ret.morse += &apos;/ &apos;;
+    }
+    ret.message = ret.message.slice(0, ret.message.length - 1);
+    ret.morse = ret.morse.slice(0, ret.morse.length - 2).trim();
+    ret.hasError = tme.hasError;
+    return ret;
+}
+
+/**
+ * Determine whether a string is most likely morse code.
+ * @param {string} input - the text
+ * @return {boolean} - true if the string only has Morse characters in after executing tidyMorse
+ * @deprecated
+ */
+export function looksLikeMorse(input) {
+    let morse = new Morse({dictionary: &apos;international&apos;});
+    return morse.looksLikeMorse(input);
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

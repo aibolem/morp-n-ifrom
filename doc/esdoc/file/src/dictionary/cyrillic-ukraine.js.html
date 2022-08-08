@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/dictionary/cyrillic-ukraine.js | morse-pro</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files."><meta property="twitter:card" content="summary"><meta property="twitter:title" content="morse-pro"><meta property="twitter:description" content="Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files."></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a href="https://gitlab.com/scphillips/morse-pro.git">Repository</a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-audiocontext.js~MorseAudioContext.html">MorseAudioContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw-compat.js~MorseCW.html">MorseCW</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw-wave.js~MorseCWWave.html">MorseCWWave</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw.js~MorseCW.html">MorseCW</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-decoder-adaptive.js~MorseAdaptiveDecoder.html">MorseAdaptiveDecoder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-decoder.js~MorseDecoder.html">MorseDecoder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-keyer-iambic.js~MorseIambicKeyer.html">MorseIambicKeyer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-keyer.js~MorseKeyer.html">MorseKeyer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-listener-adaptive.js~MorseAdaptiveListener.html">MorseAdaptiveListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-listener.js~MorseListener.html">MorseListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-message.js~MorseMessage.html">MorseMessage</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-waa-light.js~MorsePlayerWAALight.html">MorsePlayerWAALight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-waa.js~MorsePlayerWAA.html">MorsePlayerWAA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-xas.js~MorsePlayerXAS.html">MorsePlayerXAS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro.js~Morse.html">Morse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-looksLikeMorse">looksLikeMorse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-morse2text">morse2text</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-text2ditdah">text2ditdah</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-text2morse">text2morse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-tidyMorse">tidyMorse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDataURI">getDataURI</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getData">getData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getMIMEType">getMIMEType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-charSpace">charSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-dahLength">dahLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ditLength">ditLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ditSpace">ditSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fditLength">fditLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fwpm">fwpm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ratio">ratio</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-wordSpace">wordSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-wpm">wpm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-morseAudioContext">morseAudioContext</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#dictionary">dictionary</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionaries">dictionaries</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/dictionary/cyrillic-ukraine.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">export var dictionary = {
+    id: &apos;cyrillic-ukraine&apos;,
+
+    letter: {
+        &apos;&#x410;&apos;: &apos;. -&apos;,
+        &apos;&#x411;&apos;: &apos;- . . .&apos;,
+        &apos;&#x412;&apos;: &apos;. - -&apos;,
+        &apos;&#x413;&apos;: &apos;- - .&apos;,
+        &apos;&#x414;&apos;: &apos;- . .&apos;,
+        &apos;&#x415;&apos;: &apos;.&apos;,
+        &apos;&#x416;&apos;: &apos;. . . -&apos;,
+        &apos;&#x417;&apos;: &apos;- - . .&apos;,
+        &apos;&#x406;&apos;: &apos;. .&apos;,
+        &apos;&#x419;&apos;: &apos;. - - -&apos;,
+        &apos;&#x41A;&apos;: &apos;- . -&apos;,
+        &apos;&#x41B;&apos;: &apos;. - . .&apos;,
+        &apos;&#x41C;&apos;: &apos;- -&apos;,
+        &apos;&#x41D;&apos;: &apos;- .&apos;,
+        &apos;&#x41E;&apos;: &apos;- - -&apos;,
+        &apos;&#x41F;&apos;: &apos;. - - .&apos;,
+        &apos;&#x420;&apos;: &apos;. - .&apos;,
+        &apos;&#x421;&apos;: &apos;. . .&apos;,
+        &apos;&#x422;&apos;: &apos;-&apos;,
+        &apos;&#x423;&apos;: &apos;. . -&apos;,
+        &apos;&#x424;&apos;: &apos;. . - .&apos;,
+        &apos;&#x425;&apos;: &apos;. . . .&apos;,
+        &apos;&#x426;&apos;: &apos;- . - .&apos;,
+        &apos;&#x427;&apos;: &apos;- - - .&apos;,
+        &apos;&#x428;&apos;: &apos;- - - -&apos;,
+        &apos;&#x429;&apos;: &apos;- - . -&apos;,
+        &apos;&#x42A;&apos;: &apos;- - . - -&apos;,
+        &apos;&#x42B;&apos;: &apos;- . - -&apos;,
+        &apos;&#x418;&apos;: &apos;- . - -&apos;,
+        &apos;&#x42C;&apos;: &apos;- . . -&apos;,
+        &apos;&#x404;&apos;: &apos;. . - . .&apos;,
+        &apos;&#x42E;&apos;: &apos;. . - -&apos;,
+        &apos;&#x42F;&apos;: &apos;. - . -&apos;,
+        &apos;&#x407;&apos;: &apos;. - - - .&apos;,
+        &apos;1&apos;: &apos;. - - - -&apos;,
+        &apos;2&apos;: &apos;. . - - -&apos;,
+        &apos;3&apos;: &apos;. . . - -&apos;,
+        &apos;4&apos;: &apos;. . . . -&apos;,
+        &apos;5&apos;: &apos;. . . . .&apos;,
+        &apos;6&apos;: &apos;- . . . .&apos;,
+        &apos;7&apos;: &apos;- - . . .&apos;,
+        &apos;8&apos;: &apos;- - - . .&apos;,
+        &apos;9&apos;: &apos;- - - - .&apos;,
+        &apos;0&apos;: &apos;- - - - -&apos;,
+        &apos;.&apos;: &apos;. . . . . .&apos;,
+        &apos;,&apos;: &apos;. - . - . -&apos;,
+        &apos;:&apos;: &apos;- - - . . .&apos;,
+        &apos;;&apos;: &apos;- . - . -&apos;,
+        &apos;?&apos;: &apos;. . - - . .&apos;,
+        &apos;/&apos;: &apos;- . . - .&apos;,
+        &apos;(&apos;: &apos;- . - - . -&apos;,
+        &apos;)&apos;: &apos;- . - - . -&apos;,
+        &quot;&apos;&quot;: &apos;. - - - - .&apos;,
+        &apos;&quot;&apos;: &apos;. - . . - .&apos;,
+        &apos;&#x2014;&apos;: &apos;- . . . . -&apos;,
+        &apos;!&apos;: &apos;- - . . - -&apos;,
+        &apos;-&apos;: &apos;- . . . -&apos;,
+        &apos;@&apos;: &apos;. - - . - .&apos;
+    },
+
+    letterMatch: /^./,
+
+    /* &apos;charSpace&apos; and &apos;wordSpace&apos; are mandatory. The other symbols are dictionary dependent. */
+    ratio: {
+        &apos;.&apos;: 1,
+        &apos;-&apos;: 3,
+        &apos; &apos;: -1,
+        &apos;charSpace&apos;: -3,
+        &apos;wordSpace&apos;: -7
+    },
+
+    baseElement: &apos;.&apos;,
+
+    frequency: {
+        &apos;.&apos;: 550,
+        &apos;-&apos;: 550,
+        &apos; &apos;: 0,
+        &apos;charSpace&apos;: 0,
+        &apos;wordSpace&apos;: 0
+    },
+
+    display: {
+        morse: {
+            &apos;\\.&apos;: &apos;.&apos;,
+            &apos;\\-&apos;: &apos;-&apos;,
+            &apos; &apos;: &apos;&apos;
+        },
+        join: {
+            charSpace: &apos; &apos;,
+            wordSpace: &apos; / &apos;
+        }
+    },
+
+    tokeniseMorse: function(morse) {
+        morse = morse.trim();
+        morse = morse.replace(/_/g, &apos;-&apos;)
+        morse = morse.replace(/\|/g, &apos;/&apos;);
+        morse = morse.replace(/\s+/g, &apos; &apos;);
+        morse = morse.replace(/\s*\/[\s\/]*/g, &apos;/&apos;);
+        let words = morse.split(&apos;/&apos;);
+        let tokens = words.map(word =&gt; word.split(&apos; &apos;));
+        tokens = tokens.map(letters =&gt; letters.map(letter =&gt; letter.replace(/(.)(?=.)/g, &apos;$1 &apos;)));
+        return tokens;
+    },
+
+    morseMatch: new RegExp(&apos;^\\s*[\\.\\-_]+[\\.\\-_\\s\\/\\|]*$&apos;),
+
+    displayName: {
+        keys: [&apos;.&apos;, &apos;-&apos;, &apos; &apos;, &apos;charSpace&apos;, &apos;wordSpace&apos;],
+        values: [&apos;Dit length&apos;, &apos;Dah length&apos;, &apos;Intra-character space&apos;, &apos;Inter-character space&apos;, &apos;Inter-word space&apos;]
+    },
+
+    options: {
+    }
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

@@ -1,9 +1,10 @@
 {
   "name": "morse-pro",
-  "version": "2.0.0",
-  "description": "Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can create WAV files and analyse input from the microphone or audio files.",
+  "version": "3.0.0",
+  "description": "Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files.",
   "keywords": [
     "morse code",
+    "CW",
     "decoder",
     "wav file",
     "microphone",
@@ -14,18 +15,18 @@
     "prosigns"
   ],
   "license": "EUPL-1.2",
-  "homepage": "https://morsecode.scphillips.com",
+  "homepage": "https://morsecode.world",
   "author": {
     "name": "Stephen C Phillips",
-    "email": "steve@scphillips.com",
+    "email": "steve@morsecode.world",
     "url": "https://scphillips.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/scp93ch/morse-pro.git"
+    "url": "https://gitlab.com/scphillips/morse-pro.git"
   },
   "bugs": {
-    "url": "https://github.com/scp93ch/morse-pro/issues"
+    "url": "https://gitlab.com/scphillips/morse-pro/-/issues"
   },
   "directories": {
     "lib": "lib",
@@ -35,45 +36,40 @@
     "lib"
   ],
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-plugin-istanbul": "^5.1.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-register": "^6.26.0",
-    "coveralls": "^3.0.2",
-    "cross-env": "^5.2.0",
+    "@babel/cli": "^7.18.10",
+    "@babel/core": "^7.18.10",
     "esdoc": "^1.1.0",
+    "esdoc-ecmascript-proposal-plugin": "^1.0.0",
     "esdoc-standard-plugin": "^1.0.0",
-    "mocha": "^5.2.0",
-    "mocha-lcov-reporter": "^1.3.0",
-    "nyc": "^13.0.1",
-    "rimraf": "^2.6.3"
+    "rimraf": "^3.0.2"
   },
   "esdoc": {
     "source": "./src",
-    "destination": "./doc",
+    "destination": "./doc/esdoc",
     "plugins": [
       {
         "name": "esdoc-standard-plugin"
+      },
+      {
+        "name": "esdoc-ecmascript-proposal-plugin",
+        "option": {
+          "classProperties": true,
+          "objectRestSpread": true,
+          "doExpressions": true,
+          "functionBind": true,
+          "functionSent": true,
+          "asyncGenerators": true,
+          "decorators": true,
+          "exportExtensions": true,
+          "dynamicImport": true
+        }
       }
     ]
   },
-  "nyc": {
-    "require": [
-      "babel-register"
-    ],
-    "reporter": [
-      "lcov",
-      "text"
-    ],
-    "sourceMap": false,
-    "instrument": false
-  },
   "scripts": {
-    "clean": "rimraf lib coverage doc",
+    "clean": "rimraf lib doc/esdoc",
     "prebuild": "npm run clean -s",
     "build": "babel src -d lib",
-    "test": "cross-env NODE_ENV=test nyc mocha",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
     "prepare": "npm run build",
     "build-docs": "esdoc"
   }

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl">
+  <title data-ice="title">Home | morse-pro</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files."><meta property="twitter:card" content="summary"><meta property="twitter:title" content="morse-pro"><meta property="twitter:description" content="Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files."></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a href="https://gitlab.com/scphillips/morse-pro.git">Repository</a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-audiocontext.js~MorseAudioContext.html">MorseAudioContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw-compat.js~MorseCW.html">MorseCW</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw-wave.js~MorseCWWave.html">MorseCWWave</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw.js~MorseCW.html">MorseCW</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-decoder-adaptive.js~MorseAdaptiveDecoder.html">MorseAdaptiveDecoder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-decoder.js~MorseDecoder.html">MorseDecoder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-keyer-iambic.js~MorseIambicKeyer.html">MorseIambicKeyer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-keyer.js~MorseKeyer.html">MorseKeyer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-listener-adaptive.js~MorseAdaptiveListener.html">MorseAdaptiveListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-listener.js~MorseListener.html">MorseListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-message.js~MorseMessage.html">MorseMessage</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-waa-light.js~MorsePlayerWAALight.html">MorsePlayerWAALight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-waa.js~MorsePlayerWAA.html">MorsePlayerWAA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-xas.js~MorsePlayerXAS.html">MorsePlayerXAS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro.js~Morse.html">Morse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-looksLikeMorse">looksLikeMorse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-morse2text">morse2text</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-text2ditdah">text2ditdah</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-text2morse">text2morse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-tidyMorse">tidyMorse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDataURI">getDataURI</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getData">getData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getMIMEType">getMIMEType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-charSpace">charSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-dahLength">dahLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ditLength">ditLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ditSpace">ditSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fditLength">fditLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fwpm">fwpm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ratio">ratio</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-wordSpace">wordSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-wpm">wpm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-morseAudioContext">morseAudioContext</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#dictionary">dictionary</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionaries">dictionaries</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><div data-ice="index" class="github-markdown"><p><a href="https://www.npmjs.com/package/morse-pro"><img src="https://img.shields.io/npm/v/morse-pro.svg" alt="Version"></a>
+<a href="https://www.npmjs.com/package/morse-pro"><img src="https://img.shields.io/npm/dm/morse-pro.svg" alt="Downloads"></a>
+<a href="https://joinup.ec.europa.eu/community/eupl/home"><img src="https://img.shields.io/npm/l/morse-pro.svg" alt="License"></a></p>
+<h1 id="introduction">Introduction</h1><p>This Javascript (ES6) library is for manipulating Morse code text and sound. It is the library used in the tools on <a href="https://morsecode.world">Morse Code World</a>.</p>
+<p>The library can:</p>
+<ul>
+<li>Translate to and from text and Morse code (in the form of &apos;-- --- .-. ... . / -.-. --- -.. .&apos;).</li>
+<li>Understand Morse code prosigns.</li>
+<li>Translate and play International, American (railroad), Arabic, Cyrillic, Cyrillic-Ukraine, Hebrew variants.</li>
+<li>Generate downloadable RIFF WAVE (&apos;.wav&apos;) files of Morse code at given frequency and speed.</li>
+<li>Make use of the &quot;Farnsworth speed&quot; concept of extending the gaps between characters and words.</li>
+<li>Generate in-browser sounds using the Web Audio API and falling back to other methods such as Flash for older browsers.</li>
+<li>Take Morse code input from a web-based keyer or iambic keyer.</li>
+<li>Decode to text given &apos;on&apos; and &apos;off&apos; timings and a fixed speed.</li>
+<li>Adaptively decode to text, adjusting to the most likely speed and Farnsworth speed.</li>
+<li>Decode from listening to the microphone or an audio file, adapting to the most prominent frequency.</li>
+</ul>
+<p>It has been written using ES6 (ECMA Script 6).</p>
+<h1 id="copyright-and-licence">Copyright and Licence</h1><p>Two files (<a href="./src/morse-pro-util-riffwave.js">morse-pro-util-riffwave.js</a> and <a href="./src/morse-pro-util-datauri.js">morse-pro-util-datauri.js</a>) are Public Domain. The others are:</p>
+<p>Copyright: Stephen C Phillips, 2013-2017; Licensed under the EUPL v1.2, with extension of article 5 (compatibility clause) to any licence for distributing derivative works that have been produced by the normal use of the Work as a library.</p>
+<p><em>Please note, this is different to the Expat (MIT) licence often found in Javascript projects and places restrictions and obligations on the user of the software.</em></p>
+<p>The full text of the licence can be found in the <a href="./LICENSE">LICENSE file</a> in this folder. Comments below do not constitute the licence, they are just my comments on the licence.</p>
+<p>The EUPL is an &apos;open source&apos; licence: one of many options and one in the &apos;weak-copyleft&apos; category. My intention in using EUPL v1.2 is primarily to ensure that any modifications to this library are made available to the community as source code. In contrast to many open source licences, the EUPL v1.2 licence makes it clear that modifications must be made available even in the case of the library being used as part of a web service and not distributed to the user, covering the &apos;Application Service Provider loophole&apos; (in this case it is similar to the AGPL licence). My intention is also that this library can be used as a library by other pieces of software but that the EUPL v1.2 licence does not have to be applied to the software that links to it (this is similar to the LGPL licence). Of course, if you want to open source software that links to this library then you are free to do so.</p>
+<p>So basically, if you use the library as-is in some piece of software then that&apos;s just fine (though an acknowledgement would be nice) and you can even keep the software closed-source should you wish to. If you <em>modify the library</em> <strong>and</strong> <em>use it in some software that you provide to others</em>, even if the library is not distributed to the users, then you must provide your modifications to the library back to the community so that everyone can benefit.</p>
+<p>More information on the EUPL v1.2:</p>
+<ul>
+<li><a href="https://joinup.ec.europa.eu/community/eupl/home">EUPL information</a></li>
+<li><a href="https://joinup.ec.europa.eu/community/eupl/news/eupl-and-proprietary/commercial-use">EUPL and Proprietary / Commercial use</a></li>
+<li><a href="https://joinup.ec.europa.eu/community/eupl/og_page/eupl-compatible-open-source-licences">Compatibility with other licences</a></li>
+<li><a href="https://tldrlegal.com/license/european-union-public-licence">Summary of the similar EUPL v1.1 from TL;DR Legal</a></li>
+</ul>
+<p>If you would like to access this software under a different licence then please get in touch and ask.</p>
+<h1 id="documentation">Documentation</h1><p>Documentation on how to use the library is embedded in the source code and can be found <a href="./doc/esdoc/">in the esdoc folder</a>.</p>
+<p>Some diagrams:</p>
+<ul>
+<li><a href="./doc/classes.svg">Class diagram</a></li>
+<li><a href="./doc/audio-pipeline.svg">Audio pipeline</a></li>
+</ul>
+<h2 id="library-overview">Library Overview</h2><p>Basics:</p>
+<ul>
+<li><a href="./src/morse-pro.js">morse-pro.js</a>: Morse class, providing basic functions to translate Morse code and manage translation dictionaries.</li>
+<li><a href="./src/morse-pro-message.js">morse-pro-message.js</a>: MorseMessage class, for conveniently translating to and from Morse code and dealing with errors.</li>
+<li><a href="./src/dictionary">dictionary</a>: mappings from characters to dots and dashes and configuration of timing and translation</li>
+</ul>
+<p>Audio:</p>
+<ul>
+<li><a href="./src/morse-pro-cw.js">morse-pro-cw.js</a>: MorseCW class, to create the on/off timings needed by e.g. sound generators. Understands speed and Farnsworth speed concepts. Extends Morse class.</li>
+<li><a href="./src/morse-pro-cw-wave.js">morse-pro-cw-wave.js</a>: MorseCWWave class, to create sine-wave samples of standard CW Morse. Extends MorseCW.</li>
+<li><a href="./src/morse-pro-audiocontext.js">morse-pro-audiocontext.js</a>: MorseAudioContext singleton class to reliably obtain the web audio API AudioContext instance and load sound samples.</li>
+<li><a href="./src/morse-player-waa.js">morse-player-waa.js</a>: MorsePlayerWAA class, to play sounds in a web browser using the Web Audio API.</li>
+<li><a href="./src/morse-player-waa-light.js">morse-player-waa-light.js</a>: MorsePlayerWAALight class. Extends MorsePlayerWAA to provide callbacks when the sound goes on or off and when the sound ends. Can be used to turn a light on or off in time with the Morse sound.</li>
+<li><a href="./src/morse-player-xas.js">morse-player-xas.js</a>: MorsePlayerXAS class, to play sounds in older web browsers (e.g. IE) using XAudioJS.</li>
+</ul>
+<p>Decoders:</p>
+<ul>
+<li><a href="./src/morse-pro-decoder.js">morse-pro-decoder.js</a>: MorseDecoder class which converts from timings to Morse code. Extends MorseCW.</li>
+<li><a href="./src/morse-pro-decoder-adaptive.js">morse-pro-decoder-adaptive.js</a>: MorseDecoderAdaptive class, converts from timings to Morse code and adapts to changing speed. Extends MorseDecoder.</li>
+</ul>
+<p>Keyers:</p>
+<ul>
+<li><a href="./src/morse-pro-keyer.js">morse-pro-keyer.js</a>: MorseKeyer class, tests for input (e.g. from the keyboard) using a timer, plays the appropriate tone via a MorsePlayer instance and passes the data to a MorseDecoder instance.</li>
+<li><a href="./src/morse-pro-keyer-iambic.js">morse-pro-keyer-iambic.js</a>: MorseKeyerIambic class extends MorseKeyer, will alternate between dit and dah if both keys are pressed together.</li>
+</ul>
+<p>Listeners:</p>
+<ul>
+<li><a href="./src/morse-pro-listener.js">morse-pro-listener.js</a>: MorseListener class, analyses audio from the microphone or a sound file to pick out Morse code timings which are passed into a MorseDecoder instance.</li>
+<li><a href="./src/morse-pro-listener-adaptive.js">morse-pro-listener-adaptive.js</a>: MorseListenerAdaptive class extends MorseListener, adapts to changing frequency (pitch).</li>
+</ul>
+<p>Utilities:</p>
+<ul>
+<li><a href="./src/morse-pro-util-datauri.js">morse-pro-util-datauri.js</a>: Function to create a data URI.</li>
+<li><a href="./src/morse-pro-util-riffwave.js">morse-pro-util-riffwave.js</a>: Function to create a RIFF WAVE (.wav) file from a MorseCWWave instance.</li>
+</ul>
+<p>Deprecated and compatibility:</p>
+<ul>
+<li><a href="./src/morse-pro-wpm.js">morse-pro-wpm.js</a>: DEPRECATED. Constants and functions for computing the speed (and Farnsworth speed) of Morse code.</li>
+<li><a href="./src/morse-pro-compat.js">morse-pro-compat.js</a>: compatibility class for v2</li>
+<li><a href="./src/morse-pro-cw-compat.js">morse-pro-cw-compat.js</a>: compatibility class for v2</li>
+</ul>
+</div>
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/morse-pro.js | morse-pro</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files."><meta property="twitter:card" content="summary"><meta property="twitter:title" content="morse-pro"><meta property="twitter:description" content="Library for manipulating Morse code text and sound. Understands prosigns and Farnsworth speed. Can playback via web audio API, WAV files, vibration and light and can decode input from the microphone or audio files."></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a href="https://gitlab.com/scphillips/morse-pro.git">Repository</a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-audiocontext.js~MorseAudioContext.html">MorseAudioContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw-compat.js~MorseCW.html">MorseCW</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw-wave.js~MorseCWWave.html">MorseCWWave</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-cw.js~MorseCW.html">MorseCW</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-decoder-adaptive.js~MorseAdaptiveDecoder.html">MorseAdaptiveDecoder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-decoder.js~MorseDecoder.html">MorseDecoder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-keyer-iambic.js~MorseIambicKeyer.html">MorseIambicKeyer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-keyer.js~MorseKeyer.html">MorseKeyer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-listener-adaptive.js~MorseAdaptiveListener.html">MorseAdaptiveListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-listener.js~MorseListener.html">MorseListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-message.js~MorseMessage.html">MorseMessage</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-waa-light.js~MorsePlayerWAALight.html">MorsePlayerWAALight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-waa.js~MorsePlayerWAA.html">MorsePlayerWAA</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro-player-xas.js~MorsePlayerXAS.html">MorsePlayerXAS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/morse-pro.js~Morse.html">Morse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-looksLikeMorse">looksLikeMorse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-morse2text">morse2text</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-text2ditdah">text2ditdah</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-text2morse">text2morse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-tidyMorse">tidyMorse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDataURI">getDataURI</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getData">getData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getMIMEType">getMIMEType</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-charSpace">charSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-dahLength">dahLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ditLength">ditLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ditSpace">ditSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fditLength">fditLength</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fwpm">fwpm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ratio">ratio</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-wordSpace">wordSpace</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-wpm">wpm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-morseAudioContext">morseAudioContext</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#dictionary">dictionary</a><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionaries">dictionaries</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-dictionary">dictionary</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/morse-pro.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/*!
+This code is &#xA9; Copyright Stephen C. Phillips, 2018.
+Email: steve@scphillips.com
+*/
+/*
+Licensed under the EUPL, Version 1.2 or &#x2013; as soon they will be approved by the European Commission - subsequent versions of the EUPL (the &quot;Licence&quot;);
+You may not use this work except in compliance with the Licence.
+You may obtain a copy of the Licence at: https://joinup.ec.europa.eu/community/eupl/
+Unless required by applicable law or agreed to in writing, software distributed under the Licence is distributed on an &quot;AS IS&quot; basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the Licence for the specific language governing permissions and limitations under the Licence.
+*/
+
+/**
+ * Basic methods to translate Morse code.
+ */
+
+import { dictionaries } from &quot;./dictionary/index.js&quot;;
+
+export default class Morse {
+    /**
+     *
+     * @param {Object} params - dictionary of optional parameters.
+     * @param {String} [params.dictionary=&apos;international&apos;] - which dictionary to use, e.g. &apos;international&apos; or &apos;american&apos;. Can optionally take a list of dictionary strings.
+     * @param {String[]} [params.dictionaryOptions=[]] - optional additional dictionaries such as &apos;prosigns&apos;. Will look these up in the merged dictionary formed of the list of dictionaries.
+     */
+    constructor({dictionary=&apos;international&apos;, dictionaryOptions=[]} = {}) {
+        if (typeof dictionary === &apos;string&apos;) {
+            dictionary = [dictionary];
+        }
+        this.setDictionariesAndOptions(dictionary, dictionaryOptions);
+    }
+
+    setDictionariesAndOptions(dictList, optionList) {
+        this.dictionaries = dictList;
+        this.options = optionList;
+        this._loadDictionaries();
+    }
+
+    /**
+     * Set the list of dictionaries to use.
+     * @param {List} dictList - list of dictionary names
+     */
+    setDictionaries(dictList) {
+        this.dictionaries = dictList;
+        this._loadDictionaries();
+    }
+
+    /**
+     * Set the list of dictionary options to use.
+     * @param {List} optionList - list of dictionary option names. Looked up in merged dictionary
+     */
+    setOptions(optionList) {
+        this.options = optionList;
+        this._loadDictionaries()
+    }
+
+    _loadDictionaries() {
+        // Clear any existing mappings:
+        this.text2morseD = {};
+        this.morse2textD = {};
+        // Set up sensible default:
+        this._addDictionary({
+            letter:{&apos;&apos;:&apos;&apos;},
+            letterMatch:/^./
+        });
+        // Load in all dictionaries:
+        for (let d of this.dictionaries) {
+            if (d in dictionaries) {
+                let dict = dictionaries[d]  // switch to the imported dict
+                this._addDictionary(dict);
+            } else {
+                throw `No dictionary called &apos;${d}&apos;`;
+            }
+        }
+        // Overlay any options:
+        for (let optName of this.options) {
+            if (this.dictionary.options[optName] !== undefined) {
+                this._addDictionary(this.dictionary.options[optName])
+            } else {
+                throw `No option &apos;${optName}&apos; in &apos;${this.dictionary.id}&apos;`;
+            }
+        }
+    }
+
+    /**
+     * Load in a dictionary.
+     * Dictionary needs &apos;letter&apos; and (optional) &apos;letterMatch&apos; keys.
+     * @param {Object} dict
+     */
+    _addDictionary(dict) {
+        this.dictionary = {...this.dictionary, ...dict};  // overwrite any existing keys with the new dict
+
+        let letters = dict.letter;
+        for (let letter in letters) {
+            // overwrite any existing letter keys
+            this.text2morseD[letter] = letters[letter];
+            this.morse2textD[letters[letter]] = letter;
+        }
+    }
+
+    /**
+     * General method for converting a set of tokens to a displayable string
+     * @param {Array} tokens - list of lists of tokens to form into String
+     * @param {String} charSpace - String to use to separate characters
+     * @param {String} wordSpace - String to use to separate words
+     * @param {Map} map - Map to replace tokens with alternatives, e.g. for display escaping {&apos;&gt;&apos;, &apos;&amp;gt;&apos;}
+     * @param {Array} errors - list if lists of Booleans indicating if there is an error in the tokens parameter
+     * @param {String} errorPrefix - used to prefix any token that is an error
+     * @param {String} errorSuffix - used to suffix any token that is an error
+     * @returns a String of the tokens
+     */
+    display(tokens, charSpace, wordSpace, map={}, errors=undefined, errorPrefix=&apos;&apos;, errorSuffix=&apos;&apos;) {
+        for (let k in map) {
+            tokens = tokens.map(word =&gt; word.map(char =&gt; char.replace(new RegExp(k, &apos;g&apos;), map[k])));
+        }
+        if (errors !== undefined) {
+            for (let i = 0; i &lt; tokens.length; i++) {
+                for (let j = 0; j &lt; tokens[i].length; j++) {
+                    if (errors[i][j]) {
+                        tokens[i][j] = errorPrefix + tokens[i][j] + errorSuffix;
+                    }
+                }
+            }
+        }
+        let words = tokens.map(word =&gt; word.join(charSpace));
+        return words.join(wordSpace);
+    }
+
+    /**
+     * Tidies text (upper case, trim, squash multiple spaces)
+     * @param {String} text - the text to tidy
+     * @returns the tidied text
+     */
+    tidyText(text) {
+        text = text.trim();
+        text = text.replace(/\s+/g, &apos; &apos;);
+        return text;
+    }
+
+    /**
+     * Splits text into words and letters
+     * @param {String} text - the text to tokenise
+     * @returns a list of lists, e.g. [[&apos;o&apos;, &apos;n&apos;, &apos;e&apos;], [&apos;t&apos;, &apos;w&apos;, &apos;o&apos;]]
+     */
+    tokeniseRawText(text) {
+        let tokens = []
+        let words = text.split(&apos; &apos;);
+        for (let word of words) {
+            let letters = [];
+            while (word.length) {
+                let letter = word.match(this.dictionary.letterMatch)[0];
+                word = word.substr(letter.length);
+                letters.push(letter);
+            }
+            tokens.push(letters);
+        }
+        return tokens;
+    }
+
+    /**
+     * Tidies and then tokenises text
+     * @param {String} text - the text to tokenise
+     * @returns - the tidied, tokenised text
+     */
+    tokeniseText(text) {
+        return this.tokeniseRawText(this.tidyText(text));
+    }
+
+    /**
+     * Convert from text tokens to displayable String
+     * @param {Array} textTokens - list of lists representing the words and characters
+     * @param {Map} escapeMap - Map to replace tokens with alternatives, e.g. for display escaping {&apos;&gt;&apos;, &apos;&amp;gt;&apos;}
+     * @returns a String, joining the characters together, separating the words with a space
+     */
+    displayText(textTokens, escapeMap) {
+        return this.display(textTokens, &apos;&apos;, &apos; &apos;, escapeMap)
+    }
+
+    displayTextErrors(textTokens, escapeMap, errorTokens, prefix, suffix) {
+        return this.display(textTokens, &apos;&apos;, &apos; &apos;, escapeMap, errorTokens, prefix, suffix);
+    }
+
+    /**
+     *
+     * @param {Array} textTokens - list of lists of text tokens
+     * @returns Map - text: text tokens, morse: morse tokens, error: error tokens, hasError Boolean
+     */
+    textTokens2morse(textTokens) {
+        let translation = this._input2output(textTokens, this.text2morseD);
+        return {
+            text: textTokens,
+            morse: translation.output,
+            error: translation.error,
+            hasError: translation.hasError
+        }
+    }
+
+    text2morse(text) {
+        let textTokens = this.tokeniseText(text);
+        return this.textTokens2morse(textTokens);
+    }
+
+    tokeniseMorse(morse) {
+        return this.dictionary.tokeniseMorse(morse);
+    }
+
+    displayMorse(morseTokens) {
+        return this.display(morseTokens,
+            this.dictionary.display.join.charSpace, this.dictionary.display.join.wordSpace, this.dictionary.display.morse);
+    }
+
+    displayMorseErrors(morseTokens, errorTokens, prefix, suffix) {
+        return this.display(morseTokens,
+            this.dictionary.display.join.charSpace, this.dictionary.display.join.wordSpace, this.dictionary.display.morse,
+            errorTokens, prefix, suffix);
+    }
+
+    morseTokens2text(morseTokens) {
+        let translation = this._input2output(morseTokens, this.morse2textD);
+        return {
+            morse: morseTokens,
+            text: translation.output,
+            error: translation.error,
+            hasError: translation.hasError
+        }
+    }
+
+    morse2text(morse) {
+        let morseTokens = this.tokeniseMorse(morse);
+        return this.morseTokens2text(morseTokens);
+    }
+
+    looksLikeMorse(input) {
+        return input.match(this.dictionary.morseMatch) !== null;
+    }
+
+    _input2output(tokens, dict) {
+        let ret = {
+            output: [],
+            error: [],
+            hasError: false
+        }
+        for (let letters of tokens) {
+            let chars = [];
+            let errors = [];
+            for (let letter of letters) {
+                let char = &apos;&apos;;
+                let error = false;
+                // These tests are a little complex because e.g. the american dictionary uses &quot;s&quot; and &quot;S&quot; in the Morse.
+                // You therefore have to test without uppercasing.
+                // The uppercase test is useful though (so added here) so that the case of the input itself doesn&apos;t have to be changed.
+                // That&apos;s helpful e.g. when someone enters text in the translator that needs cleaning up: the case can be maintained.
+                if (letter in dict) {
+                    char = dict[letter];
+                } else if (letter.toUpperCase() in dict) {
+                    char = dict[letter.toUpperCase()];
+                } else {
+                    error = true;
+                }
+                chars.push(char);
+                errors.push(error);
+                ret.hasError = ret.hasError || error;
+            }
+            ret.output.push(chars);
+            ret.error.push(errors);
+        }
+        return ret;
+    }
+
+    text2morseClean(text) {
+        let d = this.text2morse(text);
+        d.text = d.text.map((word, i) =&gt; word.filter((char, j) =&gt; !d.error[i][j]));
+        d.morse = d.morse.map((word, i) =&gt; word.filter((char, j) =&gt; !d.error[i][j]));
+        d.error = d.error.map(word =&gt; word.filter(error =&gt; !error));
+        d.hasError = false;
+        return d;
+    }
+}
+
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

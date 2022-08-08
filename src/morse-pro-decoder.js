@@ -31,7 +31,7 @@ import MorseCW from './morse-pro-cw';
  */
 export default class MorseDecoder extends MorseCW {
     /**
-     * 
+     * Constructor
      * @param {Object} params - dictionary of optional parameters.
      * @param {string} [params.dictionary='international'] - optional dictionary to use. Must have same timing as 'international'.
      * @param {string[]} params.dictionaryOptions - optional additional dictionaries such as 'prosigns'.
