@@ -180,6 +180,12 @@ export default class Morse {
         return this.display(textTokens, '', ' ', escapeMap, errorTokens, prefix, suffix);
     }
 
+    splitTextAndSpeech(extendedText) {
+        let text = extendedText.replace(/\[([^\|]*)\|[^\]]*\]/g, '$1');
+        let speech = extendedText.replace(/\[[^\|]*\|([^\]]*)\]/g, '$1');
+        return { text, speech };
+    }
+
     /**
      *
      * @param {Array} textTokens - list of lists of text tokens
@@ -195,9 +201,12 @@ export default class Morse {
         }
     }
 
-    text2morse(text) {
+    text2morse(extendedText) {
+        let { text, speech } = this.splitTextAndSpeech(extendedText);
         let textTokens = this.tokeniseText(text);
-        return this.textTokens2morse(textTokens);
+        let ret = this.textTokens2morse(textTokens);
+        ret.speech = speech;
+        return ret;
     }
 
     tokeniseMorse(morse) {
@@ -221,7 +230,8 @@ export default class Morse {
             morse: morseTokens,
             text: translation.output,
             error: translation.error,
-            hasError: translation.hasError
+            hasError: translation.hasError,
+            speech: translation.output
         }
     }
 
