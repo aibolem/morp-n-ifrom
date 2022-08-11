@@ -180,9 +180,16 @@ export default class Morse {
         return this.display(textTokens, '', ' ', escapeMap, errorTokens, prefix, suffix);
     }
 
+    /**
+     * Split out the morse and speech elements of the extended syntax "[morse|speech]"
+     * @param {String} extendedText 
+     * @returns { text, speech }
+     */
     splitTextAndSpeech(extendedText) {
         let text = extendedText.replace(/\[([^\|]*)\|[^\]]*\]/g, '$1');
         let speech = extendedText.replace(/\[[^\|]*\|([^\]]*)\]/g, '$1');
+        // sanitise the speech by squishing all whitespace to single spaces, trimming, and discarding any of []| that have crept in
+        speech = speech.replace(/\s+/g, " ").replace(/[\[\]\|]/g, "").trim();
         return { text, speech };
     }
 

@@ -98,7 +98,7 @@ export default class MorseMessage {
     }
 
     cleanText() {
-        this._completeFields(this.morseCWWave.text2morseClean(this.text));
+        this._completeFields(this.morseCWWave.text2morseClean(this.rawInput));
         return this.text;
     }
 
