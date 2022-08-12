@@ -36,7 +36,6 @@ See the Licence for the specific language governing permissions and limitations 
 export default class MorseMessage {
     constructor(morseCWWave) {
         this.morseCWWave = morseCWWave;
-        // this.player = morsePlayer;
         this.rawInput = undefined;
         this.inputWasMorse = undefined;
         this.text = undefined;
@@ -45,8 +44,7 @@ export default class MorseMessage {
         this.morseTokens = undefined;
         this.errors = undefined;
         this.hasError = undefined;
-        // this.volumes = undefined;
-        // this.frequencies = undefined;
+        this.speech = undefined;
     }
 
     /**
@@ -79,7 +77,8 @@ export default class MorseMessage {
         this.morseTokens = d.morse;
         this.textTokens = d.text;
         this.errors = d.error;
-        this.hasError = d.hasError; 
+        this.hasError = d.hasError;
+        this.speech = d.speech;
         this.text = this.morseCWWave.displayText(this.textTokens);
         this.morse = this.morseCWWave.displayMorse(this.morseTokens);
     }
@@ -99,7 +98,7 @@ export default class MorseMessage {
     }
 
     cleanText() {
-        this._completeFields(this.morseCWWave.text2morseClean(this.text));
+        this._completeFields(this.morseCWWave.text2morseClean(this.rawInput));
         return this.text;
     }
 

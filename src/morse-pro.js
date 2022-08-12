@@ -181,6 +181,19 @@ export default class Morse {
     }
 
     /**
+     * Split out the morse and speech elements of the extended syntax "[morse|speech]"
+     * @param {String} extendedText 
+     * @returns { text, speech }
+     */
+    splitTextAndSpeech(extendedText) {
+        let text = extendedText.replace(/\[([^\|]*)\|[^\]]*\]/g, '$1');
+        let speech = extendedText.replace(/\[[^\|]*\|([^\]]*)\]/g, '$1');
+        // sanitise the speech by squishing all whitespace to single spaces, trimming, and discarding any of []| that have crept in
+        speech = speech.replace(/\s+/g, " ").replace(/[\[\]\|]/g, "").trim();
+        return { text, speech };
+    }
+
+    /**
      *
      * @param {Array} textTokens - list of lists of text tokens
      * @returns Map - text: text tokens, morse: morse tokens, error: error tokens, hasError Boolean
@@ -195,9 +208,12 @@ export default class Morse {
         }
     }
 
-    text2morse(text) {
+    text2morse(extendedText) {
+        let { text, speech } = this.splitTextAndSpeech(extendedText);
         let textTokens = this.tokeniseText(text);
-        return this.textTokens2morse(textTokens);
+        let ret = this.textTokens2morse(textTokens);
+        ret.speech = speech;
+        return ret;
     }
 
     tokeniseMorse(morse) {
@@ -221,7 +237,8 @@ export default class Morse {
             morse: morseTokens,
             text: translation.output,
             error: translation.error,
-            hasError: translation.hasError
+            hasError: translation.hasError,
+            speech: translation.output
         }
     }
 
