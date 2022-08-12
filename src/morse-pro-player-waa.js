@@ -34,16 +34,18 @@ export default class MorsePlayerWAA {
      * @param {number} [params.volume=1] - volume of Morse. Takes range [0,1].
      * @param {function()} params.sequenceStartCallback - function to call each time the sequence starts.
      * @param {function()} params.sequenceEndingCallback - function to call when the sequence is nearing the end.
-     * @param {function()} params.sequenceEndCallback - function to call when the sequence has ended.
+     * @param {function()} params.sequenceEndCallback - function to call when the last beep of a sequence has ended.
+     * @param {function()} params.paddingEndCallback - function to call when the end padding at the end of a sequence has ended.
      * @param {function()} params.soundStoppedCallback - function to call when the sequence stops.
      * @param {string} params.onSample - URL of the sound file to play at the start of a note.
      * @param {string} params.offSample - URL of the sound file to play at the end of a note.
      * @param {string} [params.playMode="sine"] - play mode, either "sine" or "sample".
      */
-    constructor({defaultFrequency=550, startPadding=0, endPadding=0, volume=1, sequenceStartCallback, sequenceEndingCallback, sequenceEndCallback, soundStoppedCallback, onSample, offSample, playMode='sine'} = {}) {
+    constructor({defaultFrequency=550, startPadding=0, endPadding=0, volume=1, sequenceStartCallback, sequenceEndingCallback, sequenceEndCallback, paddingEndCallback, soundStoppedCallback, onSample, offSample, playMode='sine'} = {}) {
         if (sequenceStartCallback !== undefined) this.sequenceStartCallback = sequenceStartCallback;
         if (sequenceEndingCallback !== undefined) this.sequenceEndingCallback = sequenceEndingCallback;
         if (sequenceEndCallback !== undefined) this.sequenceEndCallback = sequenceEndCallback;
+        if (paddingEndCallback !== undefined) this.paddingEndCallback = paddingEndCallback;
         if (soundStoppedCallback !== undefined) this.soundStoppedCallback = soundStoppedCallback;
 
         this.playMode = playMode;
@@ -69,7 +71,8 @@ export default class MorsePlayerWAA {
         this._timerInterval = 0.05;  // how often to schedule notes (seconds)
         this._timer = undefined;  // timer for scheduling notes, repeats at _timerInterval
         this._startTimer = undefined;  // timer to send sequenceStartCallback
-        this._endTimer = undefined;  // timer to send sequenceEndCallback
+        this._soundEndTimer = undefined;  // timer to send sequenceEndCallback
+        this._pauseEndTimer = undefined;  // timer to send paddingEndCallback
         this._stopTimer = undefined;  // timer to send soundStoppedCallback
         this._queue = [];
 
@@ -202,9 +205,10 @@ export default class MorsePlayerWAA {
      * @param {Object} sequence - the sequence to play.
      * @param {number[]} sequence.timings - list of millisecond timings; +ve numbers are beeps, -ve numbers are silence.
      * @param {number} sequence.frequencies - a single frequency to be used for all beeps. If not set, the fallback frequency defined in the constructor is used.
+     * @param {number} sequence.endPadding - the number of milliseconds silence to add at the end of the sequence. If not set, the class endPadding attribute is used.
      */
     load(sequence) {
-        let timings = sequence.timings;
+        let timings = sequence.timings.slice();  // make a copy of the array as we change it in here
         let frequencies = sequence.frequencies || this.fallbackFrequency;
         // TODO: add volume array
         // let volumes = sequence.volumes;
@@ -217,19 +221,17 @@ export default class MorsePlayerWAA {
 
         // TODO: undefined behaviour if this is called in the middle of a sequence
 
-        // console.log('Timings: ' + timings);
-        /*
-            The ith element of the sequence starts at _cTimings[i] and ends at _cTimings[i+1] (in fractional seconds)
-            It is a note (i.e. not silence) if isNote[i] === True
-        */
-
-        if (this.endPadding > 0) {
-            timings.push(-this.endPadding);
+        if (sequence.endPadding !== undefined) {
+            timings.push(-sequence.endPadding);   
+        } else {
+            if (this.endPadding > 0) {
+                timings.push(-this.endPadding);
+            }
         }
 
         this._cTimings = [0];
         this.isNote = [];
-        for (var i = 0; i < timings.length; i++) {
+        for (let i = 0; i < timings.length; i++) {
             this._cTimings[i + 1] = this._cTimings[i] + Math.abs(timings[i]) / 1000;  // AudioContext runs in seconds not ms
             this.isNote[i] = timings[i] > 0;
         }
@@ -250,7 +252,16 @@ export default class MorsePlayerWAA {
      * @param {Object} sequence - see load() method for object description
      */
     queue(sequence) {
-        this._queue.push(sequence);
+        if (this._cTimings.length === 0) {
+            this.load(sequence);
+        } else {
+            // make a deep copy of the object to avoid it changing
+            this._queue.push({
+                timings: sequence.timings.slice(),
+                frequencies: sequence.frequencies,
+                endPadding: sequence.endPadding
+            });
+        }
     }
 
     /**
@@ -284,7 +295,8 @@ export default class MorsePlayerWAA {
         // otherwise we really are resuming playback (or pretending we are, and actually playing from start...)
         clearInterval(this._stopTimer);  // if we were going to send a soundStoppedCallback then don't
         clearInterval(this._startTimer);  // ditto
-        clearInterval(this._endTimer);
+        clearInterval(this._soundEndTimer);
+        clearInterval(this._pauseEndTimer);
         clearInterval(this._timer);
         this._isPaused = false;
         // basically set the time base to now but
@@ -362,7 +374,7 @@ export default class MorsePlayerWAA {
      */
     _scheduleNotes() {
         // console.log('Scheduling:');
-        let start, start2, stop, stop2, bsn;
+        let start, start2, stop, stop2, bsn, pauseEndTime;
         let ac = morseAudioContext.getAudioContext();
         let nowAbsolute = ac.currentTime;
 
@@ -425,13 +437,17 @@ export default class MorsePlayerWAA {
                         console.log("offSample not decoded yet");
                     }
                 }
+            } else {
+                // Store the _pauseEndTime here as well so that the paddingEndCallback fires.
+                pauseEndTime = this._tZero + this._cTimings[this._nextNote + 1];
             }
             this._nextNote++;
 
             if (this._nextNote === this.sequenceLength) {
                 // we've just scheduled the last note of a sequence
                 this.sequenceEndingCallback();
-                this._endTimer = setTimeout(this.sequenceEndCallback, 1000 * (this._soundEndTime - nowAbsolute));
+                this._soundEndTimer = setTimeout(this.sequenceEndCallback, 1000 * (this._soundEndTime - nowAbsolute));
+                this._pauseEndTimer = setTimeout(this.paddingEndCallback, 1000 * (pauseEndTime - nowAbsolute));
                 if (this.loop || this._queue.length > 0) {
                     // there's more to play
                     // increment time base to be the absolute end time of the final element in the sequence
@@ -514,12 +530,17 @@ export default class MorsePlayerWAA {
     sequenceEndingCallback() { }
 
     /**
-     * Called at the end of the last beep of a sequence. Does not wait for endPadding.
+     * Called at the end of the last beep of a sequence. Does not wait for endPadding (use pauseEndCallback for that).
      */
     sequenceEndCallback() { }
 
     /**
-     * Called when all sounds have definitely stopped.
+     * Called at the end of the end padding at the end of a sequence.
+     */
+    paddingEndCallback() { }
+
+    /**
+     * Called when all sounds have definitely stopped. Called when sound naturally comes to an end or when the stop function is called.
      */
     soundStoppedCallback() { }
 }
