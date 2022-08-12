@@ -252,16 +252,25 @@ export default class MorsePlayerWAA {
      * @param {Object} sequence - see load() method for object description
      */
     queue(sequence) {
+        // make a deep copy of the object to avoid it changing
+        let seqCopy = {
+            timings: sequence.timings.slice(),
+            frequencies: sequence.frequencies,
+            endPadding: sequence.endPadding
+        };
         if (this._cTimings.length === 0) {
-            this.load(sequence);
+            this.load(seqCopy);
         } else {
-            // make a deep copy of the object to avoid it changing
-            this._queue.push({
-                timings: sequence.timings.slice(),
-                frequencies: sequence.frequencies,
-                endPadding: sequence.endPadding
-            });
+            this._queue.push(seqCopy);
         }
+    }
+
+    /**
+     * Delete current timings and queue.
+     */
+    clearAllTimings() {
+        this._cTimings = [];
+        this._queue = []
     }
 
     /**
