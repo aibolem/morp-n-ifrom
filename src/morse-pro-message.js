@@ -36,15 +36,15 @@ See the Licence for the specific language governing permissions and limitations 
 export default class MorseMessage {
     constructor(morseCWWave) {
         this.morseCWWave = morseCWWave;
-        this.rawInput = undefined;
+        this.rawInput = undefined;      // not used externally
         this.inputWasMorse = undefined;
         this.text = undefined;
-        this.textTokens = undefined;
+        this.textTokens = undefined;    // not used externally
         this.morse = undefined;
-        this.morseTokens = undefined;
-        this.errors = undefined;
-        this.hasError = undefined;
-        this.speech = undefined;
+        this.morseTokens = undefined;   // not used externally
+        this.errors = undefined;        // not used externally
+        this.hasError = undefined;      // not used externally
+        this.speech = undefined;        // remove?
     }
 
     /**

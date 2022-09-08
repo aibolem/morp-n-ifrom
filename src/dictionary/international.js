@@ -1,4 +1,7 @@
-export var dictionary = {
+const CHAR_SPACE = '•';  // \u2022
+const WORD_SPACE = '■';  // \u25a0
+
+export let dictionary = {
     id: 'international',
 
     letter: {
@@ -70,8 +73,8 @@ export var dictionary = {
         '.': 1,
         '-': 3,
         ' ': -1,
-        'charSpace': -3,
-        'wordSpace': -7
+        '•': -3,
+        '■': -7
     },
 
     baseElement: '.',
@@ -80,8 +83,8 @@ export var dictionary = {
         '.': 550,
         '-': 550,
         ' ': 0,
-        'charSpace': 0,
-        'wordSpace': 0
+        '•': 0,
+        '■': 0
     },
 
     display: {
@@ -91,27 +94,44 @@ export var dictionary = {
             ' ': ''
         },
         join: {
-            charSpace: ' ',
-            wordSpace: ' / '
+            '•': ' ',
+            '■': ' / '
         }
     },
 
-    tokeniseMorse: function(morse) {
+    tidyMorse: function(morse) {
+        // Tidy the Morse => ".. .- / --"
         morse = morse.trim();
         morse = morse.replace(/_/g, '-')
         morse = morse.replace(/\|/g, '/');
         morse = morse.replace(/\s+/g, ' ');
         morse = morse.replace(/\s*\/[\s\/]*/g, '/');
-        let words = morse.split('/');
-        let tokens = words.map(word => word.split(' '));
-        tokens = tokens.map(letters => letters.map(letter => letter.replace(/(.)(?=.)/g, '$1 ')));
-        return tokens;
+        return morse;
+        // // Make list of the words => [".. .-", "--"]
+        // let words = morse.split('/');
+        // // Make list of list of characters => [["..", ".-"], ["--"]]
+        // let tokens = words.map(word => word.split(' '));
+        // // Space out each character => [['. .', '. -'], ['- -']]
+        // tokens = tokens.map(word => word.map(letter => letter.replace(/(.)(?=.)/g, '$1 ')));
+        // let alternateInsert = function(items, newElement) {
+        //     let inserts = items.length - 1;
+        //     for (let i = 0; i < inserts; i++) {
+        //         items.splice(i*2+1, 0, newElement);
+        //     }
+        //     return items;
+        // }
+        // // Insert "charSpace" between characters => [['. .', 'charSpace', '. -'], ['- -']]
+        // tokens = tokens.map(word => alternateInsert(word, "charSpace"));
+        // // Insert "wordSpace" between words => [['. .', 'charSpace', '. -'], 'wordSpace', ['- -']]
+        // tokens = alternateInsert(tokens, "wordSpace");
+        // // Flatten list => [ '. .', 'charSpace', '. -', 'wordSpace', '- -' ]
+        // return tokens.flat();
     },
 
     morseMatch: new RegExp('^\\s*[\\.\\-_]+[\\.\\-_\\s\\/\\|]*$'),
 
     displayName: {
-        keys: ['.', '-', ' ', 'charSpace', 'wordSpace'],
+        keys: ['.', '-', ' ', CHAR_SPACE, WORD_SPACE],
         values: ['Dit length', 'Dah length', 'Intra-character space', 'Inter-character space', 'Inter-word space']
     },
 

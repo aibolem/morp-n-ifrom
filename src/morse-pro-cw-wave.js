@@ -1,5 +1,5 @@
 /*!
-This code is © Copyright Stephen C. Phillips, 2018.
+This code is © Copyright Stephen C. Phillips, 2018-2022
 Email: steve@scphillips.com
 */
 /*
@@ -10,17 +10,17 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-import MorseCW from './morse-pro-cw';
+import MorseCW from './morse-pro-cw.js';
 
 /**
  * Class to create sine-wave samples of standard CW Morse.
  *
  * @example
  * import MorseCWWave from 'morse-pro-cw-wave';
- * var morseCW = new MorseCW();
- * var tokens = morseCW.text2morse("abc");
- * var timings = morseCW.morseTokens2timing(tokens);
- * var sample = morseCWWave.getSample(timings);
+ * let morseCW = new MorseCW();
+ * let tokens = morseCW.text2morse("abc").morse;
+ * let timings = morseCW.morseTokens2timing(tokens);
+ * let sample = morseCWWave.getSample(timings);
  */
 export default class MorseCWWave extends MorseCW {
     /**
@@ -51,7 +51,7 @@ export default class MorseCWWave extends MorseCW {
      * @return {number[]} an array of floats in range [-1, 1] representing the wave-form.
      */
     getSample(timings, endPadding = 0) {
-        var sample = [];
+        let sample = [];
         if (timings.length === 0) {
             return [];
         }
@@ -67,34 +67,34 @@ export default class MorseCWWave extends MorseCW {
         */
 
         // set lowpass frequency cutoff to 1.5 x wave frequency
-        var lowpassFreq = (this.frequency * 1.5) / this.sampleRate;
-        var q = Math.SQRT1_2;
+        let lowpassFreq = (this.frequency * 1.5) / this.sampleRate;
+        let q = Math.SQRT1_2;
       
-        var sin = Math.sin(2 * Math.PI * lowpassFreq);
-        var cos = Math.cos(2 * Math.PI * lowpassFreq);
-        var alpha = sin / (2 * Math.pow(10, q / 20));
+        let sin = Math.sin(2 * Math.PI * lowpassFreq);
+        let cos = Math.cos(2 * Math.PI * lowpassFreq);
+        let alpha = sin / (2 * Math.pow(10, q / 20));
       
-        var a0 =  1 + alpha;
+        let a0 =  1 + alpha;
 
-        var b0 = ((1 - cos) * 0.5) / a0;
-        var b1 = (1 - cos) / a0;
-        var b2 = ((1 - cos) * 0.5) / a0;
-        var a1 = (-2 * cos) / a0;
-        var a2 = (1 - alpha) / a0;
+        let b0 = ((1 - cos) * 0.5) / a0;
+        let b1 = (1 - cos) / a0;
+        let b2 = ((1 - cos) * 0.5) / a0;
+        let a1 = (-2 * cos) / a0;
+        let a2 = (1 - alpha) / a0;
 
         /*
             Compute filtered signal
         */
 
-        var step = Math.PI * 2 * this.frequency / this.sampleRate;
-        var on, duration;
-        var x0, x1 = 0, x2 = 0;
-        var y0, y1 = 0, y2 = 0;
-        var gain = 0.813;  // empirically, the lowpass filter outputs waveform of magnitude 1.23, so need to scale it down to avoid clipping
-        for (var t = 0; t < timings.length; t += 1) {
-            duration = this.sampleRate * Math.abs(timings[t]) / 1000;
-            on = timings[t] > 0 ? 1 : 0;
-            for (var i = 0; i < duration; i += 1) {
+        let step = Math.PI * 2 * this.frequency / this.sampleRate;
+        let on, duration;
+        let x0, x1 = 0, x2 = 0;
+        let y0, y1 = 0, y2 = 0;
+        let gain = 0.813;  // empirically, the lowpass filter outputs waveform of magnitude 1.23, so need to scale it down to avoid clipping
+        for (const element of timings) {
+            duration = this.sampleRate * Math.abs(element) / 1000;
+            on = element > 0 ? 1 : 0;
+            for (let i = 0; i < duration; i += 1) {
                 x0 = on * Math.sin(i * step);  // the input signal
                 y0 = b0 * x0 + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2;
                 sample.push(y0 * gain);
@@ -123,26 +123,26 @@ export default class MorseCWWave extends MorseCW {
         } else {
             timings[timings.length - 1] = -Math.max(5, endPadding, -timings[timings.length - 1]);
         }
-        var offlineAudioContextClass = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+        let offlineAudioContextClass = window.OfflineAudioContext || window.webkitOfflineAudioContext;
         if (offlineAudioContextClass === undefined) {
             throw new Error("No OfflineAudioContext class defined");
         }
         // buffer length is the Morse duration + 5ms to let the lowpass filter end cleanly
-        var offlineCtx = new offlineAudioContextClass(1, this.sampleRate * (this.getDuration() + endPadding) / 1000, this.sampleRate);
-        var gainNode = offlineCtx.createGain();
+        let offlineCtx = new offlineAudioContextClass(1, this.sampleRate * (this.getDuration() + endPadding) / 1000, this.sampleRate);
+        let gainNode = offlineCtx.createGain();
         // empirically, the lowpass filter outputs waveform of magnitude 1.23, so need to scale it down to avoid clipping
         gainNode.gain.setValueAtTime(0.813, 0);
-        var lowPassNode = offlineCtx.createBiquadFilter();
+        let lowPassNode = offlineCtx.createBiquadFilter();
         lowPassNode.type = "lowpass";
         lowPassNode.frequency.setValueAtTime(this.frequency * 1.1, 0);  // TODO: remove this magic number and make the filter configurable?
         gainNode.connect(lowPassNode);
         lowPassNode.connect(offlineCtx.destination);
-        var t = 0;
-        var oscillator;
-        var duration;
-        for (var i = 0; i < timings.length; i++) {
-            duration = Math.abs(timings[i]) / 1000;
-            if (timings[i] > 0) {  // -ve timings are silence
+        let t = 0;
+        let oscillator;
+        let duration;
+        for (const element of timings) {
+            duration = Math.abs(element) / 1000;
+            if (element > 0) {  // -ve timings are silence
                 oscillator = offlineCtx.createOscillator();
                 oscillator.type = 'sine';
                 oscillator.frequency.setValueAtTime(this.frequency, t);

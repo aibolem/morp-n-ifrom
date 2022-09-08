@@ -1,4 +1,4 @@
-export var dictionary = {
+export let dictionary = {
     id: 'american',
 
     letter: {

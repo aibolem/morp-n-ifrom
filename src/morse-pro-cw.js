@@ -10,7 +10,8 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-import Morse from './morse-pro';
+import { CHAR_SPACE, WORD_SPACE } from './morse-pro-parser.js';
+import Morse from './morse-pro.js';
 
 const MS_IN_MINUTE = 60000;  /** number of milliseconds in 1 minute */
 
@@ -20,7 +21,7 @@ const MS_IN_MINUTE = 60000;  /** number of milliseconds in 1 minute */
  * @example
  * import MorseCW from 'morse-pro-cw';
  * var morseCW = new MorseCW();
- * var tokens = morseCW.text2morse("abc");
+ * var tokens = morseCW.text2morse("abc").morse;
  * var timings = morseCW.morseTokens2timing(tokens);
  */
 export default class MorseCW extends Morse {
@@ -35,12 +36,13 @@ export default class MorseCW extends Morse {
         super({dictionary, dictionaryOptions});
         /** The element of the dictionary that the ratios are based off */
         this._baseElement = this.dictionary.baseElement;
-        /** In initialise the ratios based on the dictionary but enable them to be changed thereafter */
+        /** Initialise the ratios based on the dictionary but enable them to be changed thereafter */
         this.ratios = this.dictionary.ratio;  // actually does a copy from the dict so we can reset if needed
         /** Compute ditsInParis and spacesInParis while we have original ratio */
-        let parisMorseTokens = this.textTokens2morse(this.tokeniseRawText('PARIS')).morse;
-        this._ditsInParis = this.getDuration(this.morseTokens2timing(parisMorseTokens, this.ratios)) + Math.abs(this.ratios.wordSpace);
-        this._spacesInParis = Math.abs((4 * this.ratios.charSpace) + this.ratios.wordSpace);
+        let parisTokens = this.text2morse('PARIS');
+        this._baseLength = 1;
+        this._ditsInParis = this.getDuration(this.getTimings(parisTokens)) + Math.abs(this.ratios[WORD_SPACE]);
+        this._spacesInParis = Math.abs((4 * this.ratios[CHAR_SPACE]) + this.ratios[WORD_SPACE]);
         /** Initialise wpm and fwpm (this potentially changes the ratios) */
         this.setWPM(wpm);
         this.setFWPM(fwpm);
@@ -92,7 +94,7 @@ export default class MorseCW extends Morse {
 
     testFWPMmatchesRatio() {
         // need to test approximately here otherwise with the rounding errors introduced in the web page input it would never return true
-        return Math.abs((this.ratios['wordSpace'] / this.dictionary.ratio['wordSpace']) / (this.ratios['charSpace'] / this.dictionary.ratio['charSpace']) - 1) < 0.001;
+        return Math.abs((this.ratios[WORD_SPACE] / this.dictionary.ratio[WORD_SPACE]) / (this.ratios[CHAR_SPACE] / this.dictionary.ratio[CHAR_SPACE]) - 1) < 0.001;
     }
 
     /** @type {number[]} */
@@ -101,8 +103,8 @@ export default class MorseCW extends Morse {
             this._ratios = {};
             Object.assign(this._ratios, this.dictionary.ratio);
             let farnsworthRatio = this.farnsworthRatio;
-            this._ratios['charSpace'] *= farnsworthRatio;
-            this._ratios['wordSpace'] *= farnsworthRatio;
+            this._ratios[CHAR_SPACE] *= farnsworthRatio;
+            this._ratios[WORD_SPACE] *= farnsworthRatio;
         }
         return this._ratios;
     }
@@ -142,31 +144,71 @@ export default class MorseCW extends Morse {
         }
     }
 
+    _saveSpeed() {
+        this._savedSpeed = {
+            ratios: {}
+        };
+        Object.assign(this._savedSpeed.ratios, this.ratios);
+        this._savedSpeed.baseLength = this.baseLength;
+    }
+
+    _restoreSpeed() {
+        this.ratios = this._savedSpeed.ratios;
+        this._baseLength = this._savedSpeed.baseLength;
+    }
+
+    getNotes(tokens) {
+        this._saveSpeed();
+        let notes = [];
+        for (let child of tokens.children) {
+            if (child.type.substring(0, 9) === "directive") {
+                switch (child.type) {
+                    case "directive-timing-timingValue":
+                        this.setWPM(child.children[0]);
+                        this.setFWPM(child.children[1]);
+                        break;
+                    case "directive-timing-timingReset":
+                        this._restoreSpeed();
+                        break;
+                }
+            } else {
+                let chars;
+                if (child.type === "morseWords") {
+                    chars = child.children;
+                } else {
+                    chars = child.translation;
+                }
+                for (let char of chars) {
+                    for (let element of char.split("")) {
+                        let note = {};
+                        note.d = this.lengths[element];
+                        notes.push(note);
+                    }
+                }
+            }
+        }
+        this._restoreSpeed();
+        return notes;
+    }
+
     /**
-     * Return an array of millisecond timings.
-     * With the Farnsworth method, the morse characters are played at one
-     * speed and the spaces between characters at a slower speed.
-     * @param {Array} morseTokens - array of morse tokens corresponding to the ratio element of the dictionary used, e.g. [['..', '.-'], ['--', '...']]
-     * @param {Object} [lengths=this.lengths] - dictionary mapping element to duration with negative duration for spaces
+     * Return an array of millisecond timings. Pauses are indicated by negative durations.
+     * @param {Object} tokens
      * @return {number[]}
      */
-    morseTokens2timing(morseTokens, lengths=this.lengths) {
+     getTimings(tokens) {
+        let notes = this.getNotes(tokens);
         let timings = [];
-        for (let word of morseTokens) {
-            for (let char of word) {
-                timings = timings.concat(char.split('').map(symbol => lengths[symbol]));
-                timings = timings.concat(lengths.charSpace);
-            }
-            timings.pop()
-            timings = timings.concat(lengths.wordSpace);
+        for (let note of notes) {
+            timings.push(note.d);
         }
-        timings.pop();
         return timings;
     }
 
     /**
-     * Add up all the millisecond timings in a list
-     * @param {Array} timings - list of millisecond timings (-ve for spaces)
+     * Add up all the millisecond timings in a list.
+     * @param {number[]} timings - list of millisecond timings (-ve for spaces)
+     * @return {number}
      */
     getDuration(timings) {
         return timings.reduce(
@@ -213,7 +255,7 @@ export default class MorseCW extends Morse {
      * Force the FWPM to match the fditlen/ditlen ratio without changing anything else
      */
     _setFWPMfromRatio() {
-        let ratio = Math.abs((this.lengths['charSpace'] / 3) / this.lengths['.']);
+        let ratio = Math.abs((this.lengths[CHAR_SPACE] / 3) / this.lengths['.']);
         this._fwpm = this._ditsInParis * this._wpm / (this._spacesInParis * ratio + (this._ditsInParis - this._spacesInParis));
     }
 
@@ -279,6 +321,6 @@ export default class MorseCW extends Morse {
      * @type {number}
      */
     get wordSpace() {
-        return Math.abs(this.lengths.wordSpace);
+        return Math.abs(this.lengths[WORD_SPACE]);
     }
 }
