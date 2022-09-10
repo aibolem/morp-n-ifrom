@@ -103,31 +103,13 @@ export let dictionary = {
         // Tidy the Morse => ".. .- / --"
         morse = morse.trim();
         morse = morse.replace(/_/g, '-')
-        morse = morse.replace(/\|/g, '/');
+        morse = morse.replace(/\|/g, '/');    //TODO: take out pipe?
         morse = morse.replace(/\s+/g, ' ');
         morse = morse.replace(/\s*\/[\s\/]*/g, '/');
         return morse;
-        // // Make list of the words => [".. .-", "--"]
-        // let words = morse.split('/');
-        // // Make list of list of characters => [["..", ".-"], ["--"]]
-        // let tokens = words.map(word => word.split(' '));
-        // // Space out each character => [['. .', '. -'], ['- -']]
-        // tokens = tokens.map(word => word.map(letter => letter.replace(/(.)(?=.)/g, '$1 ')));
-        // let alternateInsert = function(items, newElement) {
-        //     let inserts = items.length - 1;
-        //     for (let i = 0; i < inserts; i++) {
-        //         items.splice(i*2+1, 0, newElement);
-        //     }
-        //     return items;
-        // }
-        // // Insert "charSpace" between characters => [['. .', 'charSpace', '. -'], ['- -']]
-        // tokens = tokens.map(word => alternateInsert(word, "charSpace"));
-        // // Insert "wordSpace" between words => [['. .', 'charSpace', '. -'], 'wordSpace', ['- -']]
-        // tokens = alternateInsert(tokens, "wordSpace");
-        // // Flatten list => [ '. .', 'charSpace', '. -', 'wordSpace', '- -' ]
-        // return tokens.flat();
     },
 
+    //TODO: take out pipe?
     morseMatch: new RegExp('^\\s*[\\.\\-_]+[\\.\\-_\\s\\/\\|]*$'),
 
     displayName: {
@@ -190,5 +172,11 @@ export let dictionary = {
                 'Ż': '- - . . -'
             }
         }
-    }
+    },
+
+    grammar: `morse ::= (morseWords | directive)+
+morseWords ::= (morseCharacter | morseSpace+)+
+morseCharacter ::= [\\.\\-_ ]+
+morseSpace ::= [\/\r\n\t${CHAR_SPACE}${WORD_SPACE}]
+`
 }

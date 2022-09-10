@@ -10,10 +10,13 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-import { CHAR_SPACE, WORD_SPACE } from './morse-pro-parser.js';
 import Morse from './morse-pro.js';
 
 const MS_IN_MINUTE = 60000;  /** number of milliseconds in 1 minute */
+
+//TODO: define these once
+const CHAR_SPACE = '•';  // \u2022
+const WORD_SPACE = '■';  // \u25a0
 
 /**
  * Class to create the on/off timings needed by e.g. sound generators. Timings are in milliseconds; "off" timings are negative.
@@ -170,6 +173,8 @@ export default class MorseCW extends Morse {
                     case "directive-timing-timingReset":
                         this._restoreSpeed();
                         break;
+                    case "directive-pause-pauseValue":
+                        notes.push({d: -child.children[0]});
                 }
             } else {
                 let chars;

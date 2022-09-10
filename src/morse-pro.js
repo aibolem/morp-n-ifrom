@@ -14,8 +14,40 @@ See the Licence for the specific language governing permissions and limitations 
  * Basic methods to translate Morse code.
  */
 
+import { Grammars } from 'ebnf';
 import { dictionaries } from "./dictionary/index.js";
-import { CHAR_SPACE, WORD_SPACE, getAST } from "./morse-pro-parser.js";
+
+//TODO: define these once
+const CHAR_SPACE = '•';  // \u2022
+const WORD_SPACE = '■';  // \u25a0
+
+const directiveGrammar = `directive ::= volume | pitch | timing | pause
+volume ::= volumeValue | volumeReset
+volumeValue ::= "[" [vV] number "]"
+volumeReset ::= "[" [vV] "]"
+pitch ::= pitchValue | pitchReset
+pitchValue ::= "[" [pPfF] number "]"
+pitchReset ::= "[" [pPfF] "]"
+timing ::= timingReset | timingValue | timingValueLong
+timingReset ::= "[" [tT] "]"
+timingValue ::= "[" [tT] number "/" number "]"
+timingValueLong ::= "[" [tT] number "," number "," number "," number "," number ("," number)? "]"
+pause ::= pauseSpace | pauseValue
+pauseSpace ::= "[" " "+ "]"
+pauseValue ::= "[" number "ms"? "]"
+number ::= [1-9] [0-9]*
+`;
+
+//TODO: timingValueLong needs to be changed to explicitly specify timing for each element?
+//TODO: need to add pitchValueLong to explicitly set pitch for each element (as you can in the dictionary)
+
+const textGrammar = `
+text ::= (textWords | directive)+
+textWords ::= textCharacter+
+textCharacter ::= [^#x5b#x5d#x7c#x2022] | "${CHAR_SPACE}" /* anything other than [|] (other invalid characters to be found later) */
+` + directiveGrammar;
+
+const textParser = new Grammars.W3C.Parser(textGrammar);
 
 export default class Morse {
     /**
@@ -97,6 +129,9 @@ export default class Morse {
             this.text2morseD[letter] = letters[letter];
             this.morse2textD[letters[letter]] = letter;
         }
+
+        let morseGrammar = (this.dictionary.grammar !== undefined ? this.dictionary.grammar : "") + directiveGrammar;
+        this.morseParser = new Grammars.W3C.Parser(morseGrammar);
     }
 
     /**
@@ -114,7 +149,7 @@ export default class Morse {
     display(tokens, morse, charSpace, wordSpace, map = {}, errorPrefix = '', errorSuffix = '') {
         let display = [];
         let inputKey, displayKey;
-        if (tokens.type === "message-morse") {
+        if (tokens.type === "morse") {
             inputKey = "morseWords";
             if (morse) {
                 displayKey = "children";
@@ -147,19 +182,17 @@ export default class Morse {
     }
 
     /**
-     * Tidies text (upper case, trim, squash multiple spaces)
-     * @param {String} text - the text to tidy
-     * @returns the tidied text
+     * Process the whitespace in a text input
+     * @param {String} text - the text
+     * @returns the processed text
      */
-    tidyText(text) {
+    processTextSpaces(text) {
         // move spaces after directives, e.g. "a [v100]b" => "a[v100] b"
         text = text.replace(/(\s+)(\[[^\]]+\])/g, "$2$1");
+        // remove whitespace from start and end
         text = text.trim();
-        text = text.replace(/\s+/g, ' ');
-        return text;
-    }
-
-    processTextSpaces(text) {
+        // make all space characters actual spaces
+        text = text.replace(/\s/g, ' ');
         // insert CHAR_SPACE between two normal characters
         text = text.replace(/([^\[\] ])(?=[^\[\] ])/g, "$1" + CHAR_SPACE);
         // insert CHAR_SPACE between characters when there's a directive in the way, e.g. "a[v100]b" => "a[v100]•b"
@@ -169,8 +202,15 @@ export default class Morse {
         while (text.match(removeCharSpaces)) {
             text = text.replace(removeCharSpaces, "$1");
         }
-        // replace ' ' with WORD_SPACE
-        text = text.replace(/ /g, WORD_SPACE);
+        // remove character spaces after an explicit pause ("[  ]", "[99]" or "[99ms]")
+        let removeSpacesAfterPause = new RegExp(` \\]${CHAR_SPACE}+`, "g");
+        text = text.replace(removeSpacesAfterPause, " ]");
+        removeSpacesAfterPause = new RegExp(`(\\[\\d+(ms)?\\])${CHAR_SPACE}+`, "g");
+        text = text.replace(removeSpacesAfterPause, "$1");
+        // replace spaces from a pause directive with explicit word spaces
+        text = text.replace(/\[(\s+)\]/g, (match, group1) => group1.replace(/./g, WORD_SPACE));
+        // replace consecutive ' ' with WORD_SPACE
+        text = text.replace(/ +/g, WORD_SPACE);
         return text;
     }
     /**
@@ -179,7 +219,7 @@ export default class Morse {
      * @returns a list of tokens, e.g. ['o', 'charSpace', 'n', 'charSpace', 'e', 'wordSpace', 't', 'charSpace', 'w', 'charSpace', 'o']
      */
     tokeniseRawText(text) {
-        return getAST(text);
+        return this.getAST(textParser, text);
     }
 
     /**
@@ -188,7 +228,7 @@ export default class Morse {
      * @returns - the tidied, tokenised text
      */
     tokeniseText(text) {
-        return this.tokeniseRawText(this.processTextSpaces(this.tidyText(text)));
+        return this.tokeniseRawText(this.processTextSpaces(text));
     }
 
     /**
@@ -255,9 +295,9 @@ export default class Morse {
         morse = morse.replace(insertSpaces, "$1 ");
         return morse;
     }
+
     tokeniseMorse(morse) {
-        //TODO: needs to be dictionary-specific
-        return getAST(this.processMorseSpaces(this.tidyMorse(morse)));
+        return this.getAST(this.morseParser, this.processMorseSpaces(this.tidyMorse(morse)));
     }
 
     displayMorse(tokens) {
@@ -295,7 +335,7 @@ export default class Morse {
     }
 
     _input2output(tokens) {
-        let toMorse = tokens.type == "message-text";
+        let toMorse = tokens.type == "text";
         let dict, inputWords;
         tokens.error = false;
         if (toMorse) {
@@ -355,5 +395,45 @@ export default class Morse {
             }
         }
         return tokens;
+    }
+
+    summariseAST(ast) {
+        if (ast === null) {
+            return null;
+        } else {
+            let tree = {
+                type: ast.type,
+                // text: ast.text,
+            };
+            if (ast.errors.length > 0) {
+                // console.log(ast.errors);
+                return null;  // we don't care what the error is, just need to flag that there is one
+            }
+            // for these elements, just concatenate the single child to simplify
+            while (ast.children.length == 1 && (ast.type == "message" || ast.type == "directive" || ast.type == "volume" || ast.type == "pitch" || ast.type == "timing" || ast.type == "pause")) {
+                ast = ast.children[0];
+                tree.type += "-" + ast.type;
+            }
+            // for these elements, make a list of the text of all the children (the values we are actually interested in)
+            if (ast.type == "textWords" || ast.type == "morseWords" || ast.type.match("Value")) {
+                tree.children = [];
+                for (let child of ast.children) {
+                    tree.children.push(child.text);
+                }
+            // otherwise just recurse down the tree
+            } else if (ast.children.length >= 1) {
+                tree.children = [];
+                for (let child of ast.children) {
+                    tree.children.push(this.summariseAST(child));
+                }
+            }
+            return tree;
+        }
+    }
+    
+    getAST(parser, input) {
+        let ast = parser.getAST(input);
+        let summary = this.summariseAST(ast);
+        return summary;
     }
 }

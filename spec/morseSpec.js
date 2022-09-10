@@ -4,35 +4,193 @@ import Morse from "../src/morse-pro.js";
 describe("Morse", function () {
     let m = new Morse();
     it("tidies text", function () {
-        expect(m.tidyText("   aaa")).toBe("aaa");
+        expect(m.processTextSpaces("   aaa")).toBe("a•a•a");
     });
     it("tidies text containing directives", function () {
-        expect(m.tidyText(" aaa  [v100] b [v]c[f550] d[t]e ")).toBe("aaa[v100] b[v] c[f550] d[t]e");
+        expect(m.processTextSpaces(" aaa  [v100] b [v]c[f550] d[t]e ")).toBe("a•a•a[v100]■b[v]■c[f550]■d[t]•e");
     });
     it("inserts character spaces in simple text", function () {
-        expect(m.processTextSpaces(" foo bar  baz")).toBe(
-            "■f•o•o■b•a•r■■b•a•z"
-        );
+        expect(m.processTextSpaces(" foo bar  baz")).toBe("f•o•o■b•a•r■b•a•z");
     })
     it("inserts character spaces in text containing directives", function () {
-        expect(m.processTextSpaces("foo [v110] bar")).toBe(
-            "f•o•o■[v110]■b•a•r"
-        );
+        expect(m.processTextSpaces("foo [v110] bar")).toBe("f•o•o[v110]■b•a•r");
+    })
+    it("protects pause spaces", function () {
+        expect(m.processTextSpaces("[  ]")).toBe("■■");
+    })
+    it("removes character spaces around a pause space", function () {
+        expect(m.processTextSpaces("s[  ]s")).toBe("s■■s");
+    })
+    it("leaves 1 other space around a pause space", function () {
+        expect(m.processTextSpaces("s [  ]s")).toBe("s■■■s");
+        expect(m.processTextSpaces("s [  ] s")).toBe("s■■■s");
     })
     it("tokenises text", function () {
         expect(m.tokeniseText("one two")).toEqual(
             {
-                type: 'message-text',
+                type: 'text',
                 children: [
                     { type: 'textWords', children: ['o', '•', 'n', '•', 'e', '■', 't', '•', 'w', '•', 'o'] }
                 ]
             }
         );
     });
+    it("can include whitespace in simple text", function () {
+        let message = "bar\tbob\r\nfoo";
+        expect(m.tokeniseText(message)).toEqual(
+            {
+                type: 'text',
+                children: [
+                    { type: 'textWords', children: ['b', '•', 'a', '•', 'r', '■', 'b', '•', 'o', '•', 'b', '■', 'f', '•', 'o', '•', 'o'] }
+                ]
+            }
+        );
+    });
+    it("can parse text with volume directives in", function () {
+        let message = "abc [v] def[V100] [v200]ghi[v300]xyz";
+        expect(m.tokeniseText(message)).toEqual(
+            {
+                type: 'text',
+                children: [
+                    { type: 'textWords', children: ['a', '•', 'b', '•', 'c'] },
+                    { type: 'directive-volume-volumeReset' },
+                    { type: 'textWords', children: ['■', 'd', '•', 'e', '•', 'f'] },
+                    { type: 'directive-volume-volumeValue', children: ['100'] },
+                    { type: 'directive-volume-volumeValue', children: ['200'] },
+                    { type: 'textWords', children: ['■', 'g', '•', 'h', '•', 'i'] },
+                    { type: 'directive-volume-volumeValue', children: ['300'] },
+                    { type: 'textWords', children: ['•', 'x', '•', 'y', '•', 'z'] }
+                ]
+            }
+        )
+    });
+    it("can parse text with pitch directives in", function () {
+        let message = "abc [p] def[P100] [f200]ghi[F300]xyz";
+        expect(m.tokeniseText(message)).toEqual(
+            {
+                type: 'text',
+                children: [
+                    { type: 'textWords', children: ['a', '•', 'b', '•', 'c'] },
+                    { type: 'directive-pitch-pitchReset' },
+                    { type: 'textWords', children: ['■', 'd', '•', 'e', '•', 'f'] },
+                    { type: 'directive-pitch-pitchValue', children: ['100'] },
+                    { type: 'directive-pitch-pitchValue', children: ['200'] },
+                    { type: 'textWords', children: ['■', 'g', '•', 'h', '•', 'i'] },
+                    { type: 'directive-pitch-pitchValue', children: ['300'] },
+                    { type: 'textWords', children: ['•', 'x', '•', 'y', '•', 'z'] }
+                ]
+            }
+        )
+    });
+    it("can parse text with timing directives in (1)", function () {
+        let message = "[t10/10]";
+        expect(m.tokeniseText(message)).toEqual(
+            {
+                type: 'text',
+                children: [
+                    { type: 'directive-timing-timingValue', children: ['10', '10'] }
+                ]
+            }
+        );
+        message = "[t]sos";
+        expect(m.tokeniseText(message)).toEqual(
+            {
+                type: 'text',
+                children: [
+                    { type: 'directive-timing-timingReset' },
+                    { type: 'textWords', children: ['s', '•', 'o', '•', 's'] }
+                ]
+            }
+        );
+        message = "abc[t] [T20/10] [t1,2,3,4,5]x[t1,2,3,4,5,6]yz";
+        expect(m.tokeniseText(message)).toEqual(
+            {
+                type: 'text',
+                children: [
+                    { type: 'textWords', children: ['a', '•', 'b', '•', 'c'] },
+                    { type: 'directive-timing-timingReset' },
+                    { type: 'directive-timing-timingValue', children: ['20', '10'] },
+                    { type: 'textWords', children: ['■'] },
+                    { type: 'directive-timing-timingValueLong', children: ['1', '2', '3', '4', '5'] },
+                    { type: 'textWords', children: ['■', 'x'] },
+                    { type: 'directive-timing-timingValueLong', children: ['1', '2', '3', '4', '5', '6'] },
+                    { type: 'textWords', children: ['•', 'y', '•', 'z'] }
+                ]
+            }
+        );
+    });
+    it("can parse text with pause directives in", function () {
+        let message = "e [  ] e"
+        expect(m.tokeniseText(message)).toEqual(
+            {
+                type: 'text',
+                children: [
+                    { type: 'textWords', children: ['e', '■', '■', '■', 'e'] }
+                ]
+            }
+        );
+        message = "e [99] e"
+        expect(m.tokeniseText(message)).toEqual(
+            {
+                type: 'text',
+                children: [
+                    { type: 'textWords', children: ['e'] },
+                    { type: 'directive-pause-pauseValue', children: ['99'] },
+                    { type: 'textWords', children: ['■', 'e'] }
+                ]
+            }
+        );
+        message = "e[  ]e"
+        expect(m.tokeniseText(message)).toEqual(
+            {
+                type: 'text',
+                children: [
+                    { type: 'textWords', children: ['e', '■', '■', 'e'] }
+                ]
+            }
+        )
+        message = "e[99]e"
+        expect(m.tokeniseText(message)).toEqual(
+            {
+                type: 'text',
+                children: [
+                    { type: 'textWords', children: ['e'] },
+                    { type: 'directive-pause-pauseValue', children: ['99'] },
+                    { type: 'textWords', children: ['e'] }
+                ]
+            }
+        );
+        message = "e[99ms]e"
+        expect(m.tokeniseText(message)).toEqual(
+            {
+                type: 'text',
+                children: [
+                    { type: 'textWords', children: ['e'] },
+                    { type: 'directive-pause-pauseValue', children: ['99'] },
+                    { type: 'textWords', children: ['e'] }
+                ]
+            }
+        );
+    });
+    it("can deal with badly formed directives", function () {
+        let message = "georgia [t";
+        expect(m.tokeniseText(message)).toBe(
+            null
+        );
+        message = "[t1234*]";
+        expect(m.tokeniseText(message)).toBe(
+            null
+        );
+        message = "abc [z1234]";
+        expect(m.tokeniseText(message)).toBe(
+            null
+        );
+    });
+
     it("tokenises text with directives", function () {
         expect(m.tokeniseText("   one [f550]   \ntwo  \t")).toEqual(
             {
-                type: 'message-text',
+                type: 'text',
                 children: [
                     { type: 'textWords', children: ['o', '•', 'n', '•', 'e'] },
                     { type: 'directive-pitch-pitchValue', children: ['550'] },
@@ -53,7 +211,7 @@ describe("Morse", function () {
     it("tokenises Morse", function () {
         expect(m.tokeniseMorse(".. .- / --")).toEqual(
             {
-                type: 'message-morse',
+                type: 'morse',
                 children: [
                     { type: 'morseWords', children: ['. .', '•', '. -', '■', '- -'] }
                 ]
@@ -63,7 +221,7 @@ describe("Morse", function () {
     it("converts from text to message object", function () {
         expect(m.text2morse("ab cd")).toEqual(
             {
-                type: 'message-text',
+                type: 'text',
                 children: [
                     {
                         type: 'textWords',
@@ -78,7 +236,7 @@ describe("Morse", function () {
     it("flags errors when converting from text to message object", function () {
         expect(m.text2morse("ab #d")).toEqual(
             {
-                type: 'message-text',
+                type: 'text',
                 children: [
                     {
                         type: 'textWords',
@@ -94,7 +252,7 @@ describe("Morse", function () {
     it("can remove errors in text input", function () {
         expect(m.text2morseClean("abc#q")).toEqual(
             {
-                type: 'message-text',
+                type: 'text',
                 children: [
                     {
                         type: 'textWords',
@@ -110,7 +268,7 @@ describe("Morse", function () {
     it("can convert from morse to a message object", function () {
         expect(m.morse2text(".. .- / --")).toEqual(
             {
-                type: 'message-morse',
+                type: 'morse',
                 children: [
                     {
                         type: 'morseWords',
@@ -125,7 +283,7 @@ describe("Morse", function () {
     it("can deal with errors when converting from morse to a message object", function () {
         expect(m.morse2text("-- .-.-.-.-.-")).toEqual(
             {
-                type: 'message-morse',
+                type: 'morse',
                 children: [
                     {
                         type: 'morseWords',
