@@ -293,6 +293,11 @@ export default class Morse {
         // insert " " between character elements using zero-width lookahead assertion
         let insertSpaces = new RegExp(`([^${CHAR_SPACE}${WORD_SPACE}])(?=[^${CHAR_SPACE}${WORD_SPACE}])`, "g");
         morse = morse.replace(insertSpaces, "$1 ");
+        // remove " " from inside directives (added in previous step)
+        let removeCharSpaces = /(.*\[[^\]]*) /;
+        while (morse.match(removeCharSpaces)) {
+            morse = morse.replace(removeCharSpaces, "$1");
+        }
         return morse;
     }
 

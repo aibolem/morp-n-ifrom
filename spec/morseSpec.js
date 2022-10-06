@@ -1,5 +1,5 @@
 import Morse from "../src/morse-pro.js";
-//TODO: use CHAR_SPACE (defined in parser) rather than the explicit char
+//TODO: use CHAR_SPACE and WORD_SPACE (defined in morse-pro) rather than the explicit chars
 
 describe("Morse", function () {
     let m = new Morse();
@@ -305,6 +305,14 @@ describe("Morse", function () {
         let msg = m.text2morse("ab  c ");
         expect(m.displayMorse(msg)).toBe(".- -... / -.-.");
     });
+    it("can translate from text with directives and display the text", function () {
+        let msg = m.text2morse("a[v100]b[t20/10]  c ");
+        expect(m.displayText(msg)).toBe("ab c");
+    });
+    it("can translate from text and display text with errors flagged", function () {
+        let msg = m.text2morse("a#b");
+        expect(m.displayTextErrors(msg, {}, "[", "]")).toBe("a[#]b");
+    })
     it("can translate from morse and display the text", function () {
         let msg = m.morse2text("\t .-    _... /-.-.  ");
         expect(m.displayText(msg)).toBe("AB C");
@@ -313,9 +321,12 @@ describe("Morse", function () {
         let msg = m.morse2text("\t .-    _... /-.-.  ");
         expect(m.displayMorse(msg)).toBe(".- -... / -.-.");
     });
-
-    it("can translate from text with directives and display the text", function () {
-        let msg = m.text2morse("a[v100]b[t20/10]  c ");
-        expect(m.displayText(msg)).toBe("ab c");
+    it("can translate from morse with directives and display the morse", function () {
+        let msg = m.morse2text(".[v]-- [f].");
+        expect(m.displayMorse(msg)).toBe(".-- .");
+    });
+    it("can translate from morse and display morse with errors flagged", function () {
+        let msg = m.morse2text(". ------- .");
+        expect(m.displayMorseErrors(msg, "[", "]")).toBe(". [-------] .");
     });
 });
