@@ -141,27 +141,30 @@ export default class Morse {
      * @param {String} charSpace - String to use to separate characters
      * @param {String} wordSpace - String to use to separate words
      * @param {Map} map - Map to replace tokens with alternatives, e.g. for display escaping {'>', '&gt;'}
-     * @param {Array} errors - list of Booleans indicating if there is an error in the tokens parameter
      * @param {String} errorPrefix - used to prefix any token that is an error
      * @param {String} errorSuffix - used to suffix any token that is an error
      * @returns a String of the tokens
      */
     display(tokens, morse, charSpace, wordSpace, map = {}, errorPrefix = '', errorSuffix = '') {
         let display = [];
-        let inputKey, displayKey;
+        let inputKey, displayKey, errorKey;
         if (tokens.type === "morse") {
             inputKey = "morseWords";
             if (morse) {
                 displayKey = "children";
+                errorKey = "translation";
             } else {
                 displayKey = "translation";
+                errorKey = "translation";
             }
         } else {
             inputKey = "textWords";
             if (morse) {
                 displayKey = "translation";
+                errorKey = "translation";
             } else {
                 displayKey = "children";
+                errorKey = "translation";
             }
         }
         map[CHAR_SPACE] = charSpace;
@@ -169,11 +172,12 @@ export default class Morse {
         for (let child of tokens.children) {
             if (child.type === inputKey) {
                 display.push(child[displayKey].map((c, i) => {
+                    if (c === undefined) c = "";
                     for (let k in map) {
                         let mapRegExp = new RegExp(k, 'g');
                         c = c.replace(mapRegExp, map[k]);
                     }
-                    return child.translation[i] !== undefined ? c : errorPrefix + c + errorSuffix
+                    return child[errorKey][i] !== undefined ? c : errorPrefix + c + errorSuffix
                 }));
             }
         }
@@ -335,7 +339,6 @@ export default class Morse {
     }
 
     looksLikeMorse(input) {
-        //TODO: change this to look at the parse results
         return input.match(this.dictionary.morseMatch) !== null;
     }
 

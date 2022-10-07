@@ -36,15 +36,14 @@ See the Licence for the specific language governing permissions and limitations 
 export default class MorseMessage {
     constructor(morseCWWave) {
         this.morseCWWave = morseCWWave;
-        this.rawInput = undefined;      // not used externally
+        this._rawInput = undefined;      // not used externally
         this.inputWasMorse = undefined;
         this.text = undefined;
-        this.textTokens = undefined;    // not used externally
         this.morse = undefined;
-        this.morseTokens = undefined;   // not used externally
-        this.errors = undefined;        // not used externally
-        this.hasError = undefined;      // not used externally
-        this.speech = undefined;        // remove?
+    }
+
+    get hasError() {
+        return this.tokens.error;
     }
 
     /**
@@ -74,36 +73,32 @@ export default class MorseMessage {
     }
 
     _completeFields(d) {
-        this.morseTokens = d.morse;
-        this.textTokens = d.text;
-        this.errors = d.error;
-        this.hasError = d.hasError;
-        this.speech = d.speech;
-        this.text = this.morseCWWave.displayText(this.textTokens);
-        this.morse = this.morseCWWave.displayMorse(this.morseTokens);
+        this.tokens = d;
+        this.text = this.morseCWWave.displayText(this.tokens);
+        this.morse = this.morseCWWave.displayMorse(this.tokens);
     }
 
     loadMorse(input) {
-        this.rawInput = input;
+        this._rawInput = input;
         this.inputWasMorse = true;
         this._completeFields(this.morseCWWave.morse2text(input));
         return this.text;
     }
 
     loadText(input) {
-        this.rawInput = input;
+        this._rawInput = input;
         this.inputWasMorse = false;
         this._completeFields(this.morseCWWave.text2morse(input));
         return this.morse;
     }
 
     cleanText() {
-        this._completeFields(this.morseCWWave.text2morseClean(this.rawInput));
+        this._completeFields(this.morseCWWave.text2morseClean(this._rawInput));
         return this.text;
     }
 
     get timings() {
-        return this.morseCWWave.morseTokens2timing(this.morseTokens);
+        return this.morseCWWave.getTimings(this.tokens);
     }
 
     get wave() {
@@ -133,10 +128,10 @@ export default class MorseMessage {
     }
 
     getTextErrorString(prefix, suffix, escapeMap={}) {
-        return this.morseCWWave.displayTextErrors(this.textTokens, escapeMap, this.errors, prefix, suffix);
+        return this.morseCWWave.displayTextErrors(this.tokens, escapeMap, prefix, suffix);
     }
 
     getMorseErrorString(prefix, suffix) {
-        return this.morseCWWave.displayMorseErrors(this.morseTokens, this.errors, prefix, suffix);
+        return this.morseCWWave.displayMorseErrors(this.tokens, prefix, suffix);
     }
 }
