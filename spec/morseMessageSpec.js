@@ -8,6 +8,9 @@ describe("MorseMessage", function () {
     it("loads text", function () {
         expect(m.loadText("abc")).toBe(".- -... -.-.");
     });
+    it("loads text with errors", function () {
+        expect(m.loadText("ab#c")).toBe(".- -...  -.-.");  // bad token missed out, extra space present
+    });
     it("loads morse", function () {
         expect(m.loadMorse(". .. --- / - -- ...")).toBe("EIO TMS");
     });

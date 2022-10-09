@@ -82,7 +82,7 @@ describe("Morse", function () {
             }
         )
     });
-    it("can parse text with timing directives in (1)", function () {
+    it("can parse text with timing directives in", function () {
         let message = "[t10/10]";
         expect(m.tokeniseText(message)).toEqual(
             {
@@ -265,6 +265,30 @@ describe("Morse", function () {
             }
         );
     });
+    it("can remove errors in text input that includes directives", function () {
+        expect(m.text2morseClean("ab[v]c#q")).toEqual(
+            {
+                type: 'text',
+                children: [
+                    {
+                        type: 'textWords',
+                        children: ['a', '•', 'b'],
+                        translation: ['. -', '•', '- . . .']
+                    },
+                    {
+                        type: 'directive-volume-volumeReset'
+                    },
+                    {
+                        type: 'textWords',
+                        children: ['•', 'c', '•', 'q'],
+                        translation: ['•', '- . - .', '•', '- - . -'],
+                        error: false
+                    }
+                ],
+                error: false
+            }
+        );
+    });
     it("can convert from morse to a message object", function () {
         expect(m.morse2text(".. .- / --")).toEqual(
             {
@@ -327,6 +351,6 @@ describe("Morse", function () {
     });
     it("can translate from morse and display morse with errors flagged", function () {
         let msg = m.morse2text(". ------- .");
-        expect(m.displayMorseErrors(msg, "[", "]")).toBe(". [-------] .");
+        expect(m.displayMorseErrors(msg, "{", "}")).toBe(". {-------} .");
     });
 });
