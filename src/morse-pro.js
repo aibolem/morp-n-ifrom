@@ -21,30 +21,31 @@ import { dictionaries } from "./dictionary/index.js";
 const CHAR_SPACE = '•';  // \u2022
 const WORD_SPACE = '■';  // \u25a0
 
-const directiveGrammar = `directive ::= volume | pitch | timing | pause
-volume ::= volumeValue | volumeReset
-volumeValue ::= "[" [vV] number "]"
-volumeReset ::= "[" [vV] "]"
-pitch ::= pitchValue | pitchReset
-pitchValue ::= "[" [pPfF] number "]"
-pitchReset ::= "[" [pPfF] "]"
-timing ::= timingReset | timingValue | timingValueLong
-timingReset ::= "[" [tT] "]"
-timingValue ::= "[" [tT] number "/" number "]"
-timingValueLong ::= "[" [tT] number "," number "," number "," number "," number ("," number)? "]"
-pause ::= pauseSpace | pauseValue
-pauseSpace ::= "[" " "+ "]"
-pauseValue ::= "[" number "ms"? "]"
-number ::= [1-9] [0-9]*
+const directiveGrammar = `
+    directive ::= volume | pitch | timing | pause
+    volume ::= volumeValue | volumeReset
+    volumeValue ::= "[" [vV] number "]"
+    volumeReset ::= "[" [vV] "]"
+    pitch ::= pitchValue | pitchReset
+    pitchValue ::= "[" [pPfF] number "]"
+    pitchReset ::= "[" [pPfF] "]"
+    timing ::= timingReset | timingValue | timingValueLong
+    timingReset ::= "[" [tT] "]"
+    timingValue ::= "[" [tT] number "/" number "]"
+    timingValueLong ::= "[" [tT] number "," number "," number "," number "," number ("," number)? "]"
+    pause ::= pauseSpace | pauseValue
+    pauseSpace ::= "[" " "+ "]"
+    pauseValue ::= "[" number "ms"? "]"
+    number ::= [1-9] [0-9]*
 `;
 
 //TODO: timingValueLong needs to be changed to explicitly specify timing for each element?
 //TODO: need to add pitchValueLong to explicitly set pitch for each element (as you can in the dictionary)
 
 const textGrammar = `
-text ::= (textWords | directive)+
-textWords ::= textCharacter+
-textCharacter ::= [^#x5b#x5d#x7c#x2022] | "${CHAR_SPACE}" /* anything other than [|] (other invalid characters to be found later) */
+    text ::= (textWords | directive)+
+    textWords ::= textCharacter+
+    textCharacter ::= [^#x5b#x5d#x7c] | "${CHAR_SPACE}" /* anything other than [|] (other invalid characters to be found later) */
 ` + directiveGrammar;
 
 const textParser = new Grammars.W3C.Parser(textGrammar);
@@ -136,8 +137,9 @@ export default class Morse {
 
     /**
      * General method for converting a list of tokens to a displayable string.
-     * N.B. given the tokens include "wordSpace" and "charSpace", an unusual map parameter could completely mess that up.
      * @param {Array} tokens - list of tokens to form into String
+     * @param {Boolean} morse - whether to display the Morse (displays text if false)
+     * @param {Boolean} directives - whether to display the directives
      * @param {String} charSpace - String to use to separate characters
      * @param {String} wordSpace - String to use to separate words
      * @param {Map} map - Map to replace tokens with alternatives, e.g. for display escaping {'>', '&gt;'}
@@ -170,6 +172,7 @@ export default class Morse {
         map[CHAR_SPACE] = charSpace;
         map[WORD_SPACE] = wordSpace;
         for (let child of tokens.children) {
+            // we just pull out the morseWords or textWords, ignoring any directives
             if (child.type === inputKey) {
                 display.push(child[displayKey].map((c, i) => {
                     if (c === undefined) c = "";
@@ -249,19 +252,6 @@ export default class Morse {
         return this.display(tokens, false, '', ' ', escapeMap, prefix, suffix);
     }
 
-    // /**
-    //  * Split out the morse and speech elements of the extended syntax "[morse|speech]"
-    //  * @param {String} extendedText 
-    //  * @returns { text, speech }
-    //  */
-    // splitTextAndSpeech(extendedText) {
-    //     let text = extendedText.replace(/\[([^\|]*)\|[^\]]*\]/g, '$1');
-    //     let speech = extendedText.replace(/\[[^\|]*\|([^\]]*)\]/g, '$1');
-    //     // sanitise the speech by squishing all whitespace to single spaces, trimming, and discarding any of []| that have crept in
-    //     speech = speech.replace(/\s+/g, " ").replace(/[\[\]\|]/g, "").trim();
-    //     return { text, speech };
-    // }
-
     /**
      * Convert from a list of text tokens to a message object.
      * @param {Array} tokens - list of text tokens
@@ -278,11 +268,8 @@ export default class Morse {
      * @returns {Object} - text: text tokens, morse: morse tokens, error: error tokens, hasError Boolean
      */
     text2morse(text) {
-        // let { text, speech } = this.splitTextAndSpeech(extendedText);
         let textTokens = this.tokeniseText(text);
-        let ret = this.textTokens2morse(textTokens);
-        // ret.speech = speech;
-        return ret;
+        return this.textTokens2morse(textTokens);
     }
 
     tidyMorse(morse) {
