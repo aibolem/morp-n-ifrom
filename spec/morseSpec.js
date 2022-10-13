@@ -18,6 +18,10 @@ describe("Morse", function () {
     it("protects pause spaces", function () {
         expect(m.processTextSpaces("[  ]")).toBe("■■");
     })
+    it("protects prosigns", function () {
+        expect(m.processTextSpaces("<BT>")).toBe("<BT>");
+        expect(m.processTextSpaces("<SOS>")).toBe("<SOS>");
+    })
     it("removes character spaces around a pause space", function () {
         expect(m.processTextSpaces("s[  ]s")).toBe("s■■s");
     })
@@ -31,6 +35,16 @@ describe("Morse", function () {
                 type: 'text',
                 children: [
                     { type: 'textWords', children: ['o', '•', 'n', '•', 'e', '■', 't', '•', 'w', '•', 'o'] }
+                ]
+            }
+        );
+    });
+    it("tokenises text containing prosigns", function () {
+        expect(m.tokeniseText("a <BT> b")).toEqual(
+            {
+                type: 'text',
+                children: [
+                    { type: 'textWords', children: ['a', '■', '<BT>', '■', 'b'] }
                 ]
             }
         );
@@ -249,6 +263,9 @@ describe("Morse", function () {
             }
         );
     });
+    it("gets null when the text can't be parsed", function () {
+        expect(m.text2morse(">aaa")).toBe(null);
+    })
     it("can remove errors in text input", function () {
         expect(m.text2morseClean("abc#q")).toEqual(
             {
@@ -320,6 +337,9 @@ describe("Morse", function () {
             }
         );
     });
+    it("gets null when the morse can't be parsed", function () {
+        expect(m.morse2text("aaa")).toBe(null);
+    })
 
     it("can translate from text and display the text", function () {
         let msg = m.text2morse("ab  c ");

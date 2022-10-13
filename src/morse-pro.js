@@ -44,8 +44,9 @@ const directiveGrammar = `
 
 const textGrammar = `
     text ::= (textWords | directive)+
-    textWords ::= textCharacter+
-    textCharacter ::= [^#x5b#x5d#x7c] | "${CHAR_SPACE}" /* anything other than [|] (other invalid characters to be found later) */
+    textWords ::= (prosign | textCharacter)+ 
+    textCharacter ::= [^#x5b#x5d#x7c#x3c#x3e] | "${CHAR_SPACE}" /* anything other than [|] (other invalid characters to be found later) */
+    prosign ::= "<" textCharacter textCharacter textCharacter? ">"
 ` + directiveGrammar;
 
 const textParser = new Grammars.W3C.Parser(textGrammar);
@@ -139,7 +140,6 @@ export default class Morse {
      * General method for converting a list of tokens to a displayable string.
      * @param {Array} tokens - list of tokens to form into String
      * @param {Boolean} morse - whether to display the Morse (displays text if false)
-     * @param {Boolean} directives - whether to display the directives
      * @param {String} charSpace - String to use to separate characters
      * @param {String} wordSpace - String to use to separate words
      * @param {Map} map - Map to replace tokens with alternatives, e.g. for display escaping {'>', '&gt;'}
@@ -148,6 +148,7 @@ export default class Morse {
      * @returns a String of the tokens
      */
     display(tokens, morse, charSpace, wordSpace, map = {}, errorPrefix = '', errorSuffix = '') {
+        if (tokens === null) return null;
         let display = [];
         let inputKey, displayKey, errorKey;
         if (tokens.type === "morse") {
@@ -201,7 +202,7 @@ export default class Morse {
         // make all space characters actual spaces
         text = text.replace(/\s/g, ' ');
         // insert CHAR_SPACE between two normal characters
-        text = text.replace(/([^\[\] ])(?=[^\[\] ])/g, "$1" + CHAR_SPACE);
+        text = text.replace(/([^<\[\] ])(?=[^>\[\] ])/g, "$1" + CHAR_SPACE);
         // insert CHAR_SPACE between characters when there's a directive in the way, e.g. "a[v100]b" => "a[v100]•b"
         text = text.replace(/([^\[\] ])(\[[^\]]+\])([^\[\] ])/g, "$1$2" + CHAR_SPACE + "$3");
         // remove CHAR_SPACE from inside directives (added in previous step)
@@ -209,6 +210,11 @@ export default class Morse {
         while (text.match(removeCharSpaces)) {
             text = text.replace(removeCharSpaces, "$1");
         }
+        // remove CHAR_SPACE from inside prosigns (added above)
+        let removeSpaceInProsign = new RegExp(`(<.)${CHAR_SPACE}(.>)`, "g");
+        text = text.replace(removeSpaceInProsign, "$1$2");
+        removeSpaceInProsign = new RegExp(`(<.)${CHAR_SPACE}(.)${CHAR_SPACE}(.>)`, "g");
+        text = text.replace(removeSpaceInProsign, "$1$2$3");
         // remove character spaces after an explicit pause ("[  ]", "[99]" or "[99ms]")
         let removeSpacesAfterPause = new RegExp(` \\]${CHAR_SPACE}+`, "g");
         text = text.replace(removeSpacesAfterPause, " ]");
@@ -220,14 +226,6 @@ export default class Morse {
         text = text.replace(/ +/g, WORD_SPACE);
         return text;
     }
-    /**
-     * Splits text into words and letters
-     * @param {String} text - the text to tokenise, e.g. "one two"
-     * @returns a list of tokens, e.g. ['o', 'charSpace', 'n', 'charSpace', 'e', 'wordSpace', 't', 'charSpace', 'w', 'charSpace', 'o']
-     */
-    tokeniseRawText(text) {
-        return this.getAST(textParser, text);
-    }
 
     /**
      * Tidies and then tokenises text
@@ -235,7 +233,7 @@ export default class Morse {
      * @returns - the tidied, tokenised text
      */
     tokeniseText(text) {
-        return this.tokeniseRawText(this.processTextSpaces(text));
+        return this.getAST(textParser, (this.processTextSpaces(text)));
     }
 
     /**
@@ -253,23 +251,15 @@ export default class Morse {
     }
 
     /**
-     * Convert from a list of text tokens to a message object.
-     * @param {Array} tokens - list of text tokens
-     * @returns {Object} - text: text tokens, morse: morse tokens, error: error tokens, hasError Boolean
-     */
-    textTokens2morse(tokens) {
-        this._input2output(tokens);
-        return tokens;  // TODO: not sensible to change it in place and return it
-    }
-
-    /**
      * Convert from the extended text format to a message object.
      * @param {String} extendedText - text using the extended format (containing directives)
      * @returns {Object} - text: text tokens, morse: morse tokens, error: error tokens, hasError Boolean
      */
     text2morse(text) {
-        let textTokens = this.tokeniseText(text);
-        return this.textTokens2morse(textTokens);
+        let tokens = this.tokeniseText(text);
+        if (tokens === null) return null;
+        this._input2output(tokens);
+        return tokens;
     }
 
     tidyMorse(morse) {
@@ -321,8 +311,10 @@ export default class Morse {
     }
 
     morse2text(morse) {
-        let morseTokens = this.tokeniseMorse(morse);
-        return this.morseTokens2text(morseTokens);
+        let tokens = this.tokeniseMorse(morse);
+        if (tokens === null) return null;
+        this._input2output(tokens);
+        return tokens;
     }
 
     looksLikeMorse(input) {

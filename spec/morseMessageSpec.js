@@ -24,9 +24,17 @@ describe("MorseMessage", function () {
         expect(m.translate("...", false)).toBe(".-.-.- .-.-.- .-.-.-");
     })
     it("gets text error string", function () {
-        m.loadText("a#b<");
-        expect(m.getTextErrorString("{", "}")).toBe("a{#}b{<}");
-        expect(m.getTextErrorString("{", "}", {'<': '&lt;'})).toBe("a{#}b{&lt;}");
+        m.loadText("a#b");
+        expect(m.getTextErrorString("{", "}")).toBe("a{#}b");
+        expect(m.getTextErrorString("{", "}", {'#': 'XXX'})).toBe("a{XXX}b");
+    });
+    it("gets null when text can't be parsed", function () {
+        expect(m.loadText("a<b")).toBe(null);
+        expect(m.getTextErrorString()).toBe(null);
+    });
+    it("gets null when morse can't be parsed", function () {
+        expect(m.loadMorse("aaa")).toBe(null);
+        expect(m.getMorseErrorString()).toBe(null);
     });
     it("gets morse error string", function () {
         m.loadText("a#b");
