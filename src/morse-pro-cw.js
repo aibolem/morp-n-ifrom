@@ -40,7 +40,7 @@ export default class MorseCW extends Morse {
         /** The element of the dictionary that the ratios are based off */
         this._baseElement = this.dictionary.baseElement;
         /** Initialise the ratios based on the dictionary but enable them to be changed thereafter */
-        this.ratios = this.dictionary.ratio;  // actually does a copy from the dict so we can reset if needed
+        this.ratios = {...this.dictionary.ratio};  // actually does a copy from the dict so we can reset if needed
         /** Compute ditsInParis and spacesInParis while we have original ratio */
         let parisTokens = this.text2morse('PARIS');
         this._baseLength = 1;
@@ -173,8 +173,12 @@ export default class MorseCW extends Morse {
                     case "directive-timing-timingReset":
                         this._restoreSpeed();
                         break;
+                    case "directive-timing-timingEqual":
+                        this.setFWPM(this.wpm);
+                        break;
                     case "directive-pause-pauseValue":
                         notes.push({d: -child.children[0]});
+                        break;
                 }
             } else {
                 let chars;

@@ -41,6 +41,8 @@ describe("MorseCW", function () {
         );
     });
     it("calculates time when there are pause spaces", function () {
+        mcw.setWPM(20);
+        mcw.setFWPM(20);
         expect(mcw.getTimings(mcw.text2morse("s s[  ]s"))).toEqual(
             [60, -60, 60, -60, 60, -420,
                 60, -60, 60, -60, 60, -420, -420,
@@ -48,11 +50,23 @@ describe("MorseCW", function () {
         )
     });
     it("calculates times including pause values", function () {
+        mcw.setWPM(20);
+        mcw.setFWPM(20);
         expect(mcw.getTimings(mcw.text2morse("e[99]e"))).toEqual(
             [60, -99, 60]
         );
         expect(mcw.getTimings(mcw.text2morse("e[99ms]e"))).toEqual(
             [60, -99, 60]
+        )
+    })
+    it("calculates times with the timing equality directive", function () {
+        mcw.setWPM(20);
+        mcw.setFWPM(10);
+        expect(mcw.getTimings(mcw.text2morse("se se")).map(x => Math.floor(x))).toEqual(
+            [ 60, -60, 60, -60, 60, -654, 60, -1526, 60, -60, 60, -60, 60, -654, 60 ]
+        )
+        expect(mcw.getTimings(mcw.text2morse("se [t=]se")).map(x => Math.floor(x))).toEqual(
+            [ 60, -60, 60, -60, 60, -654, 60, -8400, 1200, -1200, 1200, -1200, 1200, -3600, 1200 ]
         )
     })
 });

@@ -29,10 +29,11 @@ const directiveGrammar = `
     pitch ::= pitchValue | pitchReset
     pitchValue ::= "[" [pPfF] number "]"
     pitchReset ::= "[" [pPfF] "]"
-    timing ::= timingReset | timingValue | timingValueLong
+    timing ::= timingReset | timingValue | timingValueLong | timingEqual
     timingReset ::= "[" [tT] "]"
     timingValue ::= "[" [tT] number "/" number "]"
     timingValueLong ::= "[" [tT] number "," number "," number "," number "," number ("," number)? "]"
+    timingEqual ::= "[" [tT] "=]"
     pause ::= pauseSpace | pauseValue
     pauseSpace ::= "[" " "+ "]"
     pauseValue ::= "[" number "ms"? "]"
