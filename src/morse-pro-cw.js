@@ -71,6 +71,7 @@ export default class MorseCW extends Morse {
 
     /** @type {number} */
     get wpm() {
+        if (this._wpm === undefined) this._setWPMfromBaseLength();
         return this._wpm;
     }
 
@@ -92,6 +93,7 @@ export default class MorseCW extends Morse {
 
     /** @type {number} */
     get fwpm() {
+        if (this._fwpm === undefined) this._setFWPMfromRatio();
         return this._fwpm;
     }
 
