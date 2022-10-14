@@ -87,8 +87,8 @@ export let dictionary = {
 
     display: {
         morse: {
-            '\\.': '.',
-            '\\-': '-',
+            '.': '.',
+            '-': '-',
             ' ': ''
         },
         join: {
@@ -103,6 +103,22 @@ export let dictionary = {
         morse = morse.replace(/_/g, '-')
         morse = morse.replace(/\s+/g, ' ');
         morse = morse.replace(/\s*\/[\s\/]*/g, '/');
+        return morse;
+    },
+
+    processMorseSpaces: function(morse) {
+        // replace "/" with WORD_SPACE
+        morse = morse.replace(/\//g, WORD_SPACE);
+        // replace " " with CHAR_SPACE
+        morse = morse.replace(/ /g, CHAR_SPACE);
+        // insert " " between character elements using zero-width lookahead assertion
+        let insertSpaces = new RegExp(`([^${CHAR_SPACE}${WORD_SPACE}])(?=[^${CHAR_SPACE}${WORD_SPACE}])`, "g");
+        morse = morse.replace(insertSpaces, "$1 ");
+        // remove " " from inside directives (added in previous step)
+        let removeCharSpaces = /(.*\[[^\]]*) /;
+        while (morse.match(removeCharSpaces)) {
+            morse = morse.replace(removeCharSpaces, "$1");
+        }
         return morse;
     },
 
@@ -169,9 +185,10 @@ export let dictionary = {
         }
     },
 
-    grammar: `morse ::= (morseWords | directive)+
-morseWords ::= (morseCharacter | morseSpace+)+
-morseCharacter ::= [\\.\\-_ ]+
-morseSpace ::= [\/\r\n\t${CHAR_SPACE}${WORD_SPACE}]
-`
+    grammar: `
+        morse ::= (morseWords | directive)+
+        morseWords ::= (morseCharacter | morseSpace+)+
+        morseCharacter ::= [\\.\\- ]+  /* the space here is the intra-character space */
+        morseSpace ::= [\/\r\n\t${CHAR_SPACE}${WORD_SPACE}]
+    `
 }

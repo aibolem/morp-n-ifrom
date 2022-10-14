@@ -47,7 +47,7 @@ const directiveGrammar = `
 const textGrammar = `
     text ::= (textWords | directive)+
     textWords ::= (prosign | textCharacter)+ 
-    textCharacter ::= [^#x5b#x5d#x7c#x3c#x3e] | "${CHAR_SPACE}" /* anything other than [|] (other invalid characters to be found later) */
+    textCharacter ::= [^#x5b#x5d#x7c#x3c#x3e] | "${CHAR_SPACE}" /* anything other than [ | ] < > (other invalid characters to be found later) */
     prosign ::= "<" textCharacter textCharacter textCharacter? ">"
 ` + directiveGrammar;
 
@@ -98,7 +98,6 @@ export default class Morse {
         // Set up sensible default:
         this._addDictionary({
             letter: { '': '' },
-            letterMatch: /^./
         });
         // Load in all dictionaries:
         for (let d of this.dictionaries) {
@@ -121,7 +120,7 @@ export default class Morse {
 
     /**
      * Load in a dictionary.
-     * Dictionary needs 'letter' and (optional) 'letterMatch' keys.
+     * Dictionary needs 'letter' key at minimum.
      * @param {Object} dict
      */
     _addDictionary(dict) {
@@ -180,7 +179,7 @@ export default class Morse {
                 display.push(child[displayKey].map((c, i) => {
                     if (c === undefined) c = "";
                     for (let k in map) {
-                        let mapRegExp = new RegExp(k, 'g');
+                        let mapRegExp = new RegExp("\\" + k, 'g');  // escape the key as it can be "." or "-"
                         c = c.replace(mapRegExp, map[k]);
                     }
                     return child[errorKey][i] !== undefined ? c : errorPrefix + c + errorSuffix
@@ -235,7 +234,7 @@ export default class Morse {
      * @returns - the tidied, tokenised text
      */
     tokeniseText(text) {
-        return this.getAST(textParser, (this.processTextSpaces(text)));
+        return this.getAST(textParser, this.processTextSpaces(text));
     }
 
     /**
@@ -269,19 +268,7 @@ export default class Morse {
     }
 
     processMorseSpaces(morse) {
-        // replace "/" with WORD_SPACE
-        morse = morse.replace(/\//g, WORD_SPACE);
-        // replace " " with CHAR_SPACE
-        morse = morse.replace(/ /g, CHAR_SPACE);
-        // insert " " between character elements using zero-width lookahead assertion
-        let insertSpaces = new RegExp(`([^${CHAR_SPACE}${WORD_SPACE}])(?=[^${CHAR_SPACE}${WORD_SPACE}])`, "g");
-        morse = morse.replace(insertSpaces, "$1 ");
-        // remove " " from inside directives (added in previous step)
-        let removeCharSpaces = /(.*\[[^\]]*) /;
-        while (morse.match(removeCharSpaces)) {
-            morse = morse.replace(removeCharSpaces, "$1");
-        }
-        return morse;
+        return this.dictionary.processMorseSpaces(morse);
     }
 
     tokeniseMorse(morse) {
