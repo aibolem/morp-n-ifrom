@@ -62,11 +62,11 @@ describe("MorseCW", function () {
     it("calculates times with the timing equality directive", function () {
         mcw.setWPM(20);
         mcw.setFWPM(10);
-        expect(mcw.getTimings(mcw.text2morse("se se")).map(x => Math.floor(x))).toEqual(
-            [ 60, -60, 60, -60, 60, -654, 60, -1526, 60, -60, 60, -60, 60, -654, 60 ]
+        expect(mcw.getTimings(mcw.text2morse("ee e")).map(x => Math.floor(x))).toEqual(
+            [ 60, -654, 60, -1526, 60 ]
         )
-        expect(mcw.getTimings(mcw.text2morse("se [t=]se")).map(x => Math.floor(x))).toEqual(
-            [ 60, -60, 60, -60, 60, -654, 60, -8400, 1200, -1200, 1200, -1200, 1200, -3600, 1200 ]
+        expect(mcw.getTimings(mcw.text2morse("ee e [t=]ee e")).map(x => Math.floor(x))).toEqual(
+            [ 60, -654, 60, -1526, 60, -420, 60, -180, 60, -420, 60 ]
         )
     })
 });
