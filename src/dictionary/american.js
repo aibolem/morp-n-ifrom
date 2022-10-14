@@ -1,3 +1,6 @@
+const CHAR_SPACE = '•';  // \u2022
+const WORD_SPACE = '■';  // \u25a0
+
 export let dictionary = {
     id: 'american',
 
@@ -55,8 +58,6 @@ export let dictionary = {
         ';': '. . .s. .',
     },
 
-    letterMatch: /^./,
-
     ratio: {
         '.': 1,
         '-': 2,
@@ -64,8 +65,8 @@ export let dictionary = {
         'D': 5,
         ' ': -1,
         's': -1.5,
-        'charSpace': -2,
-        'wordSpace': -3
+        '•': -2,
+        '■': -3
     },
 
     baseElement: '.',
@@ -77,8 +78,8 @@ export let dictionary = {
         'D': 550,
         ' ': 0,
         's': 0,
-        'charSpace': 0,
-        'wordSpace': 0
+        '•': 0,
+        '■': 0
     },
 
     display: {
@@ -96,10 +97,9 @@ export let dictionary = {
         }
     },
 
-    tokeniseMorse: function(morse) {
+    tidyMorse: function(morse) {
         morse = morse.trim();
         morse = morse.replace(/_/g, '-')
-        morse = morse.replace(/\|/g, '/');
         morse = morse.replace(/\u2e3a/g, 'd');
         morse = morse.replace(/\u2e3b/g, 'D');
         morse = morse.replace(/[\r\n\t]+/g, '/');
@@ -107,17 +107,14 @@ export let dictionary = {
         morse = morse.replace(/([\.\-dD]  )([^ ])/g, '$1 $2');
         morse = morse.replace(/ *\/[ \/]*/g, '/');
         morse = morse.replace(/([\.\-dD]) (?=[\.\-dD])/g, '$1s');
-
-        let words = morse.split('/');
-        let tokens = words.map(word => word.split('   '));
-        tokens = tokens.map(letters => letters.map(letter => letter.replace(/([\.\-])(?=[\.\-])/g, '$1 ')));
-        return tokens;
+        return morse;
     },
 
-    morseMatch: new RegExp('^\\s*[\\.\\-_\u2e3a\u2e3b]+[\\.\\-_\u2e3a\u2e3b\\s\\/\\|]*$'),
+    // morseMatch: new RegExp('^\\s*[\\.\\-_\u2e3a\u2e3b]+[\\.\\-_\u2e3a\u2e3b\\s\\/\\|]*$'),
+    morseMatch: /^\s*[\.\-_\u2e3a\u2e3b]+[\.\-_\u2e3a\u2e3b\s\/]*$/,
 
     displayName: {
-        keys: ['.', '-', 'd', 'D', ' ', 's', 'charSpace', 'wordSpace'],
+        keys: ['.', '-', 'd', 'D', ' ', 's', CHAR_SPACE, WORD_SPACE],
         values: ['dit','dah','long dash','very long dash','short space','long space','inter-character space','word space']
     },
 
