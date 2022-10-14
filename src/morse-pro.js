@@ -43,6 +43,7 @@ const directiveGrammar = `
 //TODO: timingValueLong needs to be changed to explicitly specify timing for each element?
 //TODO: need to add pitchValueLong to explicitly set pitch for each element (as you can in the dictionary)
 
+//TODO: make the prosign parsing optional?
 const textGrammar = `
     text ::= (textWords | directive)+
     textWords ::= (prosign | textCharacter)+ 

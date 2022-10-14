@@ -66,9 +66,7 @@ export let dictionary = {
         '!': '- . - . - -',
     },
 
-    letterMatch: /^./,
-
-    /* 'charSpace' and 'wordSpace' are mandatory. The other symbols are dictionary dependent. */
+    /* '•' for a character space' and '■' for a word space are mandatory. The other symbols are dictionary dependent. */
     ratio: {
         '.': 1,
         '-': 3,
@@ -103,14 +101,12 @@ export let dictionary = {
         // Tidy the Morse => ".. .- / --"
         morse = morse.trim();
         morse = morse.replace(/_/g, '-')
-        morse = morse.replace(/\|/g, '/');    //TODO: take out pipe?
         morse = morse.replace(/\s+/g, ' ');
         morse = morse.replace(/\s*\/[\s\/]*/g, '/');
         return morse;
     },
 
-    //TODO: take out pipe?
-    morseMatch: new RegExp('^\\s*[\\.\\-_]+[\\.\\-_\\s\\/\\|]*$'),
+    morseMatch: /^\s*[\.\-_]+[\.\-_\s\/]*$/,
 
     displayName: {
         keys: ['.', '-', ' ', CHAR_SPACE, WORD_SPACE],
@@ -136,7 +132,6 @@ export let dictionary = {
                 '<VE>': '. . . - .',
                 '<SOS>': '. . . - - - . . .'
             },
-            letterMatch: /^<...?>|./
         },
         accents: {
             letter: {
