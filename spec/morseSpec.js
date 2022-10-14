@@ -1,7 +1,7 @@
 import Morse from "../src/morse-pro.js";
 //TODO: use CHAR_SPACE and WORD_SPACE (defined in morse-pro) rather than the explicit chars
 
-describe("Morse", function () {
+describe("Morse (Text)", function () {
     let m = new Morse();
     it("tidies text", function () {
         expect(m.processTextSpaces("   aaa")).toBe("a•a•a");
@@ -200,7 +200,6 @@ describe("Morse", function () {
             null
         );
     });
-
     it("tokenises text with directives", function () {
         expect(m.tokeniseText("   one [f550]   \ntwo  \t")).toEqual(
             {
@@ -209,25 +208,6 @@ describe("Morse", function () {
                     { type: 'textWords', children: ['o', '•', 'n', '•', 'e'] },
                     { type: 'directive-pitch-pitchValue', children: ['550'] },
                     { type: 'textWords', children: ['■', 't', '•', 'w', '•', 'o'] }
-                ]
-            }
-        );
-    });
-    it("tidies morse", function () {
-        expect(m.tidyMorse("   ../  -|..   ")).toBe("../-/..");
-    });
-
-    //TODO
-    // it("tidies morse containing directives", function () {
-    //     expect(m.tidyMorse("   ../ [f600] -|..   ")).toBe("../-/..");
-    // });
-
-    it("tokenises Morse", function () {
-        expect(m.tokeniseMorse(".. .- / --")).toEqual(
-            {
-                type: 'morse',
-                children: [
-                    { type: 'morseWords', children: ['. .', '•', '. -', '■', '- -'] }
                 ]
             }
         );
@@ -306,6 +286,34 @@ describe("Morse", function () {
             }
         );
     });
+});
+
+describe("Morse (International)", function () {
+    let m = new Morse();
+    it("can translate from text and display the text", function () {
+        let msg = m.text2morse("ab  c ");
+        expect(m.displayText(msg)).toBe("ab c");
+    });
+    it("tidies morse", function () {
+        expect(m.tidyMorse("   ../  -/..   ")).toBe("../-/..");
+    });
+
+    //TODO
+    // it("tidies morse containing directives", function () {
+    //     expect(m.tidyMorse("   ../ [f600] -|..   ")).toBe("../-/..");
+    // });
+
+    it("tokenises Morse", function () {
+        expect(m.tokeniseMorse(".. .- / --")).toEqual(
+            {
+                type: 'morse',
+                children: [
+                    { type: 'morseWords', children: ['. .', '•', '. -', '■', '- -'] }
+                ]
+            }
+        );
+    });
+
     it("can convert from morse to a message object", function () {
         expect(m.morse2text(".. .- / --")).toEqual(
             {
@@ -340,11 +348,6 @@ describe("Morse", function () {
     it("gets null when the morse can't be parsed", function () {
         expect(m.morse2text("aaa")).toBe(null);
     })
-
-    it("can translate from text and display the text", function () {
-        let msg = m.text2morse("ab  c ");
-        expect(m.displayText(msg)).toBe("ab c");
-    });
     it("can translate from text and display the morse", function () {
         let msg = m.text2morse("ab  c ");
         expect(m.displayMorse(msg)).toBe(".- -... / -.-.");
@@ -372,5 +375,44 @@ describe("Morse", function () {
     it("can translate from morse and display morse with errors flagged", function () {
         let msg = m.morse2text(". ------- .");
         expect(m.displayMorseErrors(msg, "{", "}")).toBe(". {-------} .");
+    });
+});
+
+describe("Morse (American)", function () {
+    let m = new Morse({ dictionary: "american" });
+    it("tidies morse", function () {
+        expect(m.tidyMorse(" \u2e3a\u2e3b.- .      .. / -_  .")).toBe("\u2e3a\u2e3b.- .   ../--   .");
+        //TODO: add a few more
+    });
+    it("processes morse spaces", function () {
+        expect(m.processMorseSpaces(m.tidyMorse("\u2e3a\u2e3b.- .   .. / -_"))).toBe("\u2e3a \u2e3b . -s.•. .■- -");
+    });
+    it("tokenises Morse", function () {
+        expect(m.tokeniseMorse("\u2e3a\u2e3b.- .   .. / -")).toEqual(
+            {
+                type: 'morse',
+                children: [
+                    {
+                        type: 'morseWords',
+                        children: ['⸺ ⸻ . -s.', '•', '. .', '■', '-']
+                    }
+                ]
+            }
+        );
+    });
+    it("translates Morse to text", function () {
+        expect(m.morse2text(".. .   \u2e3a   \u2e3b / .-   -...")).toEqual(
+            {
+                type: 'morse',
+                children: [
+                    {
+                        type: 'morseWords',
+                        children: ['. .s.', '•', '⸺', '•', '⸻', '■', '. -', '•', '- . . .'],
+                        translation: ['C', '•', 'L', '•', '0', '■', 'A', '•', 'B']
+                    }
+                ],
+                error: false
+            }
+        )
     });
 });
