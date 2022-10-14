@@ -179,8 +179,7 @@ export default class Morse {
                 display.push(child[displayKey].map((c, i) => {
                     if (c === undefined) c = "";
                     for (let k in map) {
-                        let mapRegExp = new RegExp("\\" + k, 'g');  // escape the key as it can be "." or "-"
-                        c = c.replace(mapRegExp, map[k]);
+                        c = c.replaceAll(k, map[k]);
                     }
                     return child[errorKey][i] !== undefined ? c : errorPrefix + c + errorSuffix
                 }));

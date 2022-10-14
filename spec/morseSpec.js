@@ -415,4 +415,23 @@ describe("Morse (American)", function () {
             }
         )
     });
+    it("translates text to Morse", function () {
+        expect(m.text2morse("CL0 AB")).toEqual(
+            {
+                type: 'text',
+                children: [
+                    {
+                        type: 'textWords',
+                        children: ['C', '•', 'L', '•', '0', '■', 'A', '•', 'B'],
+                        translation: ['. .s.', '•', '⸺', '•', '⸻', '■', '. -', '•', '- . . .']
+                    }
+                ],
+                error: false
+            }
+        )
+    });
+    it("can translate from text and display the morse", function () {
+        let msg = m.text2morse("CL0 AB");
+        expect(m.displayMorse(msg)).toBe(".. .   ⸺   ⸻ / .-   -...");
+    });
 });
