@@ -247,25 +247,34 @@ export default class Morse {
         text = text.replace(/\s/g, ' ');
         // insert CHAR_SPACE between two normal characters
         text = text.replace(/([^<\[\] ])(?=[^>\[\] ])/g, "$1" + CHAR_SPACE);
-        // insert CHAR_SPACE between characters when there's a tag in the way, e.g. "a[v100]b" => "a[v100]•b"
-        text = text.replace(/([^\[\] ])(\[[^\]]+\])([^\[\] ])/g, "$1$2" + CHAR_SPACE + "$3");
-        // remove CHAR_SPACE from inside tags (added in previous step)
-        let removeCharSpaces = new RegExp("(.*\\[[^\\]]*)" + CHAR_SPACE, "g");
-        while (text.match(removeCharSpaces)) {
-            text = text.replace(removeCharSpaces, "$1");
+
+        // TODO: this really needs moving into dictionary instead of relying on an option being called "tags"
+        if (this.options.includes("tags")) {
+            // insert CHAR_SPACE between characters when there's a tag in the way, e.g. "a[v100]b" => "a[v100]•b"
+            text = text.replace(/([^\[\] ])(\[[^\]]+\])([^\[\] ])/g, "$1$2" + CHAR_SPACE + "$3");
+            // remove CHAR_SPACE from inside tags (added above)
+            let removeCharSpaces = new RegExp(`(.*\\[[^\\]]*)${CHAR_SPACE}([^\\]]*\\])`, "g");
+            while (text.match(removeCharSpaces)) {
+                text = text.replace(removeCharSpaces, "$1$2");
+            }
+            // remove character spaces after an explicit pause ("[  ]", "[99]" or "[99ms]")
+            let removeSpacesAfterPause = new RegExp(` \\]${CHAR_SPACE}+`, "g");
+            text = text.replace(removeSpacesAfterPause, " ]");
+            removeSpacesAfterPause = new RegExp(`(\\[\\d+(ms)?\\])${CHAR_SPACE}+`, "g");
+            text = text.replace(removeSpacesAfterPause, "$1");
+            // replace spaces from a pause tag with explicit word spaces
+            text = text.replace(/\[(\s+)\]/g, (match, group1) => group1.replace(/./g, WORD_SPACE));
         }
-        // remove CHAR_SPACE from inside prosigns (added above)
-        let removeSpaceInProsign = new RegExp(`(<.)${CHAR_SPACE}(.>)`, "g");
-        text = text.replace(removeSpaceInProsign, "$1$2");
-        removeSpaceInProsign = new RegExp(`(<.)${CHAR_SPACE}(.)${CHAR_SPACE}(.>)`, "g");
-        text = text.replace(removeSpaceInProsign, "$1$2$3");
-        // remove character spaces after an explicit pause ("[  ]", "[99]" or "[99ms]")
-        let removeSpacesAfterPause = new RegExp(` \\]${CHAR_SPACE}+`, "g");
-        text = text.replace(removeSpacesAfterPause, " ]");
-        removeSpacesAfterPause = new RegExp(`(\\[\\d+(ms)?\\])${CHAR_SPACE}+`, "g");
-        text = text.replace(removeSpacesAfterPause, "$1");
-        // replace spaces from a pause tag with explicit word spaces
-        text = text.replace(/\[(\s+)\]/g, (match, group1) => group1.replace(/./g, WORD_SPACE));
+
+        // TODO: this really needs moving into dictionary instead of relying on an option being called "prosigns"
+        if (this.options.includes("prosigns")) {
+            // remove CHAR_SPACE from inside prosigns (added above)
+            let removeSpaceInProsign = new RegExp(`(<.)${CHAR_SPACE}(.>)`, "g");
+            text = text.replace(removeSpaceInProsign, "$1$2");
+            removeSpaceInProsign = new RegExp(`(<.)${CHAR_SPACE}(.)${CHAR_SPACE}(.>)`, "g");
+            text = text.replace(removeSpaceInProsign, "$1$2$3");
+        }
+
         // replace consecutive ' ' with WORD_SPACE
         text = text.replace(/ +/g, WORD_SPACE);
         return text;

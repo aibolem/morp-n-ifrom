@@ -120,7 +120,8 @@ export let dictionary = {
         // a space that's part of a char will now be "   ". Replace "   " with "s"
         morse = morse.replace(/   /g, "s");
         // remove " " from inside tags (added above)
-        let removeCharSpaces = /(.*\[[^\]]*) /;
+        // TODO: really this should only happen if tags are enabled
+        let removeCharSpaces = /(.*\[[^\]]*) ([^\]]*\])/;
         while (morse.match(removeCharSpaces)) {
             morse = morse.replace(removeCharSpaces, "$1");
         }

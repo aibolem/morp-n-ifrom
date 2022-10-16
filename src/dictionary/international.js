@@ -115,9 +115,10 @@ export let dictionary = {
         let insertSpaces = new RegExp(`([^${CHAR_SPACE}${WORD_SPACE}])(?=[^${CHAR_SPACE}${WORD_SPACE}])`, "g");
         morse = morse.replace(insertSpaces, "$1 ");
         // remove " " from inside tags (added in previous step)
-        let removeCharSpaces = /(.*\[[^\]]*) /;
+        // TODO: really this should only happen if tags are enabled
+        let removeCharSpaces = /(.*\[[^\]]*) ([^\]]*\])/;
         while (morse.match(removeCharSpaces)) {
-            morse = morse.replace(removeCharSpaces, "$1");
+            morse = morse.replace(removeCharSpaces, "$1$2");
         }
         return morse;
     },

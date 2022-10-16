@@ -68,10 +68,10 @@ describe("Morse() with text", function () {
                 children: [
                     {
                         type: 'textWords',
-                        children: ['a', '•', '<', 'b', 't', '>', '•', 'a'],
-                        translation: ['. -', '•', undefined, '- . . .', '-', undefined, '•', '. -'],
+                        children: ['a', '•', '<', 'b', '•', 't', '>', '•', 'a'],
+                        translation: ['. -', '•', undefined, '- . . .', '•', '-', undefined, '•', '. -'],
                         error: true
-                    },
+                    }
                 ],
                 error: true
             }
@@ -84,8 +84,8 @@ describe("Morse() with text", function () {
                 children: [
                     {
                         type: 'textWords',
-                        children: ['a', '[', 'v', '1', '0', '0', ']', '•', 'a'],
-                        translation: ['. -', undefined, '. . . -', '. - - - -', '- - - - -', '- - - - -', undefined, '•', '. -'],
+                        children: ['a', '[', 'v', '•', '1', '•', '0', '•', '0', ']', 'a'],
+                        translation: ['. -', undefined, '. . . -', '•', '. - - - -', '•', '- - - - -', '•', '- - - - -', undefined, '. -'],
                         error: true
                     }
                 ],
@@ -422,7 +422,7 @@ describe("Morse() with International Morse", function () {
 });
 
 describe("Morse({dictionaryOptions: ['tags']}) with International Morse", function () {
-    let m = new Morse({dictionaryOptions: ['tags']});
+    let m = new Morse({ dictionaryOptions: ['tags'] });
     it("can translate from text with tags and display the text", function () {
         let msg = m.text2morse("a[v100]b[t20/10]  c ");
         expect(msg.error).toBe(false);
