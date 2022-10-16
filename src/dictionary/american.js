@@ -119,7 +119,7 @@ export let dictionary = {
         morse = morse.replace(insertSpaces, "$1 ");
         // a space that's part of a char will now be "   ". Replace "   " with "s"
         morse = morse.replace(/   /g, "s");
-        // remove " " from inside directives (added above)
+        // remove " " from inside tags (added above)
         let removeCharSpaces = /(.*\[[^\]]*) /;
         while (morse.match(removeCharSpaces)) {
             morse = morse.replace(removeCharSpaces, "$1");
@@ -139,10 +139,10 @@ export let dictionary = {
     options: {
     },
 
-    grammar: `
-        morse ::= (morseWords | directive)+
-        morseWords ::= (morseCharacter | morseSpace+)+
-        morseCharacter ::= [s\\.\\-${LONG_DASH}${VERY_LONG_DASH} ]+
-        morseSpace ::= [\/\r\n\t${CHAR_SPACE}${WORD_SPACE}]
-    `
+    morseGrammar: {
+        morse: 'morseWords+',
+        morseWords: '(morseCharacter | morseSpace+)+',
+        morseCharacter: `[s\\.\\-${LONG_DASH}${VERY_LONG_DASH} ]+`,  /* the space here is the intra-character space */
+        morseSpace: `[\/\r\n\t${CHAR_SPACE}${WORD_SPACE}]`
+    }
 }

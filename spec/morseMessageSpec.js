@@ -1,7 +1,7 @@
 import MorseMessage from "../src/morse-pro-message.js";
 import MorseCWWave from '../src/morse-pro-cw-wave.js';
 
-describe("MorseMessage", function () {
+describe("MorseMessage()", function () {
     let morseCWWave = new MorseCWWave();
     let m = new MorseMessage(morseCWWave);
 
@@ -28,9 +28,9 @@ describe("MorseMessage", function () {
         expect(m.getTextErrorString("{", "}")).toBe("a{#}b");
         expect(m.getTextErrorString("{", "}", {'#': 'XXX'})).toBe("a{XXX}b");
     });
-    it("gets null when text can't be parsed", function () {
-        expect(m.loadText("a<b")).toBe(null);
-        expect(m.getTextErrorString()).toBe(null);
+    it("gets morse error string with prosign characters in", function () {
+        expect(m.loadText("a<b")).toBe(".- -...");
+        expect(m.getTextErrorString("{", "}")).toBe("a{<}b");
     });
     it("gets null when morse can't be parsed", function () {
         expect(m.loadMorse("aaa")).toBe(null);
@@ -44,5 +44,14 @@ describe("MorseMessage", function () {
     it("gets timings", function () {
         m.loadText("so s");
         expect(m.timings).toEqual([ 60, -60, 60, -60, 60, -180, 180, -60, 180, -60, 180, -420, 60, -60, 60, -60, 60 ]);
+    });
+});
+
+describe("MorseMessage using dictionaryOptions:['prosigns']", function () {
+    let morseCWWave = new MorseCWWave({dictionaryOptions:['prosigns']});
+    let m = new MorseMessage(morseCWWave);
+    it("gets null when text can't be parsed", function () {
+        expect(m.loadText("a<b")).toBe(null);
+        expect(m.getTextErrorString()).toBe(null);
     });
 });

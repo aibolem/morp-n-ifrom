@@ -114,7 +114,7 @@ export let dictionary = {
         // insert " " between character elements using zero-width lookahead assertion
         let insertSpaces = new RegExp(`([^${CHAR_SPACE}${WORD_SPACE}])(?=[^${CHAR_SPACE}${WORD_SPACE}])`, "g");
         morse = morse.replace(insertSpaces, "$1 ");
-        // remove " " from inside directives (added in previous step)
+        // remove " " from inside tags (added in previous step)
         let removeCharSpaces = /(.*\[[^\]]*) /;
         while (morse.match(removeCharSpaces)) {
             morse = morse.replace(removeCharSpaces, "$1");
@@ -148,6 +148,11 @@ export let dictionary = {
                 '<VE>': '. . . - .',
                 '<SOS>': '. . . - - - . . .'
             },
+            textGrammar: {
+                textWords: '(prosign | textCharacter)+',
+                prosign: '"<" textCharacter textCharacter textCharacter? ">"'
+            },
+            disallowed: "#x3c#x3e"  /* < and > are disallowed in normal text */
         },
         accents: {
             letter: {
@@ -185,10 +190,10 @@ export let dictionary = {
         }
     },
 
-    grammar: `
-        morse ::= (morseWords | directive)+
-        morseWords ::= (morseCharacter | morseSpace+)+
-        morseCharacter ::= [\\.\\- ]+  /* the space here is the intra-character space */
-        morseSpace ::= [\/\r\n\t${CHAR_SPACE}${WORD_SPACE}]
-    `
+    morseGrammar: {
+        morse: 'morseWords+',
+        morseWords: '(morseCharacter | morseSpace+)+',
+        morseCharacter: '[\\.\\- ]+',  /* the space here is the intra-character space */
+        morseSpace: `[\/\r\n\t${CHAR_SPACE}${WORD_SPACE}]`
+    }
 }

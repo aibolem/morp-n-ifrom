@@ -1,6 +1,6 @@
 import MorseCW from "../src/morse-pro-cw.js";
 
-describe("MorseCW", function () {
+describe("MorseCW()", function () {
     let mcw = new MorseCW();
 
     it("calculates times", function () {
@@ -10,6 +10,14 @@ describe("MorseCW", function () {
             [60, -60, 60, -180, 60, -60, 180, -420, 180, -60, 180]
         );
     });
+    it("doesn't work when there are tags", function () {
+        // TODO: sort out behaviour when translation fails - don't really want an exception
+        expect(mcw.getTimings(mcw.text2morse("a[v]"))).toBe(null);
+    });
+});
+
+describe("MorseCW({dictionaryOptions:['tags']})", function () {
+    let mcw = new MorseCW({dictionaryOptions:['tags']});
     it("calculates times using simple timing directives", function () {
         mcw.setWPM(20);
         mcw.setFWPM(20);

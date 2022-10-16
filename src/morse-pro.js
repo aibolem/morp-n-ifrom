@@ -21,37 +21,47 @@ import { dictionaries } from "./dictionary/index.js";
 const CHAR_SPACE = '•';  // \u2022
 const WORD_SPACE = '■';  // \u25a0
 
-const directiveGrammar = `
-    directive ::= volume | pitch | timing | pause
-    volume ::= volumeValue | volumeReset
-    volumeValue ::= "[" [vV] number "]"
-    volumeReset ::= "[" [vV] "]"
-    pitch ::= pitchValue | pitchReset
-    pitchValue ::= "[" [pPfF] number "]"
-    pitchReset ::= "[" [pPfF] "]"
-    timing ::= timingReset | timingValue | timingValueLong | timingEqual
-    timingReset ::= "[" [tT] "]"
-    timingValue ::= "[" [tT] number "/" number "]"
-    timingValueLong ::= "[" [tT] number "," number "," number "," number "," number ("," number)? "]"
-    timingEqual ::= "[" [tT] "=]"
-    pause ::= pauseSpace | pauseValue
-    pauseSpace ::= "[" " "+ "]"
-    pauseValue ::= "[" number "ms"? "]"
-    number ::= [1-9] [0-9]*
-`;
+const tags = {
+    tag: 'volume | pitch | timing | pause',
+    volume: 'volumeValue | volumeReset',
+    volumeValue: '"[" [vV] number "]"',
+    volumeReset: '"[" [vV] "]"',
+    pitch: 'pitchValue | pitchReset',
+    pitchValue: '"[" [pPfF] number "]"',
+    pitchReset: '"[" [pPfF] "]"',
+    timing: 'timingReset | timingValue | timingValueLong | timingEqual',
+    timingReset: '"[" [tT] "]"',
+    timingValue: '"[" [tT] number "/" number "]"',
+    timingValueLong: '"[" [tT] number "," number "," number "," number "," number ("," number)? "]"',
+    timingEqual: '"[" [tT] "=]"',
+    pause: 'pauseSpace | pauseValue',
+    pauseSpace: '"[" " "+ "]"',
+    pauseValue: '"[" number "ms"? "]"',
+    number: '[1-9] [0-9]*'
+};
 
 //TODO: timingValueLong needs to be changed to explicitly specify timing for each element?
 //TODO: need to add pitchValueLong to explicitly set pitch for each element (as you can in the dictionary)
 
-//TODO: make the prosign parsing optional?
-const textGrammar = `
-    text ::= (textWords | directive)+
-    textWords ::= (prosign | textCharacter)+ 
-    textCharacter ::= [^#x5b#x5d#x7c#x3c#x3e] | "${CHAR_SPACE}" /* anything other than [ | ] < > (other invalid characters to be found later) */
-    prosign ::= "<" textCharacter textCharacter textCharacter? ">"
-` + directiveGrammar;
+const options = {
+    tags: {
+        morseGrammar: {
+            morse: '(morseWords | tag)+',
+            ...tags
+        },
+        textGrammar: {
+            text: '(textWords | tag)+',
+            ...tags
+        },
+        disallowed: "#x5b#x5d"  /* [ | ] */
+    }
+};
 
-const textParser = new Grammars.W3C.Parser(textGrammar);
+const textGrammar = {
+    text: 'textWords+',
+    textWords: 'textCharacter+',
+    textCharacter: `"${CHAR_SPACE}" | `  /* invalid characters added in grammar option processing */
+};
 
 export default class Morse {
     /**
@@ -95,6 +105,10 @@ export default class Morse {
         // Clear any existing mappings:
         this.text2morseD = {};
         this.morse2textD = {};
+        // Clear existing grammars:
+        this.disallowed = "♥";  // need to disallow something!
+        this.textGrammar = {...textGrammar};  // value defined at the top of this file
+        this.morseGrammar = {};
         // Set up sensible default:
         this._addDictionary({
             letter: { '': '' },
@@ -104,37 +118,67 @@ export default class Morse {
             if (d in dictionaries) {
                 let dict = dictionaries[d]  // switch to the imported dict
                 this._addDictionary(dict);
+                this.morseGrammar = { ...this.morseGrammar, ...dict.morseGrammar };
             } else {
                 throw `No dictionary called '${d}'`;
             }
         }
         // Overlay any options:
         for (let optName of this.options) {
-            if (this.dictionary.options[optName] !== undefined) {
-                this._addDictionary(this.dictionary.options[optName])
+            let optDict;
+            if (options[optName] !== undefined) {
+                optDict = options[optName];
+            } else if (this.dictionary.options[optName] !== undefined) {
+                optDict = this.dictionary.options[optName];
+            }
+            if (optDict !== undefined) {
+                this._addDictionary(optDict);
             } else {
                 throw `No option '${optName}' in '${this.dictionary.id}'`;
             }
         }
+        this.textGrammar.textCharacter += `[^${this.disallowed}]`;
+        this.textParser = this._getParserFromDict(this.textGrammar);
+        this.morseParser = this._getParserFromDict(this.morseGrammar);
+    }
+
+    /**
+     * Create a grammar string from a dictionary.
+     * Using W3C EBNF notation (https://www.w3.org/TR/REC-xml/#sec-notation)
+     * @param {Object} dict - each key is a symbol in the grammar and the value is the symbol's expression
+     * @returns {Parser}
+     */
+    _getParserFromDict(dict) {
+        let grammar = "";
+        for (let key in dict) {
+            grammar += `${key} ::= ${dict[key]}\n`;
+        }
+        return new Grammars.W3C.Parser(grammar);
     }
 
     /**
      * Load in a dictionary.
-     * Dictionary needs 'letter' key at minimum.
      * @param {Object} dict
      */
     _addDictionary(dict) {
         this.dictionary = { ...this.dictionary, ...dict };  // overwrite any existing keys with the new dict
-
-        let letters = dict.letter;
-        for (let letter in letters) {
-            // overwrite any existing letter keys
-            this.text2morseD[letter] = letters[letter];
-            this.morse2textD[letters[letter]] = letter;
+        if (dict.letter !== undefined) {
+            let letters = dict.letter;
+            for (let letter in letters) {
+                // overwrite any existing letter keys
+                this.text2morseD[letter] = letters[letter];
+                this.morse2textD[letters[letter]] = letter;
+            }
         }
-
-        let morseGrammar = (this.dictionary.grammar !== undefined ? this.dictionary.grammar : "") + directiveGrammar;
-        this.morseParser = new Grammars.W3C.Parser(morseGrammar);
+        if (dict.disallowed !== undefined) {
+            this.disallowed += dict.disallowed;
+        }
+        if (dict.textGrammar !== undefined) {
+            this.textGrammar = { ...this.textGrammar, ...dict.textGrammar };
+        }
+        if (dict.morseGrammar !== undefined) {
+            this.morseGrammar = { ...this.morseGrammar, ...dict.morseGrammar };
+        }
     }
 
     /**
@@ -174,7 +218,7 @@ export default class Morse {
         map[CHAR_SPACE] = charSpace;
         map[WORD_SPACE] = wordSpace;
         for (let child of tokens.children) {
-            // we just pull out the morseWords or textWords, ignoring any directives
+            // we just pull out the morseWords or textWords, ignoring any tags
             if (child.type === inputKey) {
                 display.push(child[displayKey].map((c, i) => {
                     if (c === undefined) c = "";
@@ -195,7 +239,7 @@ export default class Morse {
      * @returns the processed text
      */
     processTextSpaces(text) {
-        // move spaces after directives, e.g. "a [v100]b" => "a[v100] b"
+        // move spaces after tags, e.g. "a [v100]b" => "a[v100] b"
         text = text.replace(/(\s+)(\[[^\]]+\])/g, "$2$1");
         // remove whitespace from start and end
         text = text.trim();
@@ -203,9 +247,9 @@ export default class Morse {
         text = text.replace(/\s/g, ' ');
         // insert CHAR_SPACE between two normal characters
         text = text.replace(/([^<\[\] ])(?=[^>\[\] ])/g, "$1" + CHAR_SPACE);
-        // insert CHAR_SPACE between characters when there's a directive in the way, e.g. "a[v100]b" => "a[v100]•b"
+        // insert CHAR_SPACE between characters when there's a tag in the way, e.g. "a[v100]b" => "a[v100]•b"
         text = text.replace(/([^\[\] ])(\[[^\]]+\])([^\[\] ])/g, "$1$2" + CHAR_SPACE + "$3");
-        // remove CHAR_SPACE from inside directives (added in previous step)
+        // remove CHAR_SPACE from inside tags (added in previous step)
         let removeCharSpaces = new RegExp("(.*\\[[^\\]]*)" + CHAR_SPACE, "g");
         while (text.match(removeCharSpaces)) {
             text = text.replace(removeCharSpaces, "$1");
@@ -220,7 +264,7 @@ export default class Morse {
         text = text.replace(removeSpacesAfterPause, " ]");
         removeSpacesAfterPause = new RegExp(`(\\[\\d+(ms)?\\])${CHAR_SPACE}+`, "g");
         text = text.replace(removeSpacesAfterPause, "$1");
-        // replace spaces from a pause directive with explicit word spaces
+        // replace spaces from a pause tag with explicit word spaces
         text = text.replace(/\[(\s+)\]/g, (match, group1) => group1.replace(/./g, WORD_SPACE));
         // replace consecutive ' ' with WORD_SPACE
         text = text.replace(/ +/g, WORD_SPACE);
@@ -233,7 +277,7 @@ export default class Morse {
      * @returns - the tidied, tokenised text
      */
     tokeniseText(text) {
-        return this.getAST(textParser, this.processTextSpaces(text));
+        return this.getAST(this.textParser, this.processTextSpaces(text));
     }
 
     /**
@@ -252,7 +296,7 @@ export default class Morse {
 
     /**
      * Convert from the extended text format to a message object.
-     * @param {String} extendedText - text using the extended format (containing directives)
+     * @param {String} extendedText - text using the extended format (containing tags)
      * @returns {Object} - text: text tokens, morse: morse tokens, error: error tokens, hasError Boolean
      */
     text2morse(text) {
@@ -385,7 +429,7 @@ export default class Morse {
                 return null;  // we don't care what the error is, just need to flag that there is one
             }
             // for these elements, just concatenate the single child to simplify
-            while (ast.children.length == 1 && (ast.type == "message" || ast.type == "directive" || ast.type == "volume" || ast.type == "pitch" || ast.type == "timing" || ast.type == "pause")) {
+            while (ast.children.length == 1 && (ast.type == "message" || ast.type == "tag" || ast.type == "volume" || ast.type == "pitch" || ast.type == "timing" || ast.type == "pause")) {
                 ast = ast.children[0];
                 tree.type += "-" + ast.type;
             }

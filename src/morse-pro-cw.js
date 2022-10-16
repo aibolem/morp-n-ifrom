@@ -166,19 +166,19 @@ export default class MorseCW extends Morse {
         this._saveSpeed();
         let notes = [];
         for (let child of tokens.children) {
-            if (child.type.substring(0, 9) === "directive") {
+            if (child.type.substring(0, 3) === "tag") {
                 switch (child.type) {
-                    case "directive-timing-timingValue":
+                    case "tag-timing-timingValue":
                         this.setWPM(child.children[0]);
                         this.setFWPM(child.children[1]);
                         break;
-                    case "directive-timing-timingReset":
+                    case "tag-timing-timingReset":
                         this._restoreSpeed();
                         break;
-                    case "directive-timing-timingEqual":
+                    case "tag-timing-timingEqual":
                         this.setFWPM(this.wpm);
                         break;
-                    case "directive-pause-pauseValue":
+                    case "tag-pause-pauseValue":
                         notes.push({d: -child.children[0]});
                         break;
                 }
