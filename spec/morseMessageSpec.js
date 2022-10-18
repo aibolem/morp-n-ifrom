@@ -33,8 +33,8 @@ describe("MorseMessage()", function () {
         expect(m.getTextErrorString("{", "}")).toBe("a{<}b");
     });
     it("gets null when morse can't be parsed", function () {
-        expect(m.loadMorse("aaa")).toBe(null);
-        expect(m.getMorseErrorString()).toBe(null);
+        expect(m.loadMorse("aaa")).toBe("");
+        expect(m.getMorseErrorString()).toBe("");
     });
     it("gets morse error string", function () {
         m.loadText("a#b");
@@ -50,8 +50,9 @@ describe("MorseMessage()", function () {
 describe("MorseMessage using dictionaryOptions:['prosigns']", function () {
     let morseCWWave = new MorseCWWave({dictionaryOptions:['prosigns']});
     let m = new MorseMessage(morseCWWave);
-    it("gets null when text can't be parsed", function () {
-        expect(m.loadText("a<b")).toBe(null);
-        expect(m.getTextErrorString()).toBe(null);
+    it("gets empty string when text can't be parsed", function () {
+        expect(m.loadText("a<b")).toBe("");
+        expect(m.hasError).toBe(true);
+        expect(m.getTextErrorString()).toBe("");
     });
 });

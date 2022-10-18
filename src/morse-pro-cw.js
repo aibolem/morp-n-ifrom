@@ -42,7 +42,7 @@ export default class MorseCW extends Morse {
         /** Initialise the ratios based on the dictionary but enable them to be changed thereafter */
         this.ratios = {...this.dictionary.ratio};  // actually does a copy from the dict so we can reset if needed
         /** Compute ditsInParis and spacesInParis while we have original ratio */
-        let parisTokens = this.text2morse('PARIS');
+        let parisTokens = this.loadText('PARIS');
         this._baseLength = 1;
         this._ditsInParis = this.getDuration(this.getTimings(parisTokens)) + Math.abs(this.ratios[WORD_SPACE]);
         this._spacesInParis = Math.abs((4 * this.ratios[CHAR_SPACE]) + this.ratios[WORD_SPACE]);
@@ -163,8 +163,9 @@ export default class MorseCW extends Morse {
     }
 
     getNotes(tokens) {
-        this._saveSpeed();
         let notes = [];
+        if (tokens === null) return notes;
+        this._saveSpeed();
         for (let child of tokens.children) {
             if (child.type.substring(0, 3) === "tag") {
                 switch (child.type) {
@@ -180,6 +181,9 @@ export default class MorseCW extends Morse {
                         break;
                     case "tag-pause-pauseValue":
                         notes.push({d: -child.children[0]});
+                        break;
+                    case "tag-pause-pauseSpace":
+                        notes.push({d: this.lengths[WORD_SPACE] * child.children.length});
                         break;
                 }
             } else {

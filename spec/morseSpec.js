@@ -31,7 +31,7 @@ describe("Morse() with text", function () {
         );
     });
     it("converts from text to message object", function () {
-        expect(m.text2morse("ab cd")).toEqual(
+        expect(m.loadText("ab cd")).toEqual(
             {
                 type: 'text',
                 children: [
@@ -46,7 +46,7 @@ describe("Morse() with text", function () {
         );
     });
     it("flags errors when converting from text to message object", function () {
-        expect(m.text2morse("ab #d")).toEqual(
+        expect(m.loadText("ab #d")).toEqual(
             {
                 type: 'text',
                 children: [
@@ -62,7 +62,7 @@ describe("Morse() with text", function () {
         );
     });
     it("flags errors including prosign characters", function () {
-        expect(m.text2morse("a<bt>a")).toEqual(
+        expect(m.loadText("a<bt>a")).toEqual(
             {
                 type: 'text',
                 children: [
@@ -78,7 +78,7 @@ describe("Morse() with text", function () {
         );
     });
     it("flags errors including tag characters", function () {
-        expect(m.text2morse("a[v100]a")).toEqual(
+        expect(m.loadText("a[v100]a")).toEqual(
             {
                 type: 'text',
                 children: [
@@ -94,7 +94,7 @@ describe("Morse() with text", function () {
         );
     });
     it("can remove errors in text input", function () {
-        expect(m.text2morseClean("abc#q")).toEqual(
+        expect(m.loadTextClean("abc#q")).toEqual(
             {
                 type: 'text',
                 children: [
@@ -119,14 +119,11 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
         expect(m.processTextSpaces("foo [v110] bar")).toBe("f•o•o[v110]■b•a•r");
     })
     it("protects pause spaces", function () {
-        expect(m.processTextSpaces("[  ]")).toBe("■■");
-    });
-    it("removes character spaces around a pause space", function () {
-        expect(m.processTextSpaces("s[  ]s")).toBe("s■■s");
+        expect(m.processTextSpaces("[  ]")).toBe("[  ]");
     });
     it("leaves 1 other space around a pause space", function () {
-        expect(m.processTextSpaces("s [  ]s")).toBe("s■■■s");
-        expect(m.processTextSpaces("s [  ] s")).toBe("s■■■s");
+        expect(m.processTextSpaces("s [  ]s")).toBe("s[  ]■s");
+        expect(m.processTextSpaces("s [  ] s")).toBe("s[  ]■s");
     });
     it("can parse text with volume tags in", function () {
         let message = "abc [v] def[V100] [v200]ghi[v300]xyz";
@@ -135,12 +132,12 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                 type: 'text',
                 children: [
                     { type: 'textWords', children: ['a', '•', 'b', '•', 'c'] },
-                    { type: 'tag-volume-volumeReset' },
+                    { type: 'tag-volume-volumeReset', tag: '[v]' },
                     { type: 'textWords', children: ['■', 'd', '•', 'e', '•', 'f'] },
-                    { type: 'tag-volume-volumeValue', children: ['100'] },
-                    { type: 'tag-volume-volumeValue', children: ['200'] },
+                    { type: 'tag-volume-volumeValue', children: ['100'], tag: '[V100]' },
+                    { type: 'tag-volume-volumeValue', children: ['200'], tag: '[v200]' },
                     { type: 'textWords', children: ['■', 'g', '•', 'h', '•', 'i'] },
-                    { type: 'tag-volume-volumeValue', children: ['300'] },
+                    { type: 'tag-volume-volumeValue', children: ['300'], tag: '[v300]' },
                     { type: 'textWords', children: ['•', 'x', '•', 'y', '•', 'z'] }
                 ]
             }
@@ -153,12 +150,12 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                 type: 'text',
                 children: [
                     { type: 'textWords', children: ['a', '•', 'b', '•', 'c'] },
-                    { type: 'tag-pitch-pitchReset' },
+                    { type: 'tag-pitch-pitchReset', tag: '[p]' },
                     { type: 'textWords', children: ['■', 'd', '•', 'e', '•', 'f'] },
-                    { type: 'tag-pitch-pitchValue', children: ['100'] },
-                    { type: 'tag-pitch-pitchValue', children: ['200'] },
+                    { type: 'tag-pitch-pitchValue', children: ['100'], tag: '[P100]' },
+                    { type: 'tag-pitch-pitchValue', children: ['200'], tag: '[f200]' },
                     { type: 'textWords', children: ['■', 'g', '•', 'h', '•', 'i'] },
-                    { type: 'tag-pitch-pitchValue', children: ['300'] },
+                    { type: 'tag-pitch-pitchValue', children: ['300'], tag: '[F300]' },
                     { type: 'textWords', children: ['•', 'x', '•', 'y', '•', 'z'] }
                 ]
             }
@@ -170,7 +167,7 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
             {
                 type: 'text',
                 children: [
-                    { type: 'tag-timing-timingValue', children: ['10', '10'] }
+                    { type: 'tag-timing-timingValue', children: ['10', '10'], tag: '[t10/10]' }
                 ]
             }
         );
@@ -179,7 +176,7 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
             {
                 type: 'text',
                 children: [
-                    { type: 'tag-timing-timingReset' },
+                    { type: 'tag-timing-timingReset', tag: '[t]' },
                     { type: 'textWords', children: ['s', '•', 'o', '•', 's'] }
                 ]
             }
@@ -190,12 +187,12 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                 type: 'text',
                 children: [
                     { type: 'textWords', children: ['a', '•', 'b', '•', 'c'] },
-                    { type: 'tag-timing-timingReset' },
-                    { type: 'tag-timing-timingValue', children: ['20', '10'] },
+                    { type: 'tag-timing-timingReset', tag: '[t]' },
+                    { type: 'tag-timing-timingValue', children: ['20', '10'], tag: '[T20/10]' },
                     { type: 'textWords', children: ['■'] },
-                    { type: 'tag-timing-timingValueLong', children: ['1', '2', '3', '4', '5'] },
+                    { type: 'tag-timing-timingValueLong', children: ['1', '2', '3', '4', '5'], tag: '[t1,2,3,4,5]' },
                     { type: 'textWords', children: ['■', 'x'] },
-                    { type: 'tag-timing-timingValueLong', children: ['1', '2', '3', '4', '5', '6'] },
+                    { type: 'tag-timing-timingValueLong', children: ['1', '2', '3', '4', '5', '6'], tag: '[t1,2,3,4,5,6]' },
                     { type: 'textWords', children: ['•', 'y', '•', 'z'] }
                 ]
             }
@@ -207,7 +204,9 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
             {
                 type: 'text',
                 children: [
-                    { type: 'textWords', children: ['e', '■', '■', '■', 'e'] }
+                    { type: 'textWords', children: ['e'] },
+                    { type: 'tag-pause-pauseSpace', children: [' ', ' '], tag: '[  ]' },
+                    { type: 'textWords', children: ['■', 'e'] }
                 ]
             }
         );
@@ -217,7 +216,7 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                 type: 'text',
                 children: [
                     { type: 'textWords', children: ['e'] },
-                    { type: 'tag-pause-pauseValue', children: ['99'] },
+                    { type: 'tag-pause-pauseValue', children: ['99'], tag: '[99]' },
                     { type: 'textWords', children: ['■', 'e'] }
                 ]
             }
@@ -227,7 +226,9 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
             {
                 type: 'text',
                 children: [
-                    { type: 'textWords', children: ['e', '■', '■', 'e'] }
+                    { type: 'textWords', children: ['e'] },
+                    { type: 'tag-pause-pauseSpace', children: [' ', ' '], tag: '[  ]' },
+                    { type: 'textWords', children: ['e'] }
                 ]
             }
         )
@@ -237,7 +238,7 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                 type: 'text',
                 children: [
                     { type: 'textWords', children: ['e'] },
-                    { type: 'tag-pause-pauseValue', children: ['99'] },
+                    { type: 'tag-pause-pauseValue', children: ['99'], tag: '[99]' },
                     { type: 'textWords', children: ['e'] }
                 ]
             }
@@ -248,7 +249,7 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                 type: 'text',
                 children: [
                     { type: 'textWords', children: ['e'] },
-                    { type: 'tag-pause-pauseValue', children: ['99'] },
+                    { type: 'tag-pause-pauseValue', children: ['99'], tag: '[99ms]' },
                     { type: 'textWords', children: ['e'] }
                 ]
             }
@@ -274,14 +275,14 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                 type: 'text',
                 children: [
                     { type: 'textWords', children: ['o', '•', 'n', '•', 'e'] },
-                    { type: 'tag-pitch-pitchValue', children: ['550'] },
+                    { type: 'tag-pitch-pitchValue', children: ['550'], tag: '[f550]' },
                     { type: 'textWords', children: ['■', 't', '•', 'w', '•', 'o'] }
                 ]
             }
         );
     });
     it("can remove errors in text input that includes tags", function () {
-        expect(m.text2morseClean("ab[v]c#q")).toEqual(
+        expect(m.loadTextClean("ab[v]c#q")).toEqual(
             {
                 type: 'text',
                 children: [
@@ -291,7 +292,7 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                         translation: ['. -', '•', '- . . .']
                     },
                     {
-                        type: 'tag-volume-volumeReset'
+                        type: 'tag-volume-volumeReset', tag: '[v]'
                     },
                     {
                         type: 'textWords',
@@ -303,6 +304,15 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                 error: false
             }
         );
+    });
+    it("keeps the tags in the displayed text", function () {
+        let msg = m.loadText("ab[v] [f100] cd");
+        expect(m.displayText(msg)).toBe("ab[v][f100] cd");
+
+    });
+    it("keeps [  ] tags in the displayed text", function () {
+        let msg = m.loadText("a[  ]b");
+        expect(m.displayText(msg)).toBe("a[  ]b");
     });
 });
 
@@ -323,14 +333,14 @@ describe("Morse({ dictionaryOptions: ['prosigns']}) with text", function () {
         );
     });
     it("gets null when a prosign is badly formed", function () {
-        expect(m.text2morse(">aaa")).toBe(null);
+        expect(m.loadText(">aaa")).toBe(null);
     })
 });
 
 describe("Morse() with International Morse", function () {
     let m = new Morse();
     it("can translate from text and display the text", function () {
-        let msg = m.text2morse("ab  c ");
+        let msg = m.loadText("ab  c ");
         expect(m.displayText(msg)).toBe("ab c");
     });
     it("tidies morse", function () {
@@ -354,7 +364,7 @@ describe("Morse() with International Morse", function () {
     });
 
     it("can convert from morse to a message object", function () {
-        expect(m.morse2text(".. .- / --")).toEqual(
+        expect(m.loadMorse(".. .- / --")).toEqual(
             {
                 type: 'morse',
                 children: [
@@ -369,7 +379,7 @@ describe("Morse() with International Morse", function () {
         );
     });
     it("can deal with errors when converting from morse to a message object", function () {
-        expect(m.morse2text("-- .-.-.-.-.-")).toEqual(
+        expect(m.loadMorse("-- .-.-.-.-.-")).toEqual(
             {
                 type: 'morse',
                 children: [
@@ -385,30 +395,30 @@ describe("Morse() with International Morse", function () {
         );
     });
     it("gets null when the morse can't be parsed", function () {
-        expect(m.morse2text("aaa")).toBe(null);
+        expect(m.loadMorse("aaa")).toBe(null);
     })
     it("can translate from text and display the morse", function () {
-        let msg = m.text2morse("ab  c ");
+        let msg = m.loadText("ab  c ");
         expect(m.displayMorse(msg)).toBe(".- -... / -.-.");
     });
     it("can translate from text with tags and display the text", function () {
-        let msg = m.text2morse("a[v100]b[t20/10]  c ");
+        let msg = m.loadText("a[v100]b[t20/10]  c ");
         expect(msg.error).toBe(true);
         expect(m.displayText(msg)).toBe("a[v100]b[t20/10] c");
         expect(m.displayTextErrors(msg, {}, '{', '}')).toBe("a{[}v100{]}b{[}t20/10{]} c");
     });
     it("can translate from text and display text with errors flagged", function () {
-        let msg = m.text2morse("a#b");
+        let msg = m.loadText("a#b");
         expect(msg.error).toBe(true);
         expect(m.displayText(msg)).toBe("a#b");
         expect(m.displayTextErrors(msg, {}, "[", "]")).toBe("a[#]b");
     })
     it("can translate from morse and display the text", function () {
-        let msg = m.morse2text("\t .-    _... /-.-.  ");
+        let msg = m.loadMorse("\t .-    _... /-.-.  ");
         expect(m.displayText(msg)).toBe("AB C");
     });
     it("can translate from morse and display the morse", function () {
-        let msg = m.morse2text("\t .-    _... /-.-.  ");
+        let msg = m.loadMorse("\t .-    _... /-.-.  ");
         expect(m.displayMorse(msg)).toBe(".- -... / -.-.");
     });
     // it("can translate from morse with tags and display the morse", function () {
@@ -416,7 +426,7 @@ describe("Morse() with International Morse", function () {
     //     expect(m.displayMorse(msg)).toBe(".-- .");
     // });
     it("can translate from morse and display morse with errors flagged", function () {
-        let msg = m.morse2text(". ------- .");
+        let msg = m.loadMorse(". ------- .");
         expect(m.displayMorseErrors(msg, "{", "}")).toBe(". {-------} .");
     });
 });
@@ -424,14 +434,15 @@ describe("Morse() with International Morse", function () {
 describe("Morse({dictionaryOptions: ['tags']}) with International Morse", function () {
     let m = new Morse({ dictionaryOptions: ['tags'] });
     it("can translate from text with tags and display the text", function () {
-        let msg = m.text2morse("a[v100]b[t20/10]  c ");
+        let msg = m.loadText("a[v100]b[t20/10]  c ");
         expect(msg.error).toBe(false);
-        expect(m.displayText(msg)).toBe("ab c");
-        expect(m.displayTextErrors(msg, {}, '{', '}')).toBe("ab c");
+        expect(m.displayText(msg)).toBe("a[v100]b[t20/10] c");
+        expect(m.displayTextErrors(msg, {}, '{', '}')).toBe("a[v100]b[t20/10] c");
     });
     it("can translate from morse with tags and display the morse", function () {
-        let msg = m.morse2text(".[v]-- [f].");
+        let msg = m.loadMorse(".[v]-- [f].");
         expect(msg.error).toBe(false);
+        // TODO: decide how this should behave
         // expect(msg).toEqual();
         // expect(m.displayMorse(msg)).toBe(".-- .");
     });
@@ -460,7 +471,7 @@ describe("Morse() with American Morse", function () {
         );
     });
     it("translates Morse to text", function () {
-        expect(m.morse2text(".. .   \u2e3a   \u2e3b / .-   -...")).toEqual(
+        expect(m.loadMorse(".. .   \u2e3a   \u2e3b / .-   -...")).toEqual(
             {
                 type: 'morse',
                 children: [
@@ -475,7 +486,7 @@ describe("Morse() with American Morse", function () {
         )
     });
     it("translates text to Morse", function () {
-        expect(m.text2morse("CL0 AB")).toEqual(
+        expect(m.loadText("CL0 AB")).toEqual(
             {
                 type: 'text',
                 children: [
@@ -490,7 +501,7 @@ describe("Morse() with American Morse", function () {
         )
     });
     it("can translate from text and display the morse", function () {
-        let msg = m.text2morse("CL0 AB");
+        let msg = m.loadText("CL0 AB");
         expect(m.displayMorse(msg)).toBe(".. .   ⸺   ⸻ / .-   -...");
     });
 });

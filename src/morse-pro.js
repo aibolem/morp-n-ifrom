@@ -1,5 +1,5 @@
 /*!
-This code is © Copyright Stephen C. Phillips, 2018.
+This code is © Copyright Stephen C. Phillips, 2018-2022.
 Email: steve@scphillips.com
 */
 /*
@@ -35,9 +35,10 @@ const tags = {
     timingValueLong: '"[" [tT] number "," number "," number "," number "," number ("," number)? "]"',
     timingEqual: '"[" [tT] "=]"',
     pause: 'pauseSpace | pauseValue',
-    pauseSpace: '"[" " "+ "]"',
+    pauseSpace: '"[" space+ "]"',
     pauseValue: '"[" number "ms"? "]"',
-    number: '[1-9] [0-9]*'
+    number: '[1-9] [0-9]*',
+    space: '" "'  /* using this means pauseSpace has children which can then be counted */
 };
 
 //TODO: timingValueLong needs to be changed to explicitly specify timing for each element?
@@ -53,7 +54,7 @@ const options = {
             text: '(textWords | tag)+',
             ...tags
         },
-        disallowed: "#x5b#x5d"  /* [ | ] */
+        disallowed: "#x5b#x5d"  /* [ ] */
     }
 };
 
@@ -65,7 +66,8 @@ const textGrammar = {
 
 export default class Morse {
     /**
-     *
+     * The Morse class deals with translating and displaying strings and is configured with dictionaries and options.
+     * It does not save any state of any messages.
      * @param {Object} params - dictionary of optional parameters.
      * @param {String} [params.dictionary='international'] - which dictionary to use, e.g. 'international' or 'american'. Can optionally take a list of dictionary strings.
      * @param {String[]} [params.dictionaryOptions=[]] - optional additional dictionaries such as 'prosigns'. Will look these up in the merged dictionary formed of the list of dictionaries.
@@ -190,29 +192,26 @@ export default class Morse {
      * @param {Map} map - Map to replace tokens with alternatives, e.g. for display escaping {'>', '&gt;'}
      * @param {String} errorPrefix - used to prefix any token that is an error
      * @param {String} errorSuffix - used to suffix any token that is an error
-     * @returns a String of the tokens
+     * @returns a String of the tokens. Returns "" if tokens is null.
      */
     display(tokens, morse, charSpace, wordSpace, map = {}, errorPrefix = '', errorSuffix = '') {
-        if (tokens === null) return null;
+        if (tokens === null) return "";
         let display = [];
         let inputKey, displayKey, errorKey;
+        errorKey = "translation";
         if (tokens.type === "morse") {
             inputKey = "morseWords";
             if (morse) {
                 displayKey = "children";
-                errorKey = "translation";
             } else {
                 displayKey = "translation";
-                errorKey = "translation";
             }
         } else {
             inputKey = "textWords";
             if (morse) {
                 displayKey = "translation";
-                errorKey = "translation";
             } else {
                 displayKey = "children";
-                errorKey = "translation";
             }
         }
         map[CHAR_SPACE] = charSpace;
@@ -227,6 +226,8 @@ export default class Morse {
                     }
                     return child[errorKey][i] !== undefined ? c : errorPrefix + c + errorSuffix
                 }));
+            } else if (child.type.substring(0,3) == "tag") {
+                display.push(child.tag);
             }
         }
         display = display.flat();
@@ -239,17 +240,17 @@ export default class Morse {
      * @returns the processed text
      */
     processTextSpaces(text) {
-        // move spaces after tags, e.g. "a [v100]b" => "a[v100] b"
-        text = text.replace(/(\s+)(\[[^\]]+\])/g, "$2$1");
-        // remove whitespace from start and end
-        text = text.trim();
         // make all space characters actual spaces
         text = text.replace(/\s/g, ' ');
-        // insert CHAR_SPACE between two normal characters
+        // remove whitespace from start and end
+        text = text.trim();
+        // insert CHAR_SPACE between two normal characters (normal meaning not "<[] " and not ">[] ")
         text = text.replace(/([^<\[\] ])(?=[^>\[\] ])/g, "$1" + CHAR_SPACE);
 
         // TODO: this really needs moving into dictionary instead of relying on an option being called "tags"
         if (this.options.includes("tags")) {
+            // move spaces after tags, e.g. "a [v100]b" => "a[v100] b"
+            text = text.replace(/( +)(\[[^\]]+\])/g, "$2$1");
             // insert CHAR_SPACE between characters when there's a tag in the way, e.g. "a[v100]b" => "a[v100]•b"
             text = text.replace(/([^\[\] ])(\[[^\]]+\])([^\[\] ])/g, "$1$2" + CHAR_SPACE + "$3");
             // remove CHAR_SPACE from inside tags (added above)
@@ -263,7 +264,7 @@ export default class Morse {
             removeSpacesAfterPause = new RegExp(`(\\[\\d+(ms)?\\])${CHAR_SPACE}+`, "g");
             text = text.replace(removeSpacesAfterPause, "$1");
             // replace spaces from a pause tag with explicit word spaces
-            text = text.replace(/\[(\s+)\]/g, (match, group1) => group1.replace(/./g, WORD_SPACE));
+            text = text.replace(/(\[ +\])/g, (match, group1) => group1.replace(/ /g, "▢"));
         }
 
         // TODO: this really needs moving into dictionary instead of relying on an option being called "prosigns"
@@ -277,13 +278,14 @@ export default class Morse {
 
         // replace consecutive ' ' with WORD_SPACE
         text = text.replace(/ +/g, WORD_SPACE);
+        text = text.replace(/▢/g, " ");
         return text;
     }
 
     /**
      * Tidies and then tokenises text
      * @param {String} text - the text to tokenise
-     * @returns - the tidied, tokenised text
+     * @returns - the tidied, tokenised text (null if cannot be parsed)
      */
     tokeniseText(text) {
         return this.getAST(this.textParser, this.processTextSpaces(text));
@@ -305,10 +307,10 @@ export default class Morse {
 
     /**
      * Convert from the extended text format to a message object.
-     * @param {String} extendedText - text using the extended format (containing tags)
-     * @returns {Object} - text: text tokens, morse: morse tokens, error: error tokens, hasError Boolean
+     * @param {String} text - text using the extended format (containing tags)
+     * @returns {Object} - tokens object
      */
-    text2morse(text) {
+    loadText(text) {
         let tokens = this.tokeniseText(text);
         if (tokens === null) return null;
         this._input2output(tokens);
@@ -346,12 +348,7 @@ export default class Morse {
         );
     }
 
-    morseTokens2text(tokens) {
-        this._input2output(tokens);
-        return tokens;
-    }
-
-    morse2text(morse) {
+    loadMorse(morse) {
         let tokens = this.tokeniseMorse(morse);
         if (tokens === null) return null;
         this._input2output(tokens);
@@ -404,8 +401,8 @@ export default class Morse {
      * @param {String} text - text string to process
      * @returns {Object} - message tokens
      */
-    text2morseClean(text) {
-        let tokens = this.text2morse(text);
+    loadTextClean(text) {
+        let tokens = this.loadText(text);
         tokens.error = false;
         for (let child of tokens.children) {
             if (child.error) {
@@ -441,9 +438,10 @@ export default class Morse {
             while (ast.children.length == 1 && (ast.type == "message" || ast.type == "tag" || ast.type == "volume" || ast.type == "pitch" || ast.type == "timing" || ast.type == "pause")) {
                 ast = ast.children[0];
                 tree.type += "-" + ast.type;
+                tree.tag = ast.text;
             }
             // for these elements, make a list of the text of all the children (the values we are actually interested in)
-            if (ast.type == "textWords" || ast.type == "morseWords" || ast.type.match("Value")) {
+            if (ast.type == "textWords" || ast.type == "morseWords" || ast.type.match("Value") || ast.type.match("Space")) {
                 tree.children = [];
                 for (let child of ast.children) {
                     tree.children.push(child.text);

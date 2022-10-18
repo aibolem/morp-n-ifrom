@@ -40,10 +40,11 @@ export default class MorseMessage {
         this.inputWasMorse = undefined;
         this.text = undefined;
         this.morse = undefined;
+        this.tokens = undefined;
     }
 
     get hasError() {
-        return this.tokens.error;
+        return this.tokens === null || this.tokens.error;
     }
 
     /**
@@ -81,19 +82,19 @@ export default class MorseMessage {
     loadMorse(input) {
         this._rawInput = input;
         this.inputWasMorse = true;
-        this._completeFields(this.morseCWWave.morse2text(input));
+        this._completeFields(this.morseCWWave.loadMorse(input));
         return this.text;
     }
 
     loadText(input) {
         this._rawInput = input;
         this.inputWasMorse = false;
-        this._completeFields(this.morseCWWave.text2morse(input));
+        this._completeFields(this.morseCWWave.loadText(input));
         return this.morse;
     }
 
     cleanText() {
-        this._completeFields(this.morseCWWave.text2morseClean(this._rawInput));
+        this._completeFields(this.morseCWWave.loadTextClean(this._rawInput));
         return this.text;
     }
 
