@@ -126,7 +126,7 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
         expect(m.processTextSpaces("s [  ] s")).toBe("s[  ]■s");
     });
     it("can parse text with volume tags in", function () {
-        let message = "abc [v] def[V100] [v200]ghi[v300]xyz";
+        let message = "abc [v] def[v100] [v200]ghi[v300]xyz";
         expect(m.tokeniseText(message)).toEqual(
             {
                 type: 'text',
@@ -134,7 +134,7 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                     { type: 'textWords', children: ['a', '•', 'b', '•', 'c'] },
                     { type: 'tag-volume-volumeReset', tag: '[v]' },
                     { type: 'textWords', children: ['■', 'd', '•', 'e', '•', 'f'] },
-                    { type: 'tag-volume-volumeValue', children: ['100'], tag: '[V100]' },
+                    { type: 'tag-volume-volumeValue', children: ['100'], tag: '[v100]' },
                     { type: 'tag-volume-volumeValue', children: ['200'], tag: '[v200]' },
                     { type: 'textWords', children: ['■', 'g', '•', 'h', '•', 'i'] },
                     { type: 'tag-volume-volumeValue', children: ['300'], tag: '[v300]' },
@@ -144,7 +144,7 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
         )
     });
     it("can parse text with pitch tags in", function () {
-        let message = "abc [p] def[P100] [f200]ghi[F300]xyz";
+        let message = "abc [p] def[p100] [f200]ghi[f300]xyz";
         expect(m.tokeniseText(message)).toEqual(
             {
                 type: 'text',
@@ -152,10 +152,10 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                     { type: 'textWords', children: ['a', '•', 'b', '•', 'c'] },
                     { type: 'tag-pitch-pitchReset', tag: '[p]' },
                     { type: 'textWords', children: ['■', 'd', '•', 'e', '•', 'f'] },
-                    { type: 'tag-pitch-pitchValue', children: ['100'], tag: '[P100]' },
+                    { type: 'tag-pitch-pitchValue', children: ['100'], tag: '[p100]' },
                     { type: 'tag-pitch-pitchValue', children: ['200'], tag: '[f200]' },
                     { type: 'textWords', children: ['■', 'g', '•', 'h', '•', 'i'] },
-                    { type: 'tag-pitch-pitchValue', children: ['300'], tag: '[F300]' },
+                    { type: 'tag-pitch-pitchValue', children: ['300'], tag: '[f300]' },
                     { type: 'textWords', children: ['•', 'x', '•', 'y', '•', 'z'] }
                 ]
             }
@@ -181,14 +181,14 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                 ]
             }
         );
-        message = "abc[t] [T20/10] [t1,2,3,4,5]x[t1,2,3,4,5,6]yz";
+        message = "abc[t] [t20/10] [t1,2,3,4,5]x[t1,2,3,4,5,6]yz";
         expect(m.tokeniseText(message)).toEqual(
             {
                 type: 'text',
                 children: [
                     { type: 'textWords', children: ['a', '•', 'b', '•', 'c'] },
                     { type: 'tag-timing-timingReset', tag: '[t]' },
-                    { type: 'tag-timing-timingValue', children: ['20', '10'], tag: '[T20/10]' },
+                    { type: 'tag-timing-timingValue', children: ['20', '10'], tag: '[t20/10]' },
                     { type: 'textWords', children: ['■'] },
                     { type: 'tag-timing-timingValueLong', children: ['1', '2', '3', '4', '5'], tag: '[t1,2,3,4,5]' },
                     { type: 'textWords', children: ['■', 'x'] },
