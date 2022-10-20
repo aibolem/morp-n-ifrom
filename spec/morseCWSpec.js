@@ -17,7 +17,7 @@ describe("MorseCW()", function () {
 });
 
 describe("MorseCW({dictionaryOptions:['tags']})", function () {
-    let mcw = new MorseCW({dictionaryOptions:['tags']});
+    let mcw = new MorseCW({ dictionaryOptions: ['tags'] });
     it("calculates times using simple timing directives", function () {
         mcw.setWPM(20);
         mcw.setFWPM(20);
@@ -73,10 +73,19 @@ describe("MorseCW({dictionaryOptions:['tags']})", function () {
         mcw.setWPM(20);
         mcw.setFWPM(10);
         expect(mcw.getTimings(mcw.loadText("ee e")).map(x => Math.floor(x))).toEqual(
-            [ 60, -654, 60, -1526, 60 ]
+            [60, -654, 60, -1526, 60]
         )
         expect(mcw.getTimings(mcw.loadText("ee e [t=]ee e")).map(x => Math.floor(x))).toEqual(
-            [ 60, -654, 60, -1526, 60, -420, 60, -180, 60, -420, 60 ]
+            [60, -654, 60, -1526, 60, -420, 60, -180, 60, -420, 60]
         )
-    })
+    });
+    it("calculates times with the single-number timing directive", function () {
+        mcw.setWPM(20);
+        mcw.setFWPM(20);
+        let target = [60, -180, 180, -420, 60, -60, 60, -60, 60];
+        expect(mcw.getTimings(mcw.loadText("et s")).map(x => Math.floor(x))).toEqual(target);
+        mcw.setWPM(12);
+        mcw.setFWPM(15);
+        expect(mcw.getTimings(mcw.loadText("[t20]et s")).map(x => Math.floor(x))).toEqual(target);
+    });
 });

@@ -35,12 +35,12 @@ export default class MorseCW extends Morse {
      * @param {number} [params.wpm=20] - speed in words per minute using "PARIS " as the standard word.
      * @param {number} [params.fwpm=wpm] - farnsworth speed.
      */
-    constructor({dictionary, dictionaryOptions, wpm=20, fwpm=wpm} = {}) {
-        super({dictionary, dictionaryOptions});
+    constructor({ dictionary, dictionaryOptions, wpm = 20, fwpm = wpm } = {}) {
+        super({ dictionary, dictionaryOptions });
         /** The element of the dictionary that the ratios are based off */
         this._baseElement = this.dictionary.baseElement;
         /** Initialise the ratios based on the dictionary but enable them to be changed thereafter */
-        this.ratios = {...this.dictionary.ratio};  // actually does a copy from the dict so we can reset if needed
+        this.ratios = { ...this.dictionary.ratio };  // actually does a copy from the dict so we can reset if needed
         /** Compute ditsInParis and spacesInParis while we have original ratio */
         let parisTokens = this.loadText('PARIS');
         this._baseLength = 1;
@@ -87,7 +87,7 @@ export default class MorseCW extends Morse {
         fwpm = Math.max(1, fwpm || 1);
         this._fwpm = fwpm;
         this.setWPM(Math.max(this._wpm, this._fwpm))
-        
+
         return fwpm;
     }
 
@@ -142,7 +142,7 @@ export default class MorseCW extends Morse {
                 this._setFWPMfromRatio();
             } else {
                 this._fwpm = undefined;
-            }    
+            }
         } else {
             this._wpm = undefined;
             this._fwpm = undefined;
@@ -170,8 +170,13 @@ export default class MorseCW extends Morse {
             if (child.type.substring(0, 3) === "tag") {
                 switch (child.type) {
                     case "tag-timing-timingValue":
-                        this.setWPM(child.children[0]);
-                        this.setFWPM(child.children[1]);
+                        if (child.children.length == 2) {
+                            this.setWPM(child.children[0]);
+                            this.setFWPM(child.children[1]);
+                        } else {
+                            this.setWPM(child.children[0]);
+                            this.setFWPM(child.children[0]);
+                        }
                         break;
                     case "tag-timing-timingReset":
                         this._restoreSpeed();
@@ -180,10 +185,10 @@ export default class MorseCW extends Morse {
                         this.setFWPM(this.wpm);
                         break;
                     case "tag-pause-pauseValue":
-                        notes.push({d: -child.children[0]});
+                        notes.push({ d: -child.children[0] });
                         break;
                     case "tag-pause-pauseSpace":
-                        notes.push({d: this.lengths[WORD_SPACE] * child.children.length});
+                        notes.push({ d: this.lengths[WORD_SPACE] * child.children.length });
                         break;
                 }
             } else {
@@ -211,7 +216,7 @@ export default class MorseCW extends Morse {
      * @param {Object} tokens
      * @return {number[]}
      */
-     getTimings(tokens) {
+    getTimings(tokens) {
         let notes = this.getNotes(tokens);
         let timings = [];
         for (let note of notes) {
@@ -278,7 +283,7 @@ export default class MorseCW extends Morse {
      * Set the Farnsworth WPM given ratio of fditlength / ditlength
      * @param {number} ratio
      */
-     setFWPMfromRatio(ratio) {
+    setFWPMfromRatio(ratio) {
         ratio = Math.max(Math.abs(ratio), 1);  // take abs just in case someone passes in something -ve
         this.setFWPM(this._ditsInParis * this._wpm / (this._spacesInParis * ratio + (this._ditsInParis - this._spacesInParis)));
     }

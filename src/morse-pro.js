@@ -31,7 +31,7 @@ const tags = {
     pitchReset: '"[" [pf] "]"',
     timing: 'timingReset | timingValue | timingValueLong | timingEqual',
     timingReset: '"[" [t] "]"',
-    timingValue: '"[" [t] number "/" number "]"',
+    timingValue: '"[" [t] number ("/" number)? "]"',
     timingValueLong: '"[" [t] number "," number "," number "," number "," number ("," number)? "]"',
     timingEqual: '"[" [t] "=]"',
     pause: 'pauseSpace | pauseValue',
