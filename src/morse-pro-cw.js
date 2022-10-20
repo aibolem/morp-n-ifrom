@@ -171,11 +171,24 @@ export default class MorseCW extends Morse {
                 switch (child.type) {
                     case "tag-timing-timingValue":
                         if (child.children.length == 2) {
-                            this.setWPM(child.children[0]);
-                            this.setFWPM(child.children[1]);
+                            if (child.children[0].slice(-1) !== "%") {
+                                this.setWPM(child.children[0]);
+                            } else {
+                                this.setWPM(this.wpm * child.children[0].slice(0, -1) / 100);
+                            }
+                            if (child.children[0].slice(-1) !== "%") {
+                                this.setFWPM(child.children[1]);
+                            } else {
+                                this.setFWPM(this.fwpm * child.children[1].slice(0, -1) / 100);
+                            }
                         } else {
-                            this.setWPM(child.children[0]);
-                            this.setFWPM(child.children[0]);
+                            if (child.children[0].slice(-1) !== "%") {
+                                this.setWPM(child.children[0]);
+                                this.setFWPM(child.children[0]);
+                            } else {
+                                this.setWPM(this.wpm * child.children[0].slice(0, -1) / 100);
+                                this.setFWPM(this.fwpm * child.children[0].slice(0, -1) / 100);
+                            }
                         }
                         break;
                     case "tag-timing-timingReset":
@@ -183,15 +196,6 @@ export default class MorseCW extends Morse {
                         break;
                     case "tag-timing-timingEqual":
                         this.setFWPM(this.wpm);
-                        break;
-                    case "tag-timing-timingValuePercentage":
-                        if (child.children.length == 2) {
-                            this.setWPM(this.wpm * child.children[0] / 100);
-                            this.setFWPM(this.fwpm * child.children[1] / 100);
-                        } else {
-                            this.setWPM(this.wpm * child.children[0] / 100);
-                            this.setFWPM(this.fwpm * child.children[0] / 100);
-                        }
                         break;
                     case "tag-pause-pauseValue":
                         notes.push({ d: -child.children[0] });

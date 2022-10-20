@@ -79,7 +79,7 @@ describe("MorseCW({dictionaryOptions:['tags']})", function () {
             [60, -654, 60, -1526, 60, -420, 60, -180, 60, -420, 60]
         )
     });
-    it("calculates times with the single-number timing directive", function () {
+    it("calculates times with the one-number timing directive", function () {
         mcw.setWPM(12);
         mcw.setFWPM(15);
         expect(mcw.getTimings(mcw.loadText("[t20]et s")).map(x => Math.floor(x))).toEqual(
@@ -93,7 +93,7 @@ describe("MorseCW({dictionaryOptions:['tags']})", function () {
             [60, -180, 180, -420, 60, -60, 60, -60, 60]
         );
     });
-    it("calculates times with the two-number timing percentage directive", function () {
+    it("calculates times with the one-number timing percentage directive", function () {
         mcw.setWPM(10);
         mcw.setFWPM(10);
         expect(mcw.getTimings(mcw.loadText("[t200%]et s")).map(x => Math.floor(x))).toEqual(

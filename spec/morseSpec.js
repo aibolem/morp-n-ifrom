@@ -194,9 +194,9 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                     { type: 'textWords', children: ['■'] },
                     { type: 'tag-timing-timingEqual', tag: '[t=]' },
                     { type: 'textWords', children: ['■'] },
-                    { type: 'tag-timing-timingValuePercentage', tag: '[t200%]', children: ['200'] },
+                    { type: 'tag-timing-timingValue', tag: '[t200%]', children: ['200%'] },
                     { type: 'textWords', children: ['■'] },
-                    { type: 'tag-timing-timingValuePercentage', tag: '[t200%/300%]', children: ['200', '300'] },
+                    { type: 'tag-timing-timingValue', tag: '[t200%/300%]', children: ['200%', '300%'] },
                     { type: 'textWords', children: ['■'] }
                 ]
             }

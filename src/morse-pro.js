@@ -29,16 +29,17 @@ const tags = {
     pitch: 'pitchValue | pitchReset',
     pitchValue: '"[" [pf] number "]"',
     pitchReset: '"[" [pf] "]"',
-    timing: 'timingReset | timingValue | timingEqual | timingValuePercentage',
+    timing: 'timingReset | timingValue | timingEqual',
     timingReset: '"[" [t] "]"',
-    timingValue: '"[" [t] number ("/" number)? "]"',
-    timingValuePercentage: '"[" [t] number "%" ("/" number "%")? "]"',
+    timingValue: '"[" [t] numberOrPercentage ("/" numberOrPercentage)? "]"',
     // timingValueLong: '"[" [t] number "," number "," number "," number "," number ("," number)? "]"',
     timingEqual: '"[" [t] "=]"',
     pause: 'pauseSpace | pauseValue',
     pauseSpace: '"[" space+ "]"',
     pauseValue: '"[" number "ms"? "]"',
+    numberOrPercentage: 'percentage | number',  /* need to put percentage first */
     number: '[1-9] [0-9]*',
+    percentage: 'number "%"',
     space: '" "'  /* using this means pauseSpace has children which can then be counted */
 };
 
