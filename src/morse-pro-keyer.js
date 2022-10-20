@@ -1,6 +1,6 @@
 /*!
-This code is © Copyright Stephen C. Phillips, 2019.
-Email: steve@scphillips.com
+This code is © Copyright Stephen C. Phillips, 2019-2022.
+Email: steve@morsecode.world
 */
 /*
 Licensed under the EUPL, Version 1.2 or – as soon they will be approved by the European Commission - subsequent versions of the EUPL (the "Licence");
