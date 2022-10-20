@@ -181,19 +181,23 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                 ]
             }
         );
-        message = "abc[t] [t20/10] [t1,2,3,4,5]x[t1,2,3,4,5,6]yz";
+        message = "abc[t] [t30] [t20/10] [t=] [t200%] [t200%/300%]";
         expect(m.tokeniseText(message)).toEqual(
             {
                 type: 'text',
                 children: [
                     { type: 'textWords', children: ['a', '•', 'b', '•', 'c'] },
                     { type: 'tag-timing-timingReset', tag: '[t]' },
-                    { type: 'tag-timing-timingValue', children: ['20', '10'], tag: '[t20/10]' },
+                    { type: 'tag-timing-timingValue', tag: '[t30]', children: ['30'] },
                     { type: 'textWords', children: ['■'] },
-                    { type: 'tag-timing-timingValueLong', children: ['1', '2', '3', '4', '5'], tag: '[t1,2,3,4,5]' },
-                    { type: 'textWords', children: ['■', 'x'] },
-                    { type: 'tag-timing-timingValueLong', children: ['1', '2', '3', '4', '5', '6'], tag: '[t1,2,3,4,5,6]' },
-                    { type: 'textWords', children: ['•', 'y', '•', 'z'] }
+                    { type: 'tag-timing-timingValue', tag: '[t20/10]', children: ['20', '10'] },
+                    { type: 'textWords', children: ['■'] },
+                    { type: 'tag-timing-timingEqual', tag: '[t=]' },
+                    { type: 'textWords', children: ['■'] },
+                    { type: 'tag-timing-timingValuePercentage', tag: '[t200%]', children: ['200'] },
+                    { type: 'textWords', children: ['■'] },
+                    { type: 'tag-timing-timingValuePercentage', tag: '[t200%/300%]', children: ['200', '300'] },
+                    { type: 'textWords', children: ['■'] }
                 ]
             }
         );

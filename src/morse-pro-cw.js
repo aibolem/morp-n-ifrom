@@ -184,6 +184,15 @@ export default class MorseCW extends Morse {
                     case "tag-timing-timingEqual":
                         this.setFWPM(this.wpm);
                         break;
+                    case "tag-timing-timingValuePercentage":
+                        if (child.children.length == 2) {
+                            this.setWPM(this.wpm * child.children[0] / 100);
+                            this.setFWPM(this.fwpm * child.children[1] / 100);
+                        } else {
+                            this.setWPM(this.wpm * child.children[0] / 100);
+                            this.setFWPM(this.fwpm * child.children[0] / 100);
+                        }
+                        break;
                     case "tag-pause-pauseValue":
                         notes.push({ d: -child.children[0] });
                         break;

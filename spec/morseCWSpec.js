@@ -80,12 +80,24 @@ describe("MorseCW({dictionaryOptions:['tags']})", function () {
         )
     });
     it("calculates times with the single-number timing directive", function () {
-        mcw.setWPM(20);
-        mcw.setFWPM(20);
-        let target = [60, -180, 180, -420, 60, -60, 60, -60, 60];
-        expect(mcw.getTimings(mcw.loadText("et s")).map(x => Math.floor(x))).toEqual(target);
         mcw.setWPM(12);
         mcw.setFWPM(15);
-        expect(mcw.getTimings(mcw.loadText("[t20]et s")).map(x => Math.floor(x))).toEqual(target);
+        expect(mcw.getTimings(mcw.loadText("[t20]et s")).map(x => Math.floor(x))).toEqual(
+            [60, -180, 180, -420, 60, -60, 60, -60, 60]
+        );
+    });
+    it("calculates times with the two-number timing percentage directive", function () {
+        mcw.setWPM(10);
+        mcw.setFWPM(5);
+        expect(mcw.getTimings(mcw.loadText("[t200%/400%]et s")).map(x => Math.floor(x))).toEqual(
+            [60, -180, 180, -420, 60, -60, 60, -60, 60]
+        );
+    });
+    it("calculates times with the two-number timing percentage directive", function () {
+        mcw.setWPM(10);
+        mcw.setFWPM(10);
+        expect(mcw.getTimings(mcw.loadText("[t200%]et s")).map(x => Math.floor(x))).toEqual(
+            [60, -180, 180, -420, 60, -60, 60, -60, 60]
+        );
     });
 });
