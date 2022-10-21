@@ -38,7 +38,7 @@ const tags = {
     pauseSpace: '"[" space+ "]"',
     pauseValue: '"[" number "ms"? "]"',
     numberOrPercentage: 'percentage | number',  /* need to put percentage first */
-    number: '[+-]? [1-9] [0-9]*',
+    number: '[+-]? [0-9]+ ("." [0-9]+)?',  /* TODO: could tighten up on this format */
     percentage: 'number "%"',
     space: '" "'  /* using this means pauseSpace has children which can then be counted */
 };
@@ -428,7 +428,7 @@ export default class Morse {
         return {
             isPercentage: num.endsWith("%"),
             isRelative: num.startsWith("+") || num.startsWith("-"),
-            value: parseInt(num.replace("%", ""))
+            value: parseFloat(num.replace("%", ""))
         };
     }
 

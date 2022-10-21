@@ -181,7 +181,7 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                 ]
             }
         );
-        message = "[t][t=][t30][t20/10][t200%][t200%/300%][t+3][t+2/-1][t-20%][t20%/-30%]";
+        message = "[t][t=][t30][t30.5][t20/10][t200%][t200%/300%][t+3][t+0][t+2/-1][t-20%][t20%/-30%]";
         expect(m.tokeniseText(message)).toEqual(
             {
                 type: 'text',
@@ -189,10 +189,12 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                     { type: 'tag-timing-timingReset', tag: '[t]' },
                     { type: 'tag-timing-timingEqual', tag: '[t=]' },
                     { type: 'tag-timing-timingValue', tag: '[t30]', children: ['30'] },
+                    { type: 'tag-timing-timingValue', tag: '[t30.5]', children: ['30.5'] },
                     { type: 'tag-timing-timingValue', tag: '[t20/10]', children: ['20', '10'] },
                     { type: 'tag-timing-timingValue', tag: '[t200%]', children: ['200%'] },
                     { type: 'tag-timing-timingValue', tag: '[t200%/300%]', children: ['200%', '300%'] },
                     { type: 'tag-timing-timingValue', tag: '[t+3]', children: ['+3'] },
+                    { type: 'tag-timing-timingValue', tag: '[t+0]', children: ['+0'] },
                     { type: 'tag-timing-timingValue', tag: '[t+2/-1]', children: ['+2', '-1'] },
                     { type: 'tag-timing-timingValue', tag: '[t-20%]', children: ['-20%'] },
                     { type: 'tag-timing-timingValue', tag: '[t20%/-30%]', children: ['20%', '-30%'] }

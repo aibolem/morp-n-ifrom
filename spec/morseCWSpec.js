@@ -100,10 +100,24 @@ describe("MorseCW({dictionaryOptions:['tags']})", function () {
             [60, -180, 180, -420, 60, -60, 60, -60, 60]
         );
     });
+    it("calculates times with the floating point one-number relative timing directive", function () {
+        mcw.setWPM(12.5);
+        mcw.setFWPM(12.5);
+        expect(mcw.getTimings(mcw.loadText("[t+7.5]et s")).map(x => Math.floor(x))).toEqual(
+            [60, -180, 180, -420, 60, -60, 60, -60, 60]
+        );
+    });
     it("calculates times with the two-number relative timing directive", function () {
         mcw.setWPM(15);
         mcw.setFWPM(12);
         expect(mcw.getTimings(mcw.loadText("[t+5/+8]et s")).map(x => Math.floor(x))).toEqual(
+            [60, -180, 180, -420, 60, -60, 60, -60, 60]
+        );
+    });
+    it("calculates times with the two-number relative timing directive, one of them zero", function () {
+        mcw.setWPM(20);
+        mcw.setFWPM(12);
+        expect(mcw.getTimings(mcw.loadText("[t+0/+8]et s")).map(x => Math.floor(x))).toEqual(
             [60, -180, 180, -420, 60, -60, 60, -60, 60]
         );
     });
