@@ -145,4 +145,30 @@ describe("MorseCW({dictionaryOptions:['tags']})", function () {
             [60, -180, 180, -420, 60, -60, 60, -60, 60]
         );
     });
+    it("calculates times correctly where changing wpm changes fwpm", function () {
+        mcw.setWPM(30);
+        mcw.setFWPM(30);
+        expect(mcw.getTimings(mcw.loadText("[t-10/-10]et s")).map(x => Math.floor(x))).toEqual(
+            [60, -180, 180, -420, 60, -60, 60, -60, 60]
+        );
+    });
+    it("calculates times restoring initial state after changing timing values inside a message", function () {
+        mcw.setWPM(10);
+        mcw.setFWPM(10);
+        expect(mcw.getTimings(mcw.loadText("[t+100%]et s")).map(x => Math.floor(x))).toEqual(
+            [60, -180, 180, -420, 60, -60, 60, -60, 60]
+        );
+        expect(mcw.getTimings(mcw.loadText("[t+100%]et s")).map(x => Math.floor(x))).toEqual(
+            [60, -180, 180, -420, 60, -60, 60, -60, 60]
+        );
+        expect(mcw.wpm).toBe(10);
+        expect(mcw.fwpm).toBe(10);
+    });
+    it("calculates times ensuring relative timing tags work on the original values", function () {
+        mcw.setWPM(10);
+        mcw.setFWPM(10);
+        expect(mcw.getTimings(mcw.loadText("[t200%]et s[t200%]e")).map(x => Math.floor(x))).toEqual(
+            [60, -180, 180, -420, 60, -60, 60, -60, 60, -180, 60]
+        );
+    });
 });

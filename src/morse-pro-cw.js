@@ -72,6 +72,7 @@ export default class MorseCW extends Morse {
     /** @type {number} */
     get wpm() {
         if (this._wpm === undefined) this._setWPMfromBaseLength();
+        this.fwpm;  // need to ensure that if wpm is set then so is fwpm otherwise changing wpm will result in NaNs
         return this._wpm;
     }
 
@@ -87,7 +88,6 @@ export default class MorseCW extends Morse {
         fwpm = Math.max(1, fwpm || 1);
         this._fwpm = fwpm;
         this.setWPM(Math.max(this._wpm, this._fwpm))
-
         return fwpm;
     }
 
@@ -166,6 +166,9 @@ export default class MorseCW extends Morse {
         let notes = [];
         if (tokens === null) return notes;
         this._saveSpeed();
+        // need to save original values so that relative changes are relative to original rather than cummulative
+        let wpm = this.wpm;
+        let fwpm = this.fwpm;  // need to save it otherwise it can be altered by changing wpm
         for (let child of tokens.children) {
             if (child.type.substring(0, 3) === "tag") {
                 let number;
@@ -177,10 +180,10 @@ export default class MorseCW extends Morse {
                                 if (number.isRelative) {
                                     number.value += 100;
                                 }
-                                this.setWPM(this.wpm * number.value / 100);
+                                this.setWPM(wpm * number.value / 100);
                             } else {
                                 if (number.isRelative) {
-                                    number.value += this.wpm;
+                                    number.value += wpm;
                                 }
                                 this.setWPM(number.value);
                             }
@@ -189,10 +192,10 @@ export default class MorseCW extends Morse {
                                 if (number.isRelative) {
                                     number.value += 100;
                                 }
-                                this.setFWPM(this.fwpm * number.value / 100);
+                                this.setFWPM(fwpm * number.value / 100);
                             } else {
                                 if (number.isRelative) {
-                                    number.value += this.fwpm;
+                                    number.value += fwpm;
                                 }
                                 this.setFWPM(number.value);
                             }
@@ -202,12 +205,12 @@ export default class MorseCW extends Morse {
                                 if (number.isRelative) {
                                     number.value += 100;
                                 }
-                                this.setWPM(this.wpm * number.value / 100);
-                                this.setFWPM(this.fwpm * number.value / 100);
+                                this.setWPM(wpm * number.value / 100);
+                                this.setFWPM(fwpm * number.value / 100);
                             } else {
                                 if (number.isRelative) {
-                                    this.setWPM(this.wpm + number.value);
-                                    this.setFWPM(this.fwpm + number.value);
+                                    this.setWPM(wpm + number.value);
+                                    this.setFWPM(fwpm + number.value);
                                 } else {
                                     this.setWPM(number.value);
                                     this.setFWPM(number.value);
