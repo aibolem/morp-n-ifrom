@@ -38,7 +38,7 @@ const tags = {
     pauseSpace: '"[" space+ "]"',
     pauseValue: '"[" number "ms"? "]"',
     numberOrPercentage: 'percentage | number',  /* need to put percentage first */
-    number: '[1-9] [0-9]*',
+    number: '[+-]? [1-9] [0-9]*',
     percentage: 'number "%"',
     space: '" "'  /* using this means pauseSpace has children which can then be counted */
 };
@@ -111,7 +111,7 @@ export default class Morse {
         this.morse2textD = {};
         // Clear existing grammars:
         this.disallowed = "♥";  // need to disallow something!
-        this.textGrammar = {...textGrammar};  // value defined at the top of this file
+        this.textGrammar = { ...textGrammar };  // value defined at the top of this file
         this.morseGrammar = {};
         // Set up sensible default:
         this._addDictionary({
@@ -228,7 +228,7 @@ export default class Morse {
                     }
                     return child[errorKey][i] !== undefined ? c : errorPrefix + c + errorSuffix
                 }));
-            } else if (child.type.substring(0,3) == "tag") {
+            } else if (child.type.substring(0, 3) == "tag") {
                 display.push(child.tag);
             }
         }
@@ -424,6 +424,14 @@ export default class Morse {
         return tokens;
     }
 
+    parseNumber(num) {
+        return {
+            isPercentage: num.endsWith("%"),
+            isRelative: num.startsWith("+") || num.startsWith("-"),
+            value: parseInt(num.replace("%", ""))
+        };
+    }
+
     summariseAST(ast) {
         if (ast === null) {
             return null;
@@ -448,7 +456,7 @@ export default class Morse {
                 for (let child of ast.children) {
                     tree.children.push(child.text);
                 }
-            // otherwise just recurse down the tree
+                // otherwise just recurse down the tree
             } else if (ast.children.length >= 1) {
                 tree.children = [];
                 for (let child of ast.children) {
@@ -458,7 +466,7 @@ export default class Morse {
             return tree;
         }
     }
-    
+
     getAST(parser, input) {
         let ast = parser.getAST(input);
         let summary = this.summariseAST(ast);

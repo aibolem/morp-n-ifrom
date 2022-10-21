@@ -168,26 +168,50 @@ export default class MorseCW extends Morse {
         this._saveSpeed();
         for (let child of tokens.children) {
             if (child.type.substring(0, 3) === "tag") {
+                let number;
                 switch (child.type) {
                     case "tag-timing-timingValue":
                         if (child.children.length == 2) {
-                            if (child.children[0].slice(-1) !== "%") {
-                                this.setWPM(child.children[0]);
+                            number = this.parseNumber(child.children[0]);
+                            if (number.isPercentage) {
+                                if (number.isRelative) {
+                                    number.value += 100;
+                                }
+                                this.setWPM(this.wpm * number.value / 100);
                             } else {
-                                this.setWPM(this.wpm * child.children[0].slice(0, -1) / 100);
+                                if (number.isRelative) {
+                                    number.value += this.wpm;
+                                }
+                                this.setWPM(number.value);
                             }
-                            if (child.children[0].slice(-1) !== "%") {
-                                this.setFWPM(child.children[1]);
+                            number = this.parseNumber(child.children[1]);
+                            if (number.isPercentage) {
+                                if (number.isRelative) {
+                                    number.value += 100;
+                                }
+                                this.setFWPM(this.fwpm * number.value / 100);
                             } else {
-                                this.setFWPM(this.fwpm * child.children[1].slice(0, -1) / 100);
+                                if (number.isRelative) {
+                                    number.value += this.fwpm;
+                                }
+                                this.setFWPM(number.value);
                             }
                         } else {
-                            if (child.children[0].slice(-1) !== "%") {
-                                this.setWPM(child.children[0]);
-                                this.setFWPM(child.children[0]);
+                            number = this.parseNumber(child.children[0]);
+                            if (number.isPercentage) {
+                                if (number.isRelative) {
+                                    number.value += 100;
+                                }
+                                this.setWPM(this.wpm * number.value / 100);
+                                this.setFWPM(this.fwpm * number.value / 100);
                             } else {
-                                this.setWPM(this.wpm * child.children[0].slice(0, -1) / 100);
-                                this.setFWPM(this.fwpm * child.children[0].slice(0, -1) / 100);
+                                if (number.isRelative) {
+                                    this.setWPM(this.wpm + number.value);
+                                    this.setFWPM(this.fwpm + number.value);
+                                } else {
+                                    this.setWPM(number.value);
+                                    this.setFWPM(number.value);
+                                }
                             }
                         }
                         break;
