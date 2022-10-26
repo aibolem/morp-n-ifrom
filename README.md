@@ -9,10 +9,11 @@ This Javascript (ES6) library is for manipulating Morse code text and sound. It 
 The library can:
 
 * Translate to and from text and Morse code (in the form of '-- --- .-. ... . / -.-. --- -.. .').
-* Understand Morse code prosigns.
+* Translate Morse code prosigns.
+* Change the speed part way through a message.
 * Translate and play International, American (railroad), Arabic, Cyrillic, Cyrillic-Ukraine, Hebrew variants.
 * Generate downloadable RIFF WAVE ('.wav') files of Morse code at given frequency and speed.
-* Make use of the "Farnsworth speed" concept of extending the gaps between characters and words.
+* Make use of the "Farnsworth" or "effective" speed concept of extending the gaps between characters and words.
 * Generate in-browser sounds using the Web Audio API and falling back to other methods such as Flash for older browsers.
 * Take Morse code input from a web-based keyer or iambic keyer.
 * Decode to text given 'on' and 'off' timings and a fixed speed.
@@ -52,6 +53,8 @@ Some diagrams:
 
 * [Class diagram](./doc/classes.svg)
 * [Audio pipeline](./doc/audio-pipeline.svg)
+
+[Documentation for the tag format](doc/tags/README.md).
 
 ## Library Overview
 
