@@ -89,9 +89,3 @@ Utilities:
 
 * [morse-pro-util-datauri.js](./src/morse-pro-util-datauri.js): Function to create a data URI.
 * [morse-pro-util-riffwave.js](./src/morse-pro-util-riffwave.js): Function to create a RIFF WAVE (.wav) file from a MorseCWWave instance.
-
-Deprecated and compatibility:
-
-* [morse-pro-wpm.js](./src/morse-pro-wpm.js): DEPRECATED. Constants and functions for computing the speed (and Farnsworth speed) of Morse code.
-* [morse-pro-compat.js](./src/morse-pro-compat.js): compatibility class for v2
-* [morse-pro-cw-compat.js](./src/morse-pro-cw-compat.js): compatibility class for v2
