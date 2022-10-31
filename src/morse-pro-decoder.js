@@ -183,7 +183,7 @@ export default class MorseDecoder extends MorseCW {
 
         let u = this.unusedTimes;
         let m = this._timings2morse(this.unusedTimes);
-        let t = this.displayText(this.loadText(m), {});  // will be '#' if there's an error
+        let t = this.displayText(this.loadMorse(m), {});  // will be '#' if there's an error
         this.morse += m;
         this.message += t;
         if (last < 0) {
