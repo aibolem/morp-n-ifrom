@@ -184,7 +184,7 @@ export default class MorseDecoder extends MorseCW {
 
         var u = this.unusedTimes;
         var m = this._timings2morse(this.unusedTimes);
-        var t = this.displayText(this.morse2text(m).text, {});  // will be '#' if there's an error
+        var t = this.displayText(this.loadText(m), {});  // will be '#' if there's an error
         this.morse += m;
         this.message += t;
         if (last < 0) {
