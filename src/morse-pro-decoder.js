@@ -17,12 +17,12 @@ import MorseCW from './morse-pro-cw';
  * @example
  * // The messageCallback is called when a character or more is decoded
  * // It receives a dictionary of the timings, morse, and the message
- * var messageCallback = function(data) {
+ * let messageCallback = function(data) {
  *     console.log("Decoded: {\n  timings: " + data.timings + "\n  morse: " + data.morse + "\n  message: " + data.message + "\n}");
  * }
- * var wpm = 10;
- * var decoder = new MorseDecoder({wpm, messageCallback});
- * var t;
+ * let wpm = 10;
+ * let decoder = new MorseDecoder({wpm, messageCallback});
+ * let t;
  * while (decoder_is_operating) {
  *     // get some ms timing "t" from a sensor, make it +ve for noise and -ve for silence
  *     decoder.addTiming(t);
@@ -130,12 +130,11 @@ export default class MorseDecoder extends MorseCW {
      * @param {number} duration - millisecond duration to add, positive for a dit or dah, negative for a space
      */
     addTiming(duration) {
-        // console.log("Received: " + duration);
         if (duration === 0) {
             return;
         }
         if (this.unusedTimes.length > 0) {
-            var last = this.unusedTimes[this.unusedTimes.length - 1];
+            let last = this.unusedTimes[this.unusedTimes.length - 1];
             if (duration * last > 0) {
                 // if the sign of the duration is the same as the previous one then add it on
                 this.unusedTimes.pop();
@@ -177,14 +176,14 @@ export default class MorseDecoder extends MorseCW {
         }
 
         // If last element is quiet but it is not enough for a space character then pop it off and replace afterwards
-        var last = this.unusedTimes[this.unusedTimes.length - 1];
+        let last = this.unusedTimes[this.unusedTimes.length - 1];
         if ((last < 0) && (-last < this.spaceThreshold)) {
             this.unusedTimes.pop();
         }
 
-        var u = this.unusedTimes;
-        var m = this._timings2morse(this.unusedTimes);
-        var t = this.displayText(this.loadText(m), {});  // will be '#' if there's an error
+        let u = this.unusedTimes;
+        let m = this._timings2morse(this.unusedTimes);
+        let t = this.displayText(this.loadText(m), {});  // will be '#' if there's an error
         this.morse += m;
         this.message += t;
         if (last < 0) {
@@ -192,7 +191,6 @@ export default class MorseDecoder extends MorseCW {
         } else {
             this.unusedTimes = [];
         }
-        // console.log(`timings ${u} / morse ${m}`);
         this.messageCallback({
             timings: u,
             morse: m,
@@ -207,12 +205,12 @@ export default class MorseDecoder extends MorseCW {
      * @access private
      */
     _timings2morse(times) {
-        var ditdah = "";
-        var c;
-        var d;
+        let ditdah = "";
+        let c;
+        let d;
 
-        for (var i = 0; i < times.length; i++) {
-            d = times[i];
+        for (const element of times) {
+            d = element;
             if (d > 0) {
                 if (d < this.ditDahThreshold) {
                     c = ".";
@@ -252,8 +250,8 @@ export default class MorseDecoder extends MorseCW {
      * @access private
      */
     _getTimings(character) {
-        var ret = [];
-        for (var i = 0; i < this.timings.length; i++) {
+        let ret = [];
+        for (let i = 0; i < this.timings.length; i++) {
             if (this.characters[i] === character) {
                 ret.push(this.timings[i]);
             }
