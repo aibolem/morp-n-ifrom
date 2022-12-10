@@ -200,7 +200,7 @@ export default class MorsePlayerWAA {
     }
 
     /**
-     * Load timing sequence, replacing any existing sequence.
+     * Load timing sequence, replacing any existing sequence and clear the queue.
      * If this.endPadding is non-zero then an appropriate pause is added to the end.
      * @param {Object} sequence - the sequence to play.
      * @param {number[]} sequence.timings - list of millisecond timings; +ve numbers are beeps, -ve numbers are silence.
@@ -229,6 +229,7 @@ export default class MorsePlayerWAA {
             }
         }
 
+        this._queue = [];
         this._cTimings = [0];
         this.isNote = [];
         for (let i = 0; i < timings.length; i++) {
