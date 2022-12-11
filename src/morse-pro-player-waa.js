@@ -56,7 +56,7 @@ export default class MorsePlayerWAA {
             morseAudioContext.loadSample(offSample, "offSample");
         }
 
-        this.loop = false;
+        this.loop = false;  // if true then the final (or only) sequence will loop
         this.fallbackFrequency = defaultFrequency;
         this._frequency = undefined;
         this.startPadding = startPadding;
