@@ -200,7 +200,7 @@ export default class MorsePlayerWAA {
     }
 
     /**
-     * Load timing sequence, replacing any existing sequence and clear the queue.
+     * Load timing sequence, replacing any existing sequence and clearing the queue.
      * If this.endPadding is non-zero then an appropriate pause is added to the end.
      * @param {Object} sequence - the sequence to play.
      * @param {number[]} sequence.timings - list of millisecond timings; +ve numbers are beeps, -ve numbers are silence.
@@ -208,6 +208,14 @@ export default class MorsePlayerWAA {
      * @param {number} sequence.endPadding - the number of milliseconds silence to add at the end of the sequence. If not set, the class endPadding attribute is used.
      */
     load(sequence) {
+        this._queue = [];
+        this._load(sequence);
+    }
+
+    /**
+     * Internal version of load(). Does not clear the queue.
+     */
+    _load(sequence) {
         let timings = sequence.timings.slice();  // make a copy of the array as we change it in here
         let frequencies = sequence.frequencies || this.fallbackFrequency;
         // TODO: add volume array
@@ -229,7 +237,6 @@ export default class MorsePlayerWAA {
             }
         }
 
-        this._queue = [];
         this._cTimings = [0];
         this.isNote = [];
         for (let i = 0; i < timings.length; i++) {
@@ -260,7 +267,7 @@ export default class MorsePlayerWAA {
             endPadding: sequence.endPadding
         };
         if (this._cTimings.length === 0) {
-            this.load(seqCopy);
+            this._load(seqCopy);
         } else {
             this._queue.push(seqCopy);
         }
@@ -345,7 +352,7 @@ export default class MorsePlayerWAA {
                 if (this.loop || this._queue.length > 0) {
                     this._nextNote = 0;
                     if (this._queue.length > 0) {
-                        this.load(this._queue.shift());
+                        this._load(this._queue.shift());
                     }
                 }
             }
@@ -464,7 +471,7 @@ export default class MorsePlayerWAA {
                     this._tZero += this._cTimings[this.sequenceLength];
                     this._nextNote = 0;
                     if (this._queue.length > 0) {
-                        this.load(this._queue.shift());
+                        this._load(this._queue.shift());
                     }
                 }
             }
