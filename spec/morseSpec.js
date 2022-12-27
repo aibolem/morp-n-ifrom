@@ -117,6 +117,9 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
     });
     it("inserts character spaces in text containing tags", function () {
         expect(m.processTextSpaces("foo [v110] bar")).toBe("f•o•o[v110]■b•a•r");
+        expect(m.processTextSpaces("foo[v110]bar")).toBe("f•o•o[v110]•b•a•r");
+        expect(m.processTextSpaces("foo[v110]bar[v100]")).toBe("f•o•o[v110]•b•a•r[v100]");
+        expect(m.processTextSpaces("foo[v110]b[v100]ar")).toBe("f•o•o[v110]•b[v100]•a•r");
     })
     it("protects pause spaces", function () {
         expect(m.processTextSpaces("[  ]")).toBe("[  ]");

@@ -254,7 +254,7 @@ export default class Morse {
             // move spaces after tags, e.g. "a [v100]b" => "a[v100] b"
             text = text.replace(/( +)(\[[^\]]+\])/g, "$2$1");
             // insert CHAR_SPACE between characters when there's a tag in the way, e.g. "a[v100]b" => "a[v100]•b"
-            text = text.replace(/([^\[\] ])(\[[^\]]+\])([^\[\] ])/g, "$1$2" + CHAR_SPACE + "$3");
+            text = text.replace(/([^\[\] ]\[[^\]]+\])(?=[^\[ ])/g, "$1" + CHAR_SPACE);
             // remove CHAR_SPACE from inside tags (added above)
             let removeCharSpaces = new RegExp(`(.*\\[[^\\]]*)${CHAR_SPACE}([^\\]]*\\])`, "g");
             while (text.match(removeCharSpaces)) {
