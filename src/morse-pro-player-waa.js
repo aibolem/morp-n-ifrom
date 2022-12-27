@@ -58,7 +58,6 @@ export default class MorsePlayerWAA {
 
         this.loop = false;  // if true then the final (or only) sequence will loop
         this.fallbackFrequency = defaultFrequency;
-        this._frequency = undefined;
         this.startPadding = startPadding;
         this._initialStartPadding = 200;  // ms
         this.endPadding = endPadding;
@@ -116,24 +115,21 @@ export default class MorsePlayerWAA {
         this.volumeNode.connect(this.muteAudioNode);
         this.muteAudioNode.connect(ac.destination);
 
-        this.frequency = this._frequency;  // set up oscillator and bandpass nodes
+        this.setFrequency(this.fallbackFrequency);  // set up oscillator and bandpass nodes
         this.volume = this._volume;  // set up gain node
         this.muteAudio(false);
     }
 
-    set frequency(freq) {
-        this._frequency = freq;
+    setFrequency(freq, time) {
+        if (time === undefined) {
+            time = morseAudioContext.getAudioContext().currentTime;
+        }
         try {
-            let now = morseAudioContext.getAudioContext().currentTime;
-            this.oscillatorNode.frequency.setValueAtTime(freq, now);
-            this.bandpassNode.frequency.setValueAtTime(freq, now);
+            this.oscillatorNode.frequency.setValueAtTime(freq, time);
+            this.bandpassNode.frequency.setValueAtTime(freq, time);
         } catch (e) {
             // getting here means _initialiseAudio() has not yet been called: that's okay
         }
-    }
-
-    get frequency() {
-        return this._frequency;
     }
 
     /**
@@ -145,7 +141,7 @@ export default class MorsePlayerWAA {
         this._playMode = mode;
         // force re-evaluation of volume and frequency in case the mode has been changed during playback
         this.volume = this._volume;
-        this.frequency = this._frequency;
+        this.setFrequency(this.fallbackFrequency);
     }
 
     get playMode() {
@@ -204,8 +200,9 @@ export default class MorsePlayerWAA {
      * If this.endPadding is non-zero then an appropriate pause is added to the end.
      * @param {Object} sequence - the sequence to play.
      * @param {number[]} sequence.timings - list of millisecond timings; +ve numbers are beeps, -ve numbers are silence.
-     * @param {number} sequence.frequencies - a single frequency to be used for all beeps. If not set, the fallback frequency defined in the constructor is used.
-     * @param {number} sequence.endPadding - the number of milliseconds silence to add at the end of the sequence. If not set, the class endPadding attribute is used.
+     * @param {number} sequence.frequency - optional frequency to be used for all beeps (used if sequence.frequencies field is not set). If neither sequence.frequencies nor sequence.frequency is set, the class fallback frequency is used.
+     * @param {number} sequence.frequencies - optional list of frequencies to be used the beeps.
+     * @param {number} sequence.endPadding - optional number of milliseconds silence to add at the end of the sequence. If not set, the class endPadding attribute is used.
      */
     load(sequence) {
         this._queue = [];
@@ -217,20 +214,11 @@ export default class MorsePlayerWAA {
      */
     _load(sequence) {
         let timings = sequence.timings.slice();  // make a copy of the array as we change it in here
-        let frequencies = sequence.frequencies || this.fallbackFrequency;
-        // TODO: add volume array
-        // let volumes = sequence.volumes;
-        if (Array.isArray(frequencies)) {
-            // TODO: add frequency arrays; set this.frequency to the highest value to make the low-pass filter work
-            throw "Arrays of frequencies not yet supported"
-        } else {
-            this.frequency = frequencies;
-        }
 
         // TODO: undefined behaviour if this is called in the middle of a sequence
 
         if (sequence.endPadding !== undefined) {
-            timings.push(-sequence.endPadding);   
+            timings.push(-sequence.endPadding);
         } else {
             if (this.endPadding > 0) {
                 timings.push(-this.endPadding);
@@ -244,6 +232,15 @@ export default class MorsePlayerWAA {
             this.isNote[i] = timings[i] > 0;
         }
         this.sequenceLength = this.isNote.length;
+
+        if (sequence.frequencies !== undefined) {
+            this._frequencies = sequence.frequencies.slice();  // will be 1 item shorter than _cTimings as the endPadding isn't included
+        } else {
+            this._frequencies = this.isNote.map(item => sequence.frequency || this.fallbackFrequency);
+        }
+
+        // TODO: add volume array
+        // let volumes = sequence.volumes;
     }
 
     /**
@@ -256,14 +253,15 @@ export default class MorsePlayerWAA {
     }
 
     /**
-     * Queue up a timing sequence (add to the end of the queue)
+     * Queue up a timing sequence (add to the end of the queue). Loads the sequence immediately if nothing is loaded.
      * @param {Object} sequence - see load() method for object description
      */
     queue(sequence) {
         // make a deep copy of the object to avoid it changing
         let seqCopy = {
             timings: sequence.timings.slice(),
-            frequencies: sequence.frequencies,
+            frequency: sequence.frequency,
+            frequencies: sequence.frequencies.slice(),
             endPadding: sequence.endPadding
         };
         if (this._cTimings.length === 0) {
@@ -278,6 +276,7 @@ export default class MorsePlayerWAA {
      */
     clearAllTimings() {
         this._cTimings = [];
+        this._frequencies = [];
         this._queue = []
     }
 
@@ -423,6 +422,7 @@ export default class MorsePlayerWAA {
                     this._soundEndTime = stop;  // we need to store this for the stop() callback
                     this.onOffNode.gain.setTargetAtTime(1, start - 0.0015, 0.001);
                     this.onOffNode.gain.setTargetAtTime(0, stop - 0.0015, 0.001);
+                    this.setFrequency(this._frequencies[this._nextNote], start);
                 } else {
                     // only other option for 'mode' is 'sample'
                     start  = this._tZero + this._cTimings[this._nextNote];
