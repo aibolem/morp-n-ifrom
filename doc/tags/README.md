@@ -35,6 +35,13 @@ The complete grammar (not all implemented) is shown in this [railroad diagram](d
 
 Coming soon.
 
-## Pitch tags
+## Pitch (or frequency) tags
 
-Coming soon.
+* pitch value:
+  * `[p550]` or `[f550]` sets the pitch to 550Hz
+  * `[p+5]` or `[f+5]` adds 5 to the current pitch
+  * `[p-5]` or `[f-5]` subtracts 5 from the current pitch
+  * `[p+20%]` or `[f+20%]` adds 20% to the current pitch
+  * `[p-20%]` or `[f-20%]` subtracts 20% from the current pitch
+* pitch reset:
+  * `[p]` or `[f]` resets the pitch to the initial value

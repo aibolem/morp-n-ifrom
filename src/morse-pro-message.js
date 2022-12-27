@@ -98,8 +98,23 @@ export default class MorseMessage {
         return this.text;
     }
 
+    get notes() {
+        return this.morseCWWave.getNotes(this.tokens);
+    }
+
+    get sequence() {
+        let notes = this.notes;
+        let timings = [];
+        let frequencies = [];
+        for (let note of notes) {
+            timings.push(note.d);
+            frequencies.push(note.f);
+        }
+        return { timings, frequencies };
+    }
+
     get timings() {
-        return this.morseCWWave.getTimings(this.tokens);
+        return this.sequence.timings;
     }
 
     get wave() {

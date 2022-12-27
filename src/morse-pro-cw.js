@@ -34,8 +34,9 @@ export default class MorseCW extends Morse {
      * @param {string[]} [params.dictionaryOptions=[]] - optional additional dictionaries such as 'prosigns'.
      * @param {number} [params.wpm=20] - speed in words per minute using "PARIS " as the standard word.
      * @param {number} [params.fwpm=wpm] - farnsworth speed.
+     * @param {number} [params.frequency=550] - frequency of wave in Hz
      */
-    constructor({ dictionary, dictionaryOptions, wpm = 20, fwpm = wpm } = {}) {
+    constructor({ dictionary, dictionaryOptions, wpm = 20, fwpm = wpm, frequency = 550 } = {}) {
         super({ dictionary, dictionaryOptions });
         /** The element of the dictionary that the ratios are based off */
         this._baseElement = this.dictionary.baseElement;
@@ -49,6 +50,7 @@ export default class MorseCW extends Morse {
         /** Initialise wpm and fwpm (this potentially changes the ratios) */
         this.setWPM(wpm);
         this.setFWPM(fwpm);
+        this.setFrequency(frequency);  // frequency of wave in Hz
     }
 
     /** 
@@ -149,6 +151,14 @@ export default class MorseCW extends Morse {
         }
     }
 
+    setFrequency(f) {
+        this._frequency = f;
+    }
+
+    getFrequency() {
+        return this._frequency;
+    }
+
     _saveSpeed() {
         this._savedSpeed = {
             ratios: {}
@@ -162,13 +172,37 @@ export default class MorseCW extends Morse {
         this._baseLength = this._savedSpeed.baseLength;
     }
 
+    _saveFrequency() {
+        this._savedFrequency = this.getFrequency();
+    }
+
+    _restoreFrequency() {
+        this.setFrequency(this._savedFrequency);
+    }
+
+    _saveParameters() {
+        this._saveSpeed();
+        this._saveFrequency();
+    }
+
+    _restoreParameters() {
+        this._restoreSpeed();
+        this._restoreFrequency();
+    }
+
+    /**
+     * 
+     * @param {*} tokens 
+     * @returns {Array} notes - Array of Objects with keys "d" for millisecond duration and "f" for frequency.
+     */
     getNotes(tokens) {
         let notes = [];
         if (tokens === null) return notes;
-        this._saveSpeed();
+        this._saveParameters();
         // need to save original values so that relative changes are relative to original rather than cummulative
         let wpm = this.wpm;
         let fwpm = this.fwpm;  // need to save it otherwise it can be altered by changing wpm
+        let frequency = this.getFrequency();
         for (let child of tokens.children) {
             if (child.type.substring(0, 3) === "tag") {
                 let number;
@@ -230,6 +264,23 @@ export default class MorseCW extends Morse {
                     case "tag-pause-pauseSpace":
                         notes.push({ d: this.lengths[WORD_SPACE] * child.children.length });
                         break;
+                    case "tag-pitch-pitchValue":
+                        number = this.parseNumber(child.children[0]);
+                        if (number.isPercentage) {
+                            if (number.isRelative) {
+                                number.value += 100;
+                            }
+                            this.setFrequency(frequency * number.value / 100);
+                        } else {
+                            if (number.isRelative) {
+                                number.value += frequency;
+                            }
+                            this.setFrequency(number.value);
+                        }
+                        break;
+                    case "tag-pitch-pitchReset":
+                        this._restoreFrequency();
+                        break;
                 }
             } else {
                 let chars;
@@ -240,14 +291,16 @@ export default class MorseCW extends Morse {
                 }
                 for (let char of chars) {
                     for (let element of char.split("")) {
-                        let note = {};
-                        note.d = this.lengths[element];
+                        let note = {
+                            d: this.lengths[element],
+                            f: this.getFrequency()
+                        }
                         notes.push(note);
                     }
                 }
             }
         }
-        this._restoreSpeed();
+        this._restoreParameters();
         return notes;
     }
 
@@ -257,6 +310,7 @@ export default class MorseCW extends Morse {
      * @return {number[]}
      */
     getTimings(tokens) {
+        // TODO: remove this as it's done in morseMessage now?
         let notes = this.getNotes(tokens);
         let timings = [];
         for (let note of notes) {

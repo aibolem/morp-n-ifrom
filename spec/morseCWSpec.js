@@ -185,4 +185,67 @@ describe("MorseCW({dictionaryOptions:['tags']})", function () {
             [60, -180, 180, -420, 60, -60, 60, -60, 60, -180, 60]
         );
     });
+    it("gets notes with frequencies in", function () {
+        mcw.setWPM(20);
+        mcw.setFWPM(20);
+        mcw.setFrequency(400);
+        expect(mcw.getNotes(mcw.loadText("ET"))).toEqual(
+            [ { d: 60, f: 400 }, { d: -180, f: 400 }, { d: 180, f: 400 } ]
+        );
+    });
+    it("can change absolute frequency", function () {
+        mcw.setWPM(20);
+        mcw.setFWPM(20);
+        mcw.setFrequency(400);
+        expect(mcw.getNotes(mcw.loadText("E [f500]E"))).toEqual(
+            [ { d: 60, f: 400 }, { d: -420, f: 500 }, { d: 60, f: 500 } ]
+        );
+        expect(mcw.getNotes(mcw.loadText("E [p500]E"))).toEqual(
+            [ { d: 60, f: 400 }, { d: -420, f: 500 }, { d: 60, f: 500 } ]
+        );
+    });
+    it("can change relative frequency", function () {
+        mcw.setWPM(20);
+        mcw.setFWPM(20);
+        mcw.setFrequency(400);
+        expect(mcw.getNotes(mcw.loadText("E [f+50]E [f-10]E"))).toEqual(
+            [ { d: 60, f: 400 }, { d: -420, f: 450 }, { d: 60, f: 450 }, { d: -420, f: 390 }, { d: 60, f: 390 } ]
+        );
+        expect(mcw.getNotes(mcw.loadText("E [p+50]E [p-10]E"))).toEqual(
+            [ { d: 60, f: 400 }, { d: -420, f: 450 }, { d: 60, f: 450 }, { d: -420, f: 390 }, { d: 60, f: 390 } ]
+        );
+    });
+    it("can change absolute percentage frequency", function () {
+        mcw.setWPM(20);
+        mcw.setFWPM(20);
+        mcw.setFrequency(400);
+        expect(mcw.getNotes(mcw.loadText("E [f150%]E [f90%]E"))).toEqual(
+            [ { d: 60, f: 400 }, { d: -420, f: 600 }, { d: 60, f: 600 }, { d: -420, f: 360 }, { d: 60, f: 360 } ]
+        );
+        expect(mcw.getNotes(mcw.loadText("E [p150%]E [p90%]E"))).toEqual(
+            [ { d: 60, f: 400 }, { d: -420, f: 600 }, { d: 60, f: 600 }, { d: -420, f: 360 }, { d: 60, f: 360 } ]
+        );
+    });
+    it("can change relative percentage frequency", function () {
+        mcw.setWPM(20);
+        mcw.setFWPM(20);
+        mcw.setFrequency(400);
+        expect(mcw.getNotes(mcw.loadText("E [f+50%]E [f-10%]E"))).toEqual(
+            [ { d: 60, f: 400 }, { d: -420, f: 600 }, { d: 60, f: 600 }, { d: -420, f: 360 }, { d: 60, f: 360 } ]
+        );
+        expect(mcw.getNotes(mcw.loadText("E [p+50%]E [p-10%]E"))).toEqual(
+            [ { d: 60, f: 400 }, { d: -420, f: 600 }, { d: 60, f: 600 }, { d: -420, f: 360 }, { d: 60, f: 360 } ]
+        );
+    });
+    it("can reset frequency", function () {
+        mcw.setWPM(20);
+        mcw.setFWPM(20);
+        mcw.setFrequency(400);
+        expect(mcw.getNotes(mcw.loadText("E [f500]E [f]E"))).toEqual(
+            [ { d: 60, f: 400 }, { d: -420, f: 500 }, { d: 60, f: 500 }, { d: -420, f: 400 }, { d: 60, f: 400 } ]
+        );
+        expect(mcw.getNotes(mcw.loadText("E [p500]E [p]E"))).toEqual(
+            [ { d: 60, f: 400 }, { d: -420, f: 500 }, { d: 60, f: 500 }, { d: -420, f: 400 }, { d: 60, f: 400 } ]
+        );
+    });
 });

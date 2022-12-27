@@ -24,10 +24,10 @@ const WORD_SPACE = '■';  // \u25a0
 const tags = {
     tag: 'volume | pitch | timing | pause',
     volume: 'volumeValue | volumeReset',
-    volumeValue: '"[" [v] number "]"',
+    volumeValue: '"[" [v] numberOrPercentage "]"',
     volumeReset: '"[" [v] "]"',
     pitch: 'pitchValue | pitchReset',
-    pitchValue: '"[" [pf] number "]"',
+    pitchValue: '"[" [pf] numberOrPercentage "]"',
     pitchReset: '"[" [pf] "]"',
     timing: 'timingReset | timingValue | timingEqual',
     timingReset: '"[" [t] "]"',

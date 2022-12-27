@@ -32,11 +32,9 @@ export default class MorseCWWave extends MorseCW {
      * @param {number} [params.frequency=550] - frequency of wave in Hz
      * @param {number} [params.sampleRate=8000] - sample rate for the waveform in Hz
      */
-    constructor({dictionary, dictionaryOptions, wpm, fwpm, frequency=550, sampleRate=8000} = {}) {
-        super({dictionary, dictionaryOptions, wpm, fwpm});
+    constructor({dictionary, dictionaryOptions, wpm, fwpm, frequency, sampleRate=8000} = {}) {
+        super({dictionary, dictionaryOptions, wpm, fwpm, frequency});
         // TODO: make this.frequency a fallback and replace with arrays of freq and volume to go with timings array when making a sample
-        /** @type {number} */
-        this.frequency = frequency;  // frequency of wave in Hz
         /** @type {number} */
         this.sampleRate = sampleRate;  // sample rate for the waveform in Hz
     }
