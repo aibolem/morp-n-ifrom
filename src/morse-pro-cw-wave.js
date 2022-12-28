@@ -44,10 +44,10 @@ export default class MorseCWWave extends MorseCW {
      * Get a sample waveform, not using Web Audio API (synchronous).
      * @param {Object} sequence - the sequence to play.
      * @param {number[]} sequence.timings - list of millisecond timings; +ve numbers are beeps, -ve numbers are silence.
-     * @param {number} sequence.frequency - optional frequency to be used for all beeps (used if sequence.frequencies field is not set). If neither sequence.frequencies nor sequence.frequency is set, the class fallback frequency is used.
-     * @param {number[]} sequence.frequencies - optional list of frequencies to be used the beeps.
-     * @param {number} endPadding - optional number of milliseconds silence to add at the end of the sequence.
-     * @param {number} startPadding - optional number of milliseconds silence to add at the start of the sequence.
+     * @param {number} [sequence.frequency] - optional frequency to be used for all beeps (used if sequence.frequencies field is not set). If neither sequence.frequencies nor sequence.frequency is set, the class fallback frequency is used.
+     * @param {number[]} [sequence.frequencies] - optional list of frequencies to be used the beeps.
+     * @param {number} [endPadding] - optional number of milliseconds silence to add at the end of the sequence.
+     * @param {number} [startPadding] - optional number of milliseconds silence to add at the start of the sequence.
      * @return {number[]} an array of floats in range [-1, 1] representing the wave-form.
      */
     getSample(sequence, startPadding, endPadding) {
