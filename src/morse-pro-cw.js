@@ -304,19 +304,24 @@ export default class MorseCW extends Morse {
         return notes;
     }
 
+    getSequence(tokens) {
+        let notes = this.getNotes(tokens);
+        let timings = [];
+        let frequencies = [];
+        for (let note of notes) {
+            timings.push(note.d);
+            frequencies.push(note.f);
+        }
+        return { timings, frequencies };
+    }
+
     /**
      * Return an array of millisecond timings. Pauses are indicated by negative durations.
      * @param {Object} tokens
      * @return {number[]}
      */
     getTimings(tokens) {
-        // TODO: remove this as it's done in morseMessage now?
-        let notes = this.getNotes(tokens);
-        let timings = [];
-        for (let note of notes) {
-            timings.push(note.d);
-        }
-        return timings;
+        return this.getSequence(tokens).timings;
     }
 
     /**

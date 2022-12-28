@@ -98,27 +98,46 @@ export default class MorseMessage {
         return this.text;
     }
 
+    /**
+     * Get the message timings and frequencies.
+     * @returns {Object[]} an array of Objects. Each item has keys "d" and "f" for duration in ms and frequency in Hz.
+     */
     get notes() {
         return this.morseCWWave.getNotes(this.tokens);
     }
 
+    /**
+     * Get the message timings and frequencies.
+     * @returns {Object} an object with keys "timings" and "frequencies" (array of millisecond note duration timings, and an array of note frequencies in Hz).
+     */
     get sequence() {
-        let notes = this.notes;
-        let timings = [];
-        let frequencies = [];
-        for (let note of notes) {
-            timings.push(note.d);
-            frequencies.push(note.f);
-        }
-        return { timings, frequencies };
+        return this.morseCWWave.getSequence(this.tokens);
     }
 
+    /**
+     * Get the message timings.
+     * @returns {number[]} an array of millisecond note duration timings, -ve numbers indicating silence.
+     */
     get timings() {
         return this.sequence.timings;
     }
 
+    /**
+     * Get the message as a sound waveform.
+     * @returns {number[]} an array of floats in range [-1, 1] representing the waveform.
+     */
     get wave() {
-        return this.morseCWWave.getSample(this.timings, 50);
+        return this.morseCWWave.getSample(this.sequence);
+    }
+
+    /**
+     * Get the message as a sound waveform.
+     * @param {number} [startPadding] - the number of milliseconds silence to add to the start
+     * @param {number} [endPadding] - the minimum number of milliseconds silence to have at the end
+     * @returns {number[]} an array of floats in range [-1, 1] representing the waveform.
+     */
+    getSample(startPadding, endPadding) {
+        return this.morseCWWave.getSample(this.sequence, startPadding, endPadding);
     }
 
     /**
