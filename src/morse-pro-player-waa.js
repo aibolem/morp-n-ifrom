@@ -385,6 +385,7 @@ export default class MorsePlayerWAA {
     _stop() {
         this._isPlaying = false;
         this._isPaused = false;
+        this._isCheckingQueue = false;
         clearInterval(this._timer);
         clearInterval(this._stopTimer);
         clearInterval(this._startTimer);
