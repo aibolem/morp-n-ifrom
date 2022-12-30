@@ -74,6 +74,7 @@ export default class MorsePlayerWAA {
         this._pauseEndTimer = undefined;  // timer to send paddingEndCallback
         this._stopTimer = undefined;  // timer to send soundStoppedCallback
         this._queue = [];
+        this._isCheckingQueue = false;  // flag to indicate whether the player will be checking the queue again or not (similar to isPlaying but more precise)
 
         this._initialiseAudio();
     }
@@ -184,6 +185,13 @@ export default class MorsePlayerWAA {
      */
     get gain() {
         return this._gain;
+    }
+
+    /**
+     * @returns {Boolean} whether the queue will be checked again or not (similar to isPlaying but more precise for this usage)
+     */
+    get isCheckingQueue() {
+        return this._isCheckingQueue;
     }
 
     /**
@@ -391,6 +399,7 @@ export default class MorsePlayerWAA {
     _scheduleNotes() {
         // console.log('Scheduling:');
         let start, start2, stop, stop2, bsn, pauseEndTime;
+        this._isCheckingQueue = true;
         let ac = morseAudioContext.getAudioContext();
         let nowAbsolute = ac.currentTime;
 
@@ -479,6 +488,7 @@ export default class MorsePlayerWAA {
 
         if (this._nextNote === this.sequenceLength) {
             // then all notes have been scheduled and we are not looping/going to next in queue
+            this._isCheckingQueue = false;
             clearInterval(this._timer);
             // schedule stop() for after when the scheduled sequence ends
             // adding on 3 * lookAheadTime for safety but shouldn't be needed
