@@ -28,7 +28,7 @@ import morseAudioContext from './morse-pro-audiocontext';
  * var morsePlayerWAALight = new MorsePlayerWAALight();
  * morsePlayerWAALight.soundOnCallback = lightOn;
  * morsePlayerWAALight.soundOffCallback = lightOff;
- * morsePlayerWAALight.soundStoppedCallback = soundStopped;
+ * morsePlayerWAALight.allStoppedCallback = soundStopped;
  * morsePlayerWAALight.muteAudio(true);
  * morsePlayerWAALight.load({timings});
  * morsePlayerWAA.playFromStart();
@@ -43,21 +43,22 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
      * @param {number} params.startPadding - number of ms to wait before playing first note of initial sequence.
      * @param {number} params.endPadding - number of ms to wait at the end of a sequence before playing the next one (or looping).
      * @param {number} params.volume - volume of Morse. Takes range [0,1].
-     * @param {function()} params.sequenceStartCallback - function to call each time the sequence starts.
-     * @param {function()} params.sequenceEndingCallback - function to call when the sequence is nearing the end.
-     * @param {function()} params.sequenceEndCallback - function to call when the sequence has ended.
-     * @param {function()} params.paddingEndCallback - function to call when the end padding at the end of a sequence has ended.
-     * @param {function()} params.soundStoppedCallback - function to call when the sequence stops.
-     * @param {function()} params.soundOnCallback - function to call when a note starts.
-     * @param {function()} params.soundOffCallback - function to call when a note stops.
+     * @param {function()} [params.sequenceStartCallback] - function to call each time a sequence starts.
+     * @param {function()} [params.sequenceSoundStartCallback] - function to call at the time of the first beep of a sequence (if there is a beep).
+     * @param {function()} [params.sequenceEndingCallback] - function to call when a sequence is nearing the end.
+     * @param {function()} [params.sequenceSoundEndCallback] - function to call when the last beep of a sequence has ended (if there is a beep).
+     * @param {function()} [params.sequenceEndCallback] - function to call when a sequence has ended (including any silence/end padding).
+     * @param {function()} [params.allStoppedCallback] - function to call when the whole playback stops (naturally or when stopped).
+     * @param {function()} [params.soundOnCallback] - function to call when a beep starts.
+     * @param {function()} [params.soundOffCallback] - function to call when a beep stops.
      * @param {string} params.onSample - URL of the sound file to play at the start of a note.
      * @param {string} params.offSample - URL of the sound file to play at the end of a note.
      * @param {string} params.playMode - play mode, either "sine" or "sample".
      */
-    constructor({defaultFrequency, startPadding, endPadding, volume, sequenceStartCallback, sequenceEndingCallback, sequenceEndCallback, paddingEndCallback, soundStoppedCallback, soundOnCallback, soundOffCallback, onSample, offSample, playMode} = {}) {
-        super({defaultFrequency, startPadding, endPadding, volume, sequenceStartCallback, sequenceEndingCallback, sequenceEndCallback, paddingEndCallback, soundStoppedCallback, onSample, offSample, playMode});
-        if (soundOnCallback !== undefined) this.soundOnCallback = soundOnCallback;
-        if (soundOffCallback !== undefined) this.soundOffCallback = soundOffCallback;
+    constructor({defaultFrequency, startPadding, endPadding, volume, sequenceStartCallback, sequenceSoundStartCallback, sequenceEndingCallback, sequenceSoundEndCallback, sequenceEndCallback, allStoppedCallback, soundOnCallback, soundOffCallback, onSample, offSample, playMode} = {}) {
+        super({defaultFrequency, startPadding, endPadding, volume, sequenceStartCallback, sequenceSoundStartCallback, sequenceEndingCallback, sequenceSoundEndCallback, sequenceEndCallback, allStoppedCallback, onSample, offSample, playMode});
+        this.soundOnCallback = soundOnCallback !== undefined ? soundOnCallback : function () { };
+        this.soundOffCallback = soundOffCallback !== undefined ? soundOffCallback : function () { };
         this._wasOn = false;
         this._count = 0;
         if (playMode === 'sample') {
@@ -142,8 +143,4 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
         // 0: Audio element using Mozilla Audio Data API (https://wiki.mozilla.org/Audio_Data_API) (using PCM audio data)
         // -1: no audio support
     }
-
-    // empty callbacks in case user does not define any
-    soundOnCallback() { }
-    soundOffCallback() { }
 }
