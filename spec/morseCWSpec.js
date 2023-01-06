@@ -1,5 +1,9 @@
 import MorseCW from "../src/morse-pro-cw.js";
 
+//TODO: define these once
+const CHAR_SPACE = '•';  // \u2022
+const WORD_SPACE = '■';  // \u25a0
+
 describe("MorseCW()", function () {
     let mcw = new MorseCW();
 
@@ -10,11 +14,72 @@ describe("MorseCW()", function () {
             [60, -60, 60, -180, 60, -60, 180, -420, 180, -60, 180]
         );
     });
+
     it("doesn't work when there are tags", function () {
         // TODO: the test for an exception does not work for some reason
         // expect(mcw.getNotes(mcw.loadText("a[v]"))).toThrow();
     });
+
+    it("updates lengths & ratios", function () {
+        mcw.setWPM(20);
+        mcw.setFWPM(10);
+        expect(round(mcw.lengths, 2)).toEqual({ '.': 60, '-': 180, ' ': -60, '•': -653.68, '■': -1525.26 });
+        expect(round(mcw.ratios, 2)).toEqual({ '.': 1, '-': 3, ' ': -1, '•': -10.89, '■': -25.42 });
+    });
+    it("prevents silly settings", function () {
+        mcw.setWPM(0);
+        expect(mcw.wpm).toBe(1);
+        mcw.setWPM(undefined);
+        expect(mcw.wpm).toBe(1);
+        mcw.setWPM(NaN);
+        expect(mcw.wpm).toBe(1);
+        mcw.setFWPM(0);
+        expect(mcw.fwpm).toBe(1);
+        mcw.setFWPM(undefined);
+        expect(mcw.fwpm).toBe(1);
+        mcw.setFWPM(NaN);
+        expect(mcw.fwpm).toBe(1);
+
+        // TODO: change the code so these pass
+        // mcw.setLength(".", -2);
+        // expect(mcw.lengths["."]).toBe(1);
+        // mcw.setLength("-", -2);
+        // expect(mcw.lengths["."]).toBe(1);
+        // mcw.setLength(" ", -2);
+        // expect(mcw.lengths["."]).toBe(-1);
+    });
+
+    it("sets fwpm to undefined if it cannot be computed", function () {
+        mcw.setWPM(20);
+        mcw.setFWPM(20);
+        mcw.setLength(CHAR_SPACE, 1); // means it will not match the inter-word space
+        expect(mcw.wpm).toBe(20);
+        expect(mcw.fwpm).toBe(undefined);
+        expect(twodp(mcw.equivalentWPM, 2)).toBe(26.36);
+    });
+
+    it("sets wpm and fwpm to undefined if wpm cannot be computed", function () {
+        mcw.setWPM(20);
+        mcw.setFWPM(20);
+        mcw.setLength(" ", 1); // means intra-character space will not match the dit length
+        expect(mcw.wpm).toBe(undefined);
+        expect(mcw.fwpm).toBe(undefined);
+        expect(twodp(mcw.equivalentWPM)).toBe(24.48);
+    });
+
 });
+
+function round(obj, dp) {
+    let ret = {};
+    for (let key in obj) {
+        ret[key] = Math.round(obj[key] * Math.pow(10, dp)) / Math.pow(10, dp);
+    }
+    return ret;
+}
+
+function twodp(num) {
+    return Math.round(num * 100) / 100;
+}
 
 describe("MorseCW({dictionaryOptions:['tags']})", function () {
     let mcw = new MorseCW({ dictionaryOptions: ['tags'] });

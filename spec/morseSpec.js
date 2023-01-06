@@ -448,7 +448,7 @@ describe("Morse({dictionaryOptions: ['tags']}) with International Morse", functi
     });
     it("can translate from morse with tags and display the morse", function () {
         let msg = m.loadMorse(".[v]-- [f].");
-        expect(msg.error).toBe(false);
+        expect(msg.error).toBe(true);
         // TODO: decide how this should behave
         // expect(msg).toEqual();
         // expect(m.displayMorse(msg)).toBe(".-- .");

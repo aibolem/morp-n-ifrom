@@ -64,7 +64,11 @@ export default class MorseCW extends Morse {
 
         wpm = Math.max(1, wpm || 1);
         this._wpm = wpm;
-        this._fwpm = Math.min(this._wpm, this._fwpm);
+        if (this._fwpm === undefined) {
+            this._fwpm = this._wpm;
+        } else {
+            this._fwpm = Math.min(this._wpm, this._fwpm);
+        }
 
         let tmp = this.ratios;
         tmp = this.baseLength;
@@ -73,7 +77,9 @@ export default class MorseCW extends Morse {
 
     /** @type {number} */
     get wpm() {
-        if (this._wpm === undefined) this._setWPMfromBaseLength();
+        if (this._wpm === undefined && this.testWPMmatchesRatio()) {
+            this._setWPMfromBaseLength();
+        }
         this.fwpm;  // need to ensure that if wpm is set then so is fwpm otherwise changing wpm will result in NaNs
         return this._wpm;
     }
@@ -89,13 +95,21 @@ export default class MorseCW extends Morse {
     setFWPM(fwpm) {
         fwpm = Math.max(1, fwpm || 1);
         this._fwpm = fwpm;
-        this.setWPM(Math.max(this._wpm, this._fwpm))
+        if (this._wpm === undefined) {
+            this.setWPM(this._fwpm);
+        } else {
+            this.setWPM(Math.max(this._wpm, this._fwpm))
+        }
         return fwpm;
     }
 
     /** @type {number} */
     get fwpm() {
-        if (this._fwpm === undefined) this._setFWPMfromRatio();
+        if (this._wpm === undefined) {
+            this._fwpm = undefined;
+        } else if (this._fwpm === undefined && this.testFWPMmatchesRatio()) {
+            this._setFWPMfromRatio();
+        }
         return this._fwpm;
     }
 
@@ -131,6 +145,19 @@ export default class MorseCW extends Morse {
         for (let element in this._ratios) {
             this._ratios[element] /= this._ratios[this._baseElement];
         }
+    }
+
+    /**
+     * Get the equivalent WPM, given all the lengths.
+     * i.e. Calculate the duration of "PARIS " and just use that.
+     */
+    get equivalentWPM() {
+        let paris = 10 * this.lengths['.'] +
+        4 * this.lengths['-'] +
+        -9 * this.lengths[' '] +
+        -4 * this.lengths[CHAR_SPACE] +
+        -1 * this.lengths[WORD_SPACE];
+        return 60 * 1000 / paris;
     }
 
     setRatio(element, ratio) {
