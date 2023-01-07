@@ -144,6 +144,8 @@ export default class MorseCW extends Morse {
         Object.assign(this._ratios, r);
         for (let element in this._ratios) {
             this._ratios[element] /= this._ratios[this._baseElement];
+            // make sure the sign of the ratio is correct
+            this._ratios[element] = Math.abs(this._ratios[element]) * (this.dictionary.ratio[element] > 0 ? 1 : -1);
         }
     }
 
@@ -161,6 +163,8 @@ export default class MorseCW extends Morse {
     }
 
     setRatio(element, ratio) {
+        // make sure the sign of the ratio is correct
+        ratio = Math.abs(ratio) * (this.dictionary.ratio[element] > 0 ? 1 : -1);
         let tmp = this.ratios;
         this._ratios[element] = ratio;
         this._lengths = undefined;
@@ -176,6 +180,7 @@ export default class MorseCW extends Morse {
             this._wpm = undefined;
             this._fwpm = undefined;
         }
+        return ratio;
     }
 
     setFrequency(f) {
@@ -452,6 +457,8 @@ export default class MorseCW extends Morse {
     }
 
     setLength(element, length) {
+        // make sure the sign of the length is correct
+        length = Math.abs(length) * (this.dictionary.ratio[element] > 0 ? 1 : -1);
         if (element == this._baseElement) {
             this._lengths = undefined;
             this._wpm = undefined;
@@ -460,6 +467,7 @@ export default class MorseCW extends Morse {
             this._baseLength = length;
         }
         this.setRatio(element, length / this._baseLength);
+        return length;
     }
 
     /** 

@@ -33,6 +33,7 @@ describe("MorseCW()", function () {
         expect(mcw.wpm).toBe(1);
         mcw.setWPM(NaN);
         expect(mcw.wpm).toBe(1);
+
         mcw.setFWPM(0);
         expect(mcw.fwpm).toBe(1);
         mcw.setFWPM(undefined);
@@ -40,31 +41,48 @@ describe("MorseCW()", function () {
         mcw.setFWPM(NaN);
         expect(mcw.fwpm).toBe(1);
 
-        // TODO: change the code so these pass
-        // mcw.setLength(".", -2);
-        // expect(mcw.lengths["."]).toBe(1);
-        // mcw.setLength("-", -2);
-        // expect(mcw.lengths["."]).toBe(1);
-        // mcw.setLength(" ", -2);
-        // expect(mcw.lengths["."]).toBe(-1);
+        mcw.setLength(".", -2);
+        expect(mcw.lengths["."]).toBe(2);
+        mcw.setLength("-", -2);
+        expect(mcw.lengths["-"]).toBe(2);
+        mcw.setLength(" ", 2);
+        expect(mcw.lengths[" "]).toBe(-2);
+        mcw.setLength(CHAR_SPACE, 2);
+        expect(mcw.lengths[CHAR_SPACE]).toBe(-2);
+        mcw.setLength(WORD_SPACE, 2);
+        expect(mcw.lengths[WORD_SPACE]).toBe(-2);
+
+        mcw.setRatio(".", -2);
+        expect(mcw.ratios["."]).toBe(2);
+        mcw.setRatio("-", -2);
+        expect(mcw.ratios["-"]).toBe(2);
+        mcw.setRatio(" ", 2);
+        expect(mcw.ratios[" "]).toBe(-2);
+        mcw.setRatio(CHAR_SPACE, 2);
+        expect(mcw.ratios[CHAR_SPACE]).toBe(-2);
+        mcw.setRatio(WORD_SPACE, 2);
+        expect(mcw.ratios[WORD_SPACE]).toBe(-2);
+
+        mcw.ratios = {".": -1, "-": -2, " ": 3, '•': 4, '■': 5};
+        expect(mcw.ratios).toEqual({".": 1, "-": 2, " ": -3, '•': -4, '■': -5});
     });
 
     it("sets fwpm to undefined if it cannot be computed", function () {
         mcw.setWPM(20);
         mcw.setFWPM(20);
-        mcw.setLength(CHAR_SPACE, 1); // means it will not match the inter-word space
+        mcw.setLength(CHAR_SPACE, -1); // means it will not match the inter-word space
         expect(mcw.wpm).toBe(20);
         expect(mcw.fwpm).toBe(undefined);
-        expect(twodp(mcw.equivalentWPM, 2)).toBe(26.36);
+        expect(twodp(mcw.equivalentWPM, 2)).toBe(26.27);
     });
 
     it("sets wpm and fwpm to undefined if wpm cannot be computed", function () {
         mcw.setWPM(20);
         mcw.setFWPM(20);
-        mcw.setLength(" ", 1); // means intra-character space will not match the dit length
+        mcw.setLength(" ", -1); // means intra-character space will not match the dit length
         expect(mcw.wpm).toBe(undefined);
         expect(mcw.fwpm).toBe(undefined);
-        expect(twodp(mcw.equivalentWPM)).toBe(24.48);
+        expect(twodp(mcw.equivalentWPM)).toBe(24.3);
     });
 
 });

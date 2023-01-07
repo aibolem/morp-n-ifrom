@@ -272,10 +272,10 @@ export default class MorsePlayerWAA {
         // TODO: undefined behaviour if this is called in the middle of a sequence
 
         if (sequence.endPadding !== undefined) {
-            timings.push(-sequence.endPadding);
+            timings.push(-Math.abs(sequence.endPadding));
         } else {
             if (this.endPadding > 0) {
-                timings.push(-this.endPadding);
+                timings.push(-Math.abs(this.endPadding));
             }
         }
 
