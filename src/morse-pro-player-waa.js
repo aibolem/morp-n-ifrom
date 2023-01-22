@@ -1,5 +1,5 @@
 /*!
-This code is © Copyright Stephen C. Phillips, 2018-2022.
+This code is © Copyright Stephen C. Phillips, 2018-2023.
 Email: steve@morsecode.world
 */
 /*

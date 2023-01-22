@@ -1,5 +1,5 @@
 /*!
-This code is © Copyright Stephen C. Phillips, 2018-2022.
+This code is © Copyright Stephen C. Phillips, 2018-2023.
 Email: steve@morsecode.world
 */
 /*
@@ -21,7 +21,7 @@ See the Licence for the specific language governing permissions and limitations 
  * morseCWWave.translate("abc");
  * var morsePlayerXAS = new MorsePlayerXAS(XAudioServer);
  * morsePlayerXAS.load(morseCWWave);
- * morsePlayerXAS.playFromStart();
+ * morsePlayerXAS.play();
  */
 export default class MorsePlayerXAS {
     /**
@@ -140,7 +140,7 @@ export default class MorsePlayerXAS {
         );
     }
 
-    playFromStart() {
+    play() {
         this.stop();
         this._isPlaying = true;
         this.samplePos = 0;

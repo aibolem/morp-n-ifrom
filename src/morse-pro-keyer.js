@@ -1,5 +1,5 @@
 /*!
-This code is © Copyright Stephen C. Phillips, 2019-2022.
+This code is © Copyright Stephen C. Phillips, 2019-2023.
 Email: steve@morsecode.world
 */
 /*
@@ -58,11 +58,11 @@ export default class MorseKeyer {
      * @access private
      */
     _check() {
-        var key = this.keyCallback();
-        var ditOrDah = this._ditOrDah(key);
-        var beepLen;  // length of beep
-        var silenceLen;  // length of silence
-        var now = (new Date()).getTime();
+        let key = this.keyCallback();
+        let ditOrDah = this._ditOrDah(key);
+        let beepLen;  // length of beep
+        let silenceLen;  // length of silence
+        let now = (new Date()).getTime();
 
         if (this._state.lastTime !== undefined) {
             this.decoder.addTiming(this._state.lastTime - now);  // add how long since we've last been here as silence
@@ -141,7 +141,8 @@ export default class MorseKeyer {
      * @access private
      */
     _playTone(duration) {
-        this.player.load({timings: [duration]});
-        this.player.playFromStart();
+        this.player.play({
+           timings: [duration]
+        });
     }
 }

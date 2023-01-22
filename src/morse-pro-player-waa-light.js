@@ -31,7 +31,7 @@ import morseAudioContext from './morse-pro-audiocontext';
  * morsePlayerWAALight.allStoppedCallback = soundStopped;
  * morsePlayerWAALight.muteAudio(true);
  * morsePlayerWAALight.load({timings});
- * morsePlayerWAA.playFromStart();
+ * morsePlayerWAA.play();
  */
 
 const SMALL_AMPLITUDE = 0.1;  // below this, we consider the sound to be off
@@ -96,12 +96,12 @@ export default class MorsePlayerWAALight extends MorsePlayerWAA {
      * @access private
      */
     _processSound(event) {
-        var input = event.inputBuffer.getChannelData(0);
-        var sum = 0;
+        let input = event.inputBuffer.getChannelData(0);
+        let sum = 0;
         for (var i = 0; i < input.length; i++) {
             sum += Math.abs(input[i]) > SMALL_AMPLITUDE;
         }
-        var on = (sum > 128);  // is more than half the buffer non-zero?
+        let on = (sum > 128);  // is more than half the buffer non-zero?
         if (on && !this._wasOn) {
             this._on();
         } else if (!on && this._wasOn) {
