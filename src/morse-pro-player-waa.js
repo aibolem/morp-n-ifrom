@@ -10,7 +10,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-import morseAudioContext from './morse-pro-audiocontext';
+import morseAudioContext from './morse-pro-audiocontext.js';
 
 /**
  * Web browser sound player using Web Audio API.

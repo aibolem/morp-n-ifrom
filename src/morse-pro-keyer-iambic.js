@@ -10,7 +10,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-import MorseKeyer from './morse-pro-keyer';
+import MorseKeyer from './morse-pro-keyer.js';
 
 /*
     The Morse iambic keyer tests for input on a timer, plays the appropriate tone and passes the data to a decoder.

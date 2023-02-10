@@ -10,7 +10,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
-import MorseDecoder from './morse-pro-decoder';
+import MorseDecoder from './morse-pro-decoder.js';
 
 /**
  * Class to convert from timings to Morse code. Uses "international" dictionary. Adapts to changing speed.

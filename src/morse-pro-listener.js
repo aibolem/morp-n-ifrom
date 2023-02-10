@@ -14,7 +14,7 @@ See the Licence for the specific language governing permissions and limitations 
  * A class to 'listen' for Morse code from the microphone or an audio file, filter the sound and pass timings to a decoder to convert to text.
  */
 
- import morseAudioContext from './morse-pro-audiocontext';
+ import morseAudioContext from './morse-pro-audiocontext.js';
 
  //TOOD: change constructor so that it uses a dictionary of parameters
 
