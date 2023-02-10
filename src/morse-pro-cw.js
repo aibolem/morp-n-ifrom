@@ -42,6 +42,11 @@ export default class MorseCW extends Morse {
         this._baseElement = this.dictionary.baseElement;
         /** Initialise the ratios based on the dictionary but enable them to be changed thereafter */
         this.ratios = { ...this.dictionary.ratio };  // actually does a copy from the dict so we can reset if needed
+        /** Initialise all element standard deviations to be 0 (i.e. no variability) */
+        this._stdDev = {};
+        for (let k in this.ratios) {
+            this.setStdDev(k, 0);
+        }
         /** Compute ditsInParis and spacesInParis while we have original ratio */
         let parisTokens = this.loadText('PARIS');
         this._baseLength = 1;
@@ -324,7 +329,7 @@ export default class MorseCW extends Morse {
                 for (let char of chars) {
                     for (let element of char.split("")) {
                         let note = {
-                            d: this.lengths[element],
+                            d: this.normal(this.lengths[element], this._stdDev[element]),
                             f: this.getFrequency()
                         }
                         notes.push(note);
@@ -476,5 +481,22 @@ export default class MorseCW extends Morse {
      */
     get wordSpace() {
         return Math.abs(this.lengths[WORD_SPACE]);
+    }
+
+    setStdDev(element, s) {
+        s = Math.abs(s);
+        this._stdDev[element] = s;
+        return s;
+    }
+
+    getStdDev(element) {
+        return this._stdDev[element];
+    }
+
+    normal(mean, stdDev) {
+        // get number with mean 0, variance 1 (using Box-Muller transform), pre-multiply by stdDev (might shortcut if stdDev == 0)
+        let f = stdDev * Math.sqrt(-2 * Math.log(1 - Math.random())) * Math.cos(2 * Math.PI * Math.random());
+        // transform to the target mean, making sure we return a number with the same sign as the input
+        return Math.max(f + Math.abs(mean), 0) * Math.sign(mean);
     }
 }
