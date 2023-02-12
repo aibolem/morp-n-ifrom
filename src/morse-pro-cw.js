@@ -63,16 +63,17 @@ export default class MorseCW extends Morse {
      * @param {number} wpm
      */
     setWPM(wpm) {
+        let fwpm = this.fwpm;  // recalculate fwpm first
         this._baseLength = undefined;
         this._ratios = undefined;
         this._lengths = undefined;
 
         wpm = Math.max(1, wpm || 1);
         this._wpm = wpm;
-        if (this._fwpm === undefined) {
+        if (fwpm === undefined) {
             this._fwpm = this._wpm;
         } else {
-            this._fwpm = Math.min(this._wpm, this._fwpm);
+            this._fwpm = Math.min(this._wpm, fwpm);
         }
 
         let tmp = this.ratios;
@@ -85,7 +86,6 @@ export default class MorseCW extends Morse {
         if (this._wpm === undefined && this.testWPMmatchesRatio()) {
             this._setWPMfromBaseLength();
         }
-        this.fwpm;  // need to ensure that if wpm is set then so is fwpm otherwise changing wpm will result in NaNs
         return this._wpm;
     }
 
@@ -100,7 +100,7 @@ export default class MorseCW extends Morse {
     setFWPM(fwpm) {
         fwpm = Math.max(1, fwpm || 1);
         this._fwpm = fwpm;
-        if (this._wpm === undefined) {
+        if (this.wpm === undefined) {
             this.setWPM(this._fwpm);
         } else {
             this.setWPM(Math.max(this._wpm, this._fwpm))
@@ -110,9 +110,7 @@ export default class MorseCW extends Morse {
 
     /** @type {number} */
     get fwpm() {
-        if (this._wpm === undefined) {
-            this._fwpm = undefined;
-        } else if (this._fwpm === undefined && this.testFWPMmatchesRatio()) {
+        if (this._fwpm === undefined && this.testFWPMmatchesRatio()) {
             this._setFWPMfromRatio();
         }
         return this._fwpm;
