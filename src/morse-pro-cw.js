@@ -42,10 +42,16 @@ export default class MorseCW extends Morse {
         this._baseElement = this.dictionary.baseElement;
         /** Initialise the ratios based on the dictionary but enable them to be changed thereafter */
         this.ratios = { ...this.dictionary.ratio };  // actually does a copy from the dict so we can reset if needed
-        /** Initialise all element standard deviations to be 0 (i.e. no variability) */
-        this._stdDev = {};
+        /** Initialise all element variation to be no variability */
+        this.variation = {};
         for (let k in this.ratios) {
-            this.setStdDev(k, 0);
+            this.setVariation(k, {
+                sysOffset: 0,
+                sysSlope: 1,
+                rndRange: 0,
+                rndSlope: 0,
+                stdDev: 0
+            });
         }
         /** Compute ditsInParis and spacesInParis while we have original ratio */
         let parisTokens = this.loadText('PARIS');
@@ -230,7 +236,7 @@ export default class MorseCW extends Morse {
      * @param {*} tokens 
      * @returns {Array} notes - Array of Objects with keys "d" for millisecond duration and "f" for frequency.
      */
-    getNotes(tokens) {
+    getNotes(tokens, perfect=true) {
         let notes = [];
         if (tokens === null) return notes;
         this._saveParameters();
@@ -327,7 +333,7 @@ export default class MorseCW extends Morse {
                 for (let char of chars) {
                     for (let element of char.split("")) {
                         let note = {
-                            d: this.normal(this.lengths[element], this._stdDev[element]),
+                            d: perfect ? this.lengths[element] : this.getAdjustedLength(element),
                             f: this.getFrequency()
                         }
                         notes.push(note);
@@ -339,8 +345,8 @@ export default class MorseCW extends Morse {
         return notes;
     }
 
-    getSequence(tokens) {
-        let notes = this.getNotes(tokens);
+    getSequence(tokens, perfect=true) {
+        let notes = this.getNotes(tokens, perfect);
         let timings = [];
         let frequencies = [];
         for (let note of notes) {
@@ -355,8 +361,8 @@ export default class MorseCW extends Morse {
      * @param {Object} tokens
      * @return {number[]}
      */
-    getTimings(tokens) {
-        return this.getSequence(tokens).timings;
+    getTimings(tokens, perfect=true) {
+        return this.getSequence(tokens, perfect).timings;
     }
 
     /**
@@ -481,20 +487,58 @@ export default class MorseCW extends Morse {
         return Math.abs(this.lengths[WORD_SPACE]);
     }
 
-    setStdDev(element, s) {
-        s = Math.abs(s);
-        this._stdDev[element] = s;
-        return s;
+    setVariation(element, {sysOffset, sysSlope, rndRange, rndSlope, stdDev} = {}) {
+        this.variation[element] = {sysOffset, sysSlope, rndRange, rndSlope, stdDev};
     }
 
-    getStdDev(element) {
-        return this._stdDev[element];
+    getVariation(element) {
+        return this.variation[element];
     }
 
-    normal(mean, stdDev) {
+    /**
+     * Get the length of an element, taking into account the variation parameters, potentially adding an offset and randomness.
+     * @param {String} element - the element to get the length for (e.g. '.', '-')
+     * @returns {Number} - the duration in milliseconds, -ve number used for spaces
+     */
+    getAdjustedLength(element) {
+        let mean = this._lengths[element];
+        let {sysOffset, sysSlope, rndRange, rndSlope, stdDev} = this.getVariation(element);
+        // add on a systematic error
+        let sys = Math.abs(mean) * sysSlope + sysOffset;
+        // get random number in range [-1, 1]
+        let rnd = this.truncatedNormal(stdDev);
+        // the range of the random part can vary with the mean
+        let range2 = Math.abs(mean) * rndSlope + rndRange / 2
+        // keep the random variable within the range
+        rnd *= range2;
+        // add the random part to the systematic part, making sure we return a number with the same sign as the input and >= 0
+        // = sysSlope * mean + sysOffset + rnd() * [rndSlope * mean + (rndRange / 2)]
+        return Math.max(sys + rnd, 0) * Math.sign(mean);
+
+        // Comparison to Seiuchy's model (http://seiuchy.macache.com/)
+        // This returns     sysSlope * mean + sysOffset + rnd() * [rndSlope * mean + (rndRange / 2)]
+        // As the rnd() function here is [-1, 1] it is similar to [Math.random() * 2 - 1] (a different distribution though)
+        // = sysSlope * mean + sysOffset + [(Math.random() * 2) - 1] * [(rndSlope * mean) + (rndRange / 2)]
+        // = mean * {Math.random() * (2 * rndSlope) + (sysSlope - rndSlope)} + (Math.random() * rndRange) + sysOffset - (rndRange / 2)
+        // Seiuchy uses     mean * [Math.random() * s + c]
+        // Therefore rndSlope = s/2
+        //       and sysSlope = c + s/2
+        //      also rndRange = 0
+        //          sysOffset = 0
+        //             stdDev = large to simulate a uniform distribution
+    }
+
+    /**
+     * Get a random number in the range [-1, 1]. Uses a (truncated) normal distribution.
+     * Use a large stdDev to simulate a uniform distribution.
+     * @param {Number} stdDev - the standard deviation of the normal distribution
+     * @returns {Number} - a random number
+     */
+    truncatedNormal(stdDev) {
         // get number with mean 0, variance 1 (using Box-Muller transform), pre-multiply by stdDev (might shortcut if stdDev == 0)
-        let f = stdDev * Math.sqrt(-2 * Math.log(1 - Math.random())) * Math.cos(2 * Math.PI * Math.random());
-        // transform to the target mean, making sure we return a number with the same sign as the input
-        return Math.max(f + Math.abs(mean), 0) * Math.sign(mean);
+        let rnd = stdDev * Math.sqrt(-2 * Math.log(1 - Math.random())) * Math.cos(2 * Math.PI * Math.random());
+        // shift values outside [-1, 1] into the range [-1, 1]
+        rnd -= Math.trunc(rnd)
+        return rnd;
     }
 }

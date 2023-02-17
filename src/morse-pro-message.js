@@ -103,23 +103,47 @@ export default class MorseMessage {
      * @returns {Object[]} an array of Objects. Each item has keys "d" and "f" for duration in ms and frequency in Hz.
      */
     get notes() {
-        return this.morseCWWave.getNotes(this.tokens);
+        return this.getNotes();
+    }
+
+    /**
+     * Get the message timings and frequencies.
+     * @returns {Object[]} an array of Objects. Each item has keys "d" and "f" for duration in ms and frequency in Hz.
+     */
+    getNotes(perfect=true) {
+        return this.morseCWWave.getNotes(this.tokens, perfect);
+    }
+    
+    /**
+     * Get the message timings and frequencies.
+     * @returns {Object} an object with keys "timings" and "frequencies" (array of millisecond note duration timings, and an array of note frequencies in Hz).
+     */
+    get sequence() {
+        return this.getSequence();
     }
 
     /**
      * Get the message timings and frequencies.
      * @returns {Object} an object with keys "timings" and "frequencies" (array of millisecond note duration timings, and an array of note frequencies in Hz).
      */
-    get sequence() {
-        return this.morseCWWave.getSequence(this.tokens);
+    getSequence(perfect=true) {
+        return this.morseCWWave.getSequence(this.tokens, perfect);
     }
-
+    
     /**
      * Get the message timings.
      * @returns {number[]} an array of millisecond note duration timings, -ve numbers indicating silence.
      */
     get timings() {
         return this.sequence.timings;
+    }
+
+    /**
+     * Get the message timings.
+     * @returns {number[]} an array of millisecond note duration timings, -ve numbers indicating silence.
+     */
+    getTimings(perfect=true) {
+        return this.getSequence(perfect).timings;
     }
 
     /**
@@ -132,12 +156,20 @@ export default class MorseMessage {
 
     /**
      * Get the message as a sound waveform.
+     * @returns {number[]} an array of floats in range [-1, 1] representing the waveform.
+     */
+    getWave(perfect=true) {
+        return this.morseCWWave.getSample(this.getSequence(perfect));
+    }
+
+    /**
+     * Get the message as a sound waveform.
      * @param {number} [startPadding] - the number of milliseconds silence to add to the start
      * @param {number} [endPadding] - the minimum number of milliseconds silence to have at the end
      * @returns {number[]} an array of floats in range [-1, 1] representing the waveform.
      */
-    getSample(startPadding, endPadding) {
-        return this.morseCWWave.getSample(this.sequence, startPadding, endPadding);
+    getSample(startPadding, endPadding, perfect=true) {
+        return this.morseCWWave.getSample(this.getSequence(perfect), startPadding, endPadding);
     }
 
     /**
