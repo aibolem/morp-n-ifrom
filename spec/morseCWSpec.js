@@ -331,4 +331,24 @@ describe("MorseCW({dictionaryOptions:['tags']})", function () {
             [ { d: 60, f: 400 }, { d: -420, f: 500 }, { d: 60, f: 500 }, { d: -420, f: 400 }, { d: 60, f: 400 } ]
         );
     });
+    // it("can rnd1", function () {
+    //     mcw.setLength('.', 100);
+    //     mcw.setVariation('.', {sysOffset:0, sysSlope:1, rndRange:0, rndSlope:1, stdDev:100000});
+    //     let d = [];
+    //     let e = [];
+    //     let dit;
+    //     for (let i = 0; i < 10000000; i++) {
+    //         dit = mcw.getAdjustedLength('.');
+    //         d.push(dit);
+    //         e.push(10 * Math.trunc((dit + 5)/10));
+    //     }
+    //     let dist = {};
+    //     for (let n of e) {
+    //         if (dist[n] === undefined) {
+    //             dist[n] = 0;
+    //         }
+    //         dist[n] += 1;
+    //     }
+    //     expect(dist).toEqual("");
+    // })
 });
