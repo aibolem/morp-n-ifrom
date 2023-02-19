@@ -508,20 +508,21 @@ export default class MorseCW extends Morse {
         // get random number in range [-1, 1]
         let rnd = this.truncatedNormal(stdDev);
         // the range of the random part can vary with the mean
-        let range2 = Math.abs(mean) * rndSlope + rndRange / 2
+        let range2 = (Math.abs(mean) * rndSlope + rndRange) / 2
         // keep the random variable within the range
         rnd *= range2;
         // add the random part to the systematic part, making sure we return a number with the same sign as the input and >= 0
-        // = sysSlope * mean + sysOffset + rnd() * [rndSlope * mean + (rndRange / 2)]
+        // = sysSlope * mean + sysOffset + rnd() * (rndSlope * mean + rndRange) / 2
         return Math.max(sys + rnd, 0) * Math.sign(mean);
 
         // Comparison to Seiuchy's model (http://seiuchy.macache.com/)
-        // This returns     sysSlope * mean + sysOffset + rnd() * [rndSlope * mean + (rndRange / 2)]
+        // This returns     sysSlope * mean + sysOffset + rnd() * (rndSlope * mean + rndRange) / 2
         // As the rnd() function here is [-1, 1] it is similar to [Math.random() * 2 - 1] (a different distribution though)
-        // = sysSlope * mean + sysOffset + [(Math.random() * 2) - 1] * [(rndSlope * mean) + (rndRange / 2)]
-        // = mean * {Math.random() * (2 * rndSlope) + (sysSlope - rndSlope)} + (Math.random() * rndRange) + sysOffset - (rndRange / 2)
-        // Seiuchy uses     mean * [Math.random() * s + c]
-        // Therefore rndSlope = s/2
+        // = sysSlope * mean + sysOffset + [(Math.random() * 2) - 1] * (rndSlope * mean + rndRange) / 2
+        // = sysSlope * mean + sysOffset + (Math.random() - 0.5) * (rndSlope * mean + rndRange)
+        // = mean * {Math.random() * rndSlope + [sysSlope - (rndSlope / 2)]} + (Math.random() * rndRange) + sysOffset - (rndRange / 2)
+        // Seiuchy uses     mean * (Math.random() * s + c)
+        // Therefore rndSlope = s
         //       and sysSlope = c + s/2
         //      also rndRange = 0
         //          sysOffset = 0
