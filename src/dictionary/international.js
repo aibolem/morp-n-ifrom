@@ -5,72 +5,74 @@ export let dictionary = {
     id: 'international',
 
     letter: {
-        '×': '- . . -',  // as this is the same as "X" it needs to go before "X" to get the expected translation from -..-
+        '×': '- .t. -',  // as this is the same as "X" it needs to go before "X" to get the expected translation from -..-
 
         'A': '. -',
-        'B': '- . . .',
+        'B': '- .t.t.',
         'C': '- . - .',
-        'D': '- . .',
+        'D': '- .t.',
         'E': '.',
-        'F': '. . - .',
-        'G': '- - .',
-        'H': '. . . .',
-        'I': '. .',
-        'J': '. - - -',
+        'F': '.t. - .',
+        'G': '-h- .',
+        'H': '.t.t.t.',
+        'I': '.t.',
+        'J': '. -h-h-',
         'K': '- . -',
-        'L': '. - . .',
-        'M': '- -',
+        'L': '. - .t.',
+        'M': '-h-',
         'N': '- .',
-        'O': '- - -',
-        'P': '. - - .',
-        'Q': '- - . -',
+        'O': '-h-h-',
+        'P': '. -h- .',
+        'Q': '-h- . -',
         'R': '. - .',
-        'S': '. . .',
+        'S': '.t.t.',
         'T': '-',
-        'U': '. . -',
-        'V': '. . . -',
-        'W': '. - -',
-        'X': '- . . -',
-        'Y': '- . - -',
-        'Z': '- - . .',
+        'U': '.t. -',
+        'V': '.t.t. -',
+        'W': '. -h-',
+        'X': '- .t. -',
+        'Y': '- . -h-',
+        'Z': '-h- .t.',
 
-        '1': '. - - - -',
-        '2': '. . - - -',
-        '3': '. . . - -',
-        '4': '. . . . -',
-        '5': '. . . . .',
-        '6': '- . . . .',
-        '7': '- - . . .',
-        '8': '- - - . .',
-        '9': '- - - - .',
-        '0': '- - - - -',
+        '1': '. -h-h-h-',
+        '2': '.t. -h-h-',
+        '3': '.t.t. -h-',
+        '4': '.t.t.t. -',
+        '5': '.t.t.t.t.',
+        '6': '- .t.t.t.',
+        '7': '-h- .t.t.',
+        '8': '-h-h- .t.',
+        '9': '-h-h-h- .',
+        '0': '-h-h-h-h-',
 
         '.': '. - . - . -',
-        ',': '- - . . - -',
-        ':': '- - - . . .',
-        '?': '. . - - . .',
-        '\'': '. - - - - .',
-        '-': '- . . . . -',
-        '/': '- . . - .',
-        '(': '- . - - .',
-        ')': '- . - - . -',
-        '“': '. - . . - .',  // U+201C
-        '”': '. - . . - .',  // U+201D
-        '‘': '. - . . - .',  // U+2018
-        '’': '. - . . - .',  // U+2019
-        '"': '. - . . - .',
-        '@': '. - - . - .',
-        '=': '- . . . -',
-        '&': '. - . . .',
+        ',': '-h- .t. -h-',
+        ':': '-h-h- .t.t.',
+        '?': '.t. -h- .t.',
+        '\'': '. -h-h-h- .',
+        '-': '- .t.t.t. -',
+        '/': '- .t. - .',
+        '(': '- . -h- .',
+        ')': '- . -h- . -',
+        '“': '. - .t. - .',  // U+201C
+        '”': '. - .t. - .',  // U+201D
+        '‘': '. - .t. - .',  // U+2018
+        '’': '. - .t. - .',  // U+2019
+        '"': '. - .t. - .',
+        '@': '. -h- . - .',
+        '=': '- .t.t. -',
+        '&': '. - .t.t.',
         '+': '. - . - .',
-        '!': '- . - . - -',
+        '!': '- . - . -h-',
     },
 
     /* '•' for a character space' and '■' for a word space are mandatory. The other symbols are dictionary dependent. */
     ratio: {
         '.': 1,
         '-': 3,
-        ' ': -1,
+        ' ': -1,  // a space between dit and dah or dah and dit
+        't': -1,  // a space between two dits
+        'h': -1,  // a space between two dahs
         '•': -3,
         '■': -7
     },
@@ -81,6 +83,8 @@ export let dictionary = {
         '.': 550,
         '-': 550,
         ' ': 0,
+        't': 0,
+        'h': 0,
         '•': 0,
         '■': 0
     },
@@ -89,7 +93,9 @@ export let dictionary = {
         morse: {
             '.': '.',
             '-': '-',
-            ' ': ''
+            ' ': '',
+            't': '',
+            'h': ''
         },
         join: {
             '•': ' ',
@@ -97,8 +103,8 @@ export let dictionary = {
         }
     },
 
+    // Tidy the Morse input by the user to give e.g. ".. .-/--"
     tidyMorse: function(morse) {
-        // Tidy the Morse => ".. .- / --"
         morse = morse.trim();
         morse = morse.replace(/_/g, '-')
         morse = morse.replace(/\s+/g, ' ');
@@ -106,20 +112,26 @@ export let dictionary = {
         return morse;
     },
 
+    // Put the spacial spaces into tidied Morse coming from the user
     processMorseSpaces: function(morse) {
         // replace "/" with WORD_SPACE
         morse = morse.replace(/\//g, WORD_SPACE);
         // replace " " with CHAR_SPACE
         morse = morse.replace(/ /g, CHAR_SPACE);
-        // insert " " between character elements using zero-width lookahead assertion
-        let insertSpaces = new RegExp(`([^${CHAR_SPACE}${WORD_SPACE}])(?=[^${CHAR_SPACE}${WORD_SPACE}])`, "g");
-        morse = morse.replace(insertSpaces, "$1 ");
-        // remove " " from inside tags (added in previous step)
-        // TODO: really this should only happen if tags are enabled
-        let removeCharSpaces = /(.*\[[^\]]*) ([^\]]*\])/;
-        while (morse.match(removeCharSpaces)) {
-            morse = morse.replace(removeCharSpaces, "$1$2");
-        }
+        // insert the 3 different intra-character spaces
+        morse = morse.replace(/\.(?=\.)/g, ".t");
+        morse = morse.replace(/\-(?=\-)/g, "-h");
+        morse = morse.replace(/\.(?=\-)/g, ". ");
+        morse = morse.replace(/\-(?=\.)/g, "- ");
+        // // insert " " between character elements using zero-width lookahead assertion
+        // let insertSpaces = new RegExp(`([^${CHAR_SPACE}${WORD_SPACE}])(?=[^${CHAR_SPACE}${WORD_SPACE}])`, "g");
+        // morse = morse.replace(insertSpaces, "$1 ");
+        // // remove " " from inside tags (added in previous step)
+        // // TODO: really this should only happen if tags are enabled
+        // let removeCharSpaces = /(.*\[[^\]]*) ([^\]]*\])/;
+        // while (morse.match(removeCharSpaces)) {
+        //     morse = morse.replace(removeCharSpaces, "$1$2");
+        // }
         return morse;
     },
 
@@ -135,19 +147,19 @@ export let dictionary = {
             letter: {
                 '<AA>': '. - . -',
                 '<AR>': '. - . - .',
-                '<AS>': '. - . . .',
-                '<BK>': '- . . . - . -',
-                '<BT>': '- . . . -', // also <TV>
-                '<CL>': '- . - . . - . .',
+                '<AS>': '. - .t.t.',
+                '<BK>': '- .t.t. - . -',
+                '<BT>': '- .t.t. -', // also <TV>
+                '<CL>': '- . - .t. - .t.',
                 '<CT>': '- . - . -',
-                '<DO>': '- . . - - -',
+                '<DO>': '- .t. -h-h-',
                 '<KA>': '- . - . -',
-                '<KN>': '- . - - .',
-                '<SK>': '. . . - . -', // also <VA>
-                '<SN>': '. . . - .', // also <VE>
-                '<VA>': '. . . - . -',
-                '<VE>': '. . . - .',
-                '<SOS>': '. . . - - - . . .'
+                '<KN>': '- . -h- .',
+                '<SK>': '.t.t. - . -', // also <VA>
+                '<SN>': '.t.t. - .', // also <VE>
+                '<VA>': '.t.t. - . -',
+                '<VE>': '.t.t. - .',
+                '<SOS>': '.t.t. -h-h- .t.t.'
             },
             textGrammar: {
                 textWords: '(prosign | textCharacter)+',
@@ -157,36 +169,36 @@ export let dictionary = {
         },
         accents: {
             letter: {
-                'À': '. - - . -',
-                'Å': '. - - . -',
+                'À': '. -h- . -',
+                'Å': '. -h- . -',
                 'Ä': '. - . -',
                 'Ą': '. - . -',
                 'Æ': '. - . -',
-                'Ć': '- . - . .',
-                'Ĉ': '- . - . .',
-                'Ç': '- . - . .',
-                'Đ': '. . - . .',
-                'Ð': '. . - - .',
-                'É': '. . - . .',
-                'È': '. - . . -',
-                'Ę': '. . - . .',
-                'Ĝ': '- - . - .',
-                'Ĥ': '- - - -',
-                'Ĵ': '. - - - .',
-                'Ł': '. - . . -',
-                'Ń': '- - . - -',
-                'Ñ': '- - . - -',
-                'Ó': '- - - .',
-                'Ö': '- - - .',
-                'Ø': '- - - .',
-                'Ś': '. . . - . . .',
-                'Ŝ': '. . . - .',
-                'Š': '- - - -',
-                'Þ': '. - - . .',
-                'Ü': '. . - -',
-                'Ŭ': '. . - -',
-                'Ź': '- - . . - .',
-                'Ż': '- - . . -'
+                'Ć': '- . - .t.',
+                'Ĉ': '- . - .t.',
+                'Ç': '- . - .t.',
+                'Đ': '.t. - .t.',
+                'Ð': '.t. -h- .',
+                'É': '.t. - .t.',
+                'È': '. - .t. -',
+                'Ę': '.t. - .t.',
+                'Ĝ': '-h- . - .',
+                'Ĥ': '-h-h-h-',
+                'Ĵ': '. -h-h- .',
+                'Ł': '. - .t. -',
+                'Ń': '-h- . -h-',
+                'Ñ': '-h- . -h-',
+                'Ó': '-h-h- .',
+                'Ö': '-h-h- .',
+                'Ø': '-h-h- .',
+                'Ś': '.t.t. - .t.t.',
+                'Ŝ': '.t.t. - .',
+                'Š': '-h-h-h-',
+                'Þ': '. -h- .t.',
+                'Ü': '.t. -h-',
+                'Ŭ': '.t. -h-',
+                'Ź': '-h- .t. - .',
+                'Ż': '-h- .t. -'
             }
         }
     },
@@ -194,7 +206,7 @@ export let dictionary = {
     morseGrammar: {
         morse: 'morseWords+',
         morseWords: '(morseCharacter | morseSpace+)+',
-        morseCharacter: '[\\.\\- ]+',  /* the space here is the intra-character space */
+        morseCharacter: '[\\.\\-th ]+',  /* the space here is the intra-character space */
         morseSpace: `[\/\r\n\t${CHAR_SPACE}${WORD_SPACE}]`
     }
 }

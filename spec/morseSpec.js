@@ -38,7 +38,7 @@ describe("Morse() with text", function () {
                     {
                         type: 'textWords',
                         children: ['a', '•', 'b', '■', 'c', '•', 'd'],
-                        translation: ['. -', '•', '- . . .', '■', '- . - .', '•', '- . .']
+                        translation: ['. -', '•', '- .t.t.', '■', '- . - .', '•', '- .t.']
                     }
                 ],
                 error: false
@@ -53,7 +53,7 @@ describe("Morse() with text", function () {
                     {
                         type: 'textWords',
                         children: ['a', '•', 'b', '■', '#', '•', 'd'],
-                        translation: ['. -', '•', '- . . .', '■', undefined, '•', '- . .'],
+                        translation: ['. -', '•', '- .t.t.', '■', undefined, '•', '- .t.'],
                         error: true
                     }
                 ],
@@ -69,7 +69,7 @@ describe("Morse() with text", function () {
                     {
                         type: 'textWords',
                         children: ['a', '•', '<', 'b', '•', 't', '>', '•', 'a'],
-                        translation: ['. -', '•', undefined, '- . . .', '•', '-', undefined, '•', '. -'],
+                        translation: ['. -', '•', undefined, '- .t.t.', '•', '-', undefined, '•', '. -'],
                         error: true
                     }
                 ],
@@ -85,7 +85,7 @@ describe("Morse() with text", function () {
                     {
                         type: 'textWords',
                         children: ['a', '[', 'v', '•', '1', '•', '0', '•', '0', ']', 'a'],
-                        translation: ['. -', undefined, '. . . -', '•', '. - - - -', '•', '- - - - -', '•', '- - - - -', undefined, '. -'],
+                        translation: ['. -', undefined, '.t.t. -', '•', '. -h-h-h-', '•', '-h-h-h-h-', '•', '-h-h-h-h-', undefined, '. -'],
                         error: true
                     }
                 ],
@@ -101,7 +101,7 @@ describe("Morse() with text", function () {
                     {
                         type: 'textWords',
                         children: ['a', '•', 'b', '•', 'c', '•', 'q'],
-                        translation: ['. -', '•', '- . . .', '•', '- . - .', '•', '- - . -'],
+                        translation: ['. -', '•', '- .t.t.', '•', '- . - .', '•', '-h- . -'],
                         error: false
                     }
                 ],
@@ -296,7 +296,7 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                     {
                         type: 'textWords',
                         children: ['a', '•', 'b'],
-                        translation: ['. -', '•', '- . . .']
+                        translation: ['. -', '•', '- .t.t.']
                     },
                     {
                         type: 'tag-volume-volumeReset', tag: '[v]'
@@ -304,7 +304,7 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                     {
                         type: 'textWords',
                         children: ['•', 'c', '•', 'q'],
-                        translation: ['•', '- . - .', '•', '- - . -'],
+                        translation: ['•', '- . - .', '•', '-h- . -'],
                         error: false
                     }
                 ],
@@ -364,7 +364,7 @@ describe("Morse() with International Morse", function () {
             {
                 type: 'morse',
                 children: [
-                    { type: 'morseWords', children: ['. .', '•', '. -', '■', '- -'] }
+                    { type: 'morseWords', children: ['.t.', '•', '. -', '■', '-h-'] }
                 ]
             }
         );
@@ -377,7 +377,7 @@ describe("Morse() with International Morse", function () {
                 children: [
                     {
                         type: 'morseWords',
-                        children: ['. .', '•', '. -', '■', '- -'],
+                        children: ['.t.', '•', '. -', '■', '-h-'],
                         translation: ['I', '•', 'A', '■', 'M']
                     }
                 ],
@@ -392,7 +392,7 @@ describe("Morse() with International Morse", function () {
                 children: [
                     {
                         type: 'morseWords',
-                        children: ['- -', '•', '. - . - . - . - . -'],
+                        children: ['-h-', '•', '. - . - . - . - . -'],
                         translation: ['M', '•', undefined],
                         error: true
                     }

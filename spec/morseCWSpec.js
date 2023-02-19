@@ -23,8 +23,8 @@ describe("MorseCW()", function () {
     it("updates lengths & ratios", function () {
         mcw.setWPM(20);
         mcw.setFWPM(10);
-        expect(round(mcw.lengths, 2)).toEqual({ '.': 60, '-': 180, ' ': -60, '•': -653.68, '■': -1525.26 });
-        expect(round(mcw.ratios, 2)).toEqual({ '.': 1, '-': 3, ' ': -1, '•': -10.89, '■': -25.42 });
+        expect(round(mcw.lengths, 2)).toEqual({ '.': 60, '-': 180, ' ': -60, 't': -60, 'h': -60, '•': -653.68, '■': -1525.26 });
+        expect(round(mcw.ratios, 2)).toEqual({ '.': 1, '-': 3, ' ': -1, 't': -1, 'h': -1, '•': -10.89, '■': -25.42 });
     });
     it("prevents silly settings", function () {
         mcw.setWPM(0);
@@ -105,7 +105,7 @@ describe("MorseCW({dictionaryOptions:['tags']})", function () {
         mcw.setWPM(20);
         mcw.setFWPM(20);
         expect(mcw.lengths).toEqual(
-            { '.': 60, '-': 180, ' ': -60, '•': -180, '■': -420 }
+            { '.': 60, '-': 180, ' ': -60, 't': -60, 'h': -60, '•': -180, '■': -420 }
         );
         expect(mcw.getTimings(mcw.loadText("SO[t10/10]S"))).toEqual(
             [60, -60, 60, -60, 60, -180,
@@ -113,14 +113,14 @@ describe("MorseCW({dictionaryOptions:['tags']})", function () {
                 120, -120, 120, -120, 120]
         );
         expect(mcw.lengths).toEqual(
-            { '.': 60, '-': 180, ' ': -60, '•': -180, '■': -420 }
+            { '.': 60, '-': 180, ' ': -60, 't': -60, 'h': -60, '•': -180, '■': -420 }
         );
     });
     it("calculates times including timing reset directives", function () {
         mcw.setWPM(20);
         mcw.setFWPM(20);
         expect(mcw.lengths).toEqual(
-            { '.': 60, '-': 180, ' ': -60, '•': -180, '■': -420 }
+            { '.': 60, '-': 180, ' ': -60, 't': -60, 'h': -60, '•': -180, '■': -420 }
         );
         expect(mcw.getTimings(mcw.loadText("[t10/10]S[t]OS"))).toEqual(
             [120, -120, 120, -120, 120,
@@ -128,7 +128,7 @@ describe("MorseCW({dictionaryOptions:['tags']})", function () {
                 60, -60, 60, -60, 60]
         );
         expect(mcw.lengths).toEqual(
-            { '.': 60, '-': 180, ' ': -60, '•': -180, '■': -420 }
+            { '.': 60, '-': 180, ' ': -60, 't': -60, 'h': -60, '•': -180, '■': -420 }
         );
     });
     it("calculates time when there are pause spaces", function () {
