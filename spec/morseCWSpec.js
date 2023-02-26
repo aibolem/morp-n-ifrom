@@ -273,7 +273,7 @@ describe("MorseCW({dictionaryOptions:['tags']})", function () {
         mcw.setFWPM(20);
         mcw.setFrequency(400);
         expect(mcw.getNotes(mcw.loadText("ET"))).toEqual(
-            [ { d: 60, f: 400 }, { d: -180, f: 400 }, { d: 180, f: 400 } ]
+            [ { d: 60, f: 400, e: '.' }, { d: -180, f: 400, e: '•' }, { d: 180, f: 400, e: '-' } ]
         );
     });
     it("can change absolute frequency", function () {
@@ -281,10 +281,10 @@ describe("MorseCW({dictionaryOptions:['tags']})", function () {
         mcw.setFWPM(20);
         mcw.setFrequency(400);
         expect(mcw.getNotes(mcw.loadText("E [f500]E"))).toEqual(
-            [ { d: 60, f: 400 }, { d: -420, f: 500 }, { d: 60, f: 500 } ]
+            [ { d: 60, f: 400, e: '.' }, { d: -420, f: 500, e: '■' }, { d: 60, f: 500, e: '.' } ]
         );
         expect(mcw.getNotes(mcw.loadText("E [p500]E"))).toEqual(
-            [ { d: 60, f: 400 }, { d: -420, f: 500 }, { d: 60, f: 500 } ]
+            [ { d: 60, f: 400, e: '.' }, { d: -420, f: 500, e: '■' }, { d: 60, f: 500, e: '.' } ]
         );
     });
     it("can change relative frequency", function () {
@@ -292,10 +292,10 @@ describe("MorseCW({dictionaryOptions:['tags']})", function () {
         mcw.setFWPM(20);
         mcw.setFrequency(400);
         expect(mcw.getNotes(mcw.loadText("E [f+50]E [f-10]E"))).toEqual(
-            [ { d: 60, f: 400 }, { d: -420, f: 450 }, { d: 60, f: 450 }, { d: -420, f: 390 }, { d: 60, f: 390 } ]
+            [ { d: 60, f: 400, e: '.' }, { d: -420, f: 450, e: '■' }, { d: 60, f: 450, e: '.' }, { d: -420, f: 390, e: '■' }, { d: 60, f: 390, e: '.' } ]
         );
         expect(mcw.getNotes(mcw.loadText("E [p+50]E [p-10]E"))).toEqual(
-            [ { d: 60, f: 400 }, { d: -420, f: 450 }, { d: 60, f: 450 }, { d: -420, f: 390 }, { d: 60, f: 390 } ]
+            [ { d: 60, f: 400, e: '.' }, { d: -420, f: 450, e: '■' }, { d: 60, f: 450, e: '.' }, { d: -420, f: 390, e: '■' }, { d: 60, f: 390, e: '.' } ]
         );
     });
     it("can change absolute percentage frequency", function () {
@@ -303,10 +303,10 @@ describe("MorseCW({dictionaryOptions:['tags']})", function () {
         mcw.setFWPM(20);
         mcw.setFrequency(400);
         expect(mcw.getNotes(mcw.loadText("E [f150%]E [f90%]E"))).toEqual(
-            [ { d: 60, f: 400 }, { d: -420, f: 600 }, { d: 60, f: 600 }, { d: -420, f: 360 }, { d: 60, f: 360 } ]
+            [ { d: 60, f: 400, e: '.' }, { d: -420, f: 600, e: '■' }, { d: 60, f: 600, e: '.' }, { d: -420, f: 360, e: '■' }, { d: 60, f: 360, e: '.' } ]
         );
         expect(mcw.getNotes(mcw.loadText("E [p150%]E [p90%]E"))).toEqual(
-            [ { d: 60, f: 400 }, { d: -420, f: 600 }, { d: 60, f: 600 }, { d: -420, f: 360 }, { d: 60, f: 360 } ]
+            [ { d: 60, f: 400, e: '.' }, { d: -420, f: 600, e: '■' }, { d: 60, f: 600, e: '.' }, { d: -420, f: 360, e: '■' }, { d: 60, f: 360, e: '.' } ]
         );
     });
     it("can change relative percentage frequency", function () {
@@ -314,10 +314,10 @@ describe("MorseCW({dictionaryOptions:['tags']})", function () {
         mcw.setFWPM(20);
         mcw.setFrequency(400);
         expect(mcw.getNotes(mcw.loadText("E [f+50%]E [f-10%]E"))).toEqual(
-            [ { d: 60, f: 400 }, { d: -420, f: 600 }, { d: 60, f: 600 }, { d: -420, f: 360 }, { d: 60, f: 360 } ]
+            [ { d: 60, f: 400, e: '.' }, { d: -420, f: 600, e: '■' }, { d: 60, f: 600, e: '.' }, { d: -420, f: 360, e: '■' }, { d: 60, f: 360, e: '.' } ]
         );
         expect(mcw.getNotes(mcw.loadText("E [p+50%]E [p-10%]E"))).toEqual(
-            [ { d: 60, f: 400 }, { d: -420, f: 600 }, { d: 60, f: 600 }, { d: -420, f: 360 }, { d: 60, f: 360 } ]
+            [ { d: 60, f: 400, e: '.' }, { d: -420, f: 600, e: '■' }, { d: 60, f: 600, e: '.' }, { d: -420, f: 360, e: '■' }, { d: 60, f: 360, e: '.' } ]
         );
     });
     it("can reset frequency", function () {
@@ -325,10 +325,10 @@ describe("MorseCW({dictionaryOptions:['tags']})", function () {
         mcw.setFWPM(20);
         mcw.setFrequency(400);
         expect(mcw.getNotes(mcw.loadText("E [f500]E [f]E"))).toEqual(
-            [ { d: 60, f: 400 }, { d: -420, f: 500 }, { d: 60, f: 500 }, { d: -420, f: 400 }, { d: 60, f: 400 } ]
+            [ { d: 60, f: 400, e: '.' }, { d: -420, f: 500, e: '■' }, { d: 60, f: 500, e: '.' }, { d: -420, f: 400, e: '■' }, { d: 60, f: 400, e: '.' } ]
         );
         expect(mcw.getNotes(mcw.loadText("E [p500]E [p]E"))).toEqual(
-            [ { d: 60, f: 400 }, { d: -420, f: 500 }, { d: 60, f: 500 }, { d: -420, f: 400 }, { d: 60, f: 400 } ]
+            [ { d: 60, f: 400, e: '.' }, { d: -420, f: 500, e: '■' }, { d: 60, f: 500, e: '.' }, { d: -420, f: 400, e: '■' }, { d: 60, f: 400, e: '.' } ]
         );
     });
     // it("can rnd1", function () {
