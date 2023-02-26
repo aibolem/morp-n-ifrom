@@ -234,7 +234,7 @@ export default class MorseCW extends Morse {
     /**
      * 
      * @param {*} tokens 
-     * @returns {Array} notes - Array of Objects with keys "d" for millisecond duration and "f" for frequency.
+     * @returns {Array} notes - Array of Objects with keys "d" for millisecond duration, (optional) "f" for frequency, and (optional) "e" for element.
      */
     getNotes(tokens, perfect=true) {
         let notes = [];
@@ -334,7 +334,8 @@ export default class MorseCW extends Morse {
                     for (let element of char.split("")) {
                         let note = {
                             d: perfect ? this.lengths[element] : this.getAdjustedLength(element),
-                            f: this.getFrequency()
+                            f: this.getFrequency(),
+                            e: element
                         }
                         notes.push(note);
                     }
