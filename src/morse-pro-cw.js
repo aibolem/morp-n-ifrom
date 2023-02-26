@@ -110,7 +110,7 @@ export default class MorseCW extends Morse {
 
     /** @type {number} */
     get fwpm() {
-        if (this._fwpm === undefined && this.testFWPMmatchesRatio()) {
+        if (this.wpm !== undefined && this._fwpm === undefined && this.testFWPMmatchesRatio()) {
             this._setFWPMfromRatio();
         }
         return this._fwpm;
@@ -118,7 +118,7 @@ export default class MorseCW extends Morse {
 
     testFWPMmatchesRatio() {
         // need to test approximately here otherwise with the rounding errors introduced in the web page input it would never return true
-        return Math.abs((this.ratios[WORD_SPACE] / this.dictionary.ratio[WORD_SPACE]) / (this.ratios[CHAR_SPACE] / this.dictionary.ratio[CHAR_SPACE]) - 1) < 0.001;
+        return Math.abs((this.ratios[WORD_SPACE] / this.dictionary.ratio[WORD_SPACE]) - (this.ratios[CHAR_SPACE] / this.dictionary.ratio[CHAR_SPACE])) < 0.001;
     }
 
     /** @type {number[]} */

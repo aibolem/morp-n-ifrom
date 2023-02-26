@@ -73,7 +73,7 @@ describe("MorseCW()", function () {
         mcw.setLength(CHAR_SPACE, -1); // means it will not match the inter-word space
         expect(mcw.wpm).toBe(20);
         expect(mcw.fwpm).toBe(undefined);
-        expect(twodp(mcw.equivalentWPM, 2)).toBe(26.27);
+        expect(twodp(mcw.equivalentWPM)).toBe(26.27);
     });
 
     it("sets wpm and fwpm to undefined if wpm cannot be computed", function () {
