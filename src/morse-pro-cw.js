@@ -45,13 +45,7 @@ export default class MorseCW extends Morse {
         /** Initialise all element variation to be no variability */
         this.variation = {};
         for (let k in this.ratios) {
-            this.setVariation(k, {
-                sysOffset: 0,
-                sysSlope: 1,
-                rndRange: 0,
-                rndSlope: 0,
-                stdDev: 0
-            });
+            this.clearVariation(k);
         }
         /** Compute ditsInParis and spacesInParis while we have original ratio */
         let parisTokens = this.loadText('PARIS');
@@ -494,6 +488,21 @@ export default class MorseCW extends Morse {
 
     getVariation(element) {
         return this.variation[element];
+    }
+
+    clearVariation(element) {
+        this.setVariation(element, {
+            sysOffset: 0,
+            sysSlope: 1,
+            rndRange: 0,
+            rndSlope: 0,
+            stdDev: 0
+        });
+    }
+
+    hasVariation(element) {
+        let v = this.getVariation(element);
+        return !(v.sysOffset == 0 && v.sysSlope == 1 && v.rndRange == 0 && v.rndSlope == 0 && v.stdDev == 0);
     }
 
     /**
