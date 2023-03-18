@@ -28,7 +28,7 @@ export default class MorsePlayerWAA {
     /**
      * @param {Object} params - lots of optional parameters.
      * @param {number} [params.defaultFrequency=550] - fallback frequency (Hz) to use if the loaded sequence does not define any.
-     * @param {number} [params.startPadding=0] - number of ms to wait before playing first note after play is pressed
+     * @param {number} [params.startPadding=0] - number of ms to wait (in addition to minimumStartPadding) before the first note in a sequence is scheduled (intended to be exposed as a user-configurable parameter).
      * @param {number} [params.endPadding=0] - number of ms to wait at the end of a sequence before playing the next one (or looping).
      * @param {number} [params.volume=1] - volume of Morse. Takes range [0,1].
      * @param {function()} [params.sequenceStartCallback] - function to call each time a sequence starts.
@@ -40,8 +40,9 @@ export default class MorsePlayerWAA {
      * @param {string} [params.onSample] - URL of the sound file to play at the start of a note for when playMode is "sample".
      * @param {string} [params.offSample] - URL of the sound file to play at the end of a note for when playMode is "sample".
      * @param {string} [params.playMode="sine"] - play mode, either "sine" or "sample".
+     * @param {number} [params.minimumStartPadding=50] - number of ms to wait before first note in a sequence is scheduled to avoid clipping (not intended to be user-configurable).
      */
-    constructor({defaultFrequency=550, startPadding=0, endPadding=0, volume=1, sequenceStartCallback, sequenceSoundStartCallback, sequenceEndingCallback, sequenceSoundEndCallback, sequenceEndCallback, allStoppedCallback, onSample, offSample, playMode='sine'} = {}) {
+    constructor({defaultFrequency=550, startPadding=0, endPadding=0, volume=1, sequenceStartCallback, sequenceSoundStartCallback, sequenceEndingCallback, sequenceSoundEndCallback, sequenceEndCallback, allStoppedCallback, onSample, offSample, playMode='sine', minimumStartPadding=50} = {}) {
         this.setCallbacks({sequenceStartCallback, sequenceSoundStartCallback, sequenceEndingCallback, sequenceSoundEndCallback, sequenceEndCallback, allStoppedCallback});
 
         this.playMode = playMode;
@@ -55,7 +56,7 @@ export default class MorsePlayerWAA {
         this.loop = false;  // if true then the final (or only) sequence will loop
         this.fallbackFrequency = defaultFrequency;
         this.startPadding = startPadding;
-        this._initialStartPadding = 200;  // ms
+        this.minimumStartPadding = minimumStartPadding;  // ms
         this.endPadding = endPadding;
         this.volume = volume;
 
@@ -271,7 +272,7 @@ export default class MorsePlayerWAA {
 
         // TODO: undefined behaviour if this is called in the middle of a sequence
 
-        if (sequence.endPadding !== undefined) {
+        if (sequence.endPadding !== undefined && sequence.endPadding != 0) {
             timings.push(-Math.abs(sequence.endPadding));
         } else {
             if (this.endPadding > 0) {
@@ -384,8 +385,7 @@ export default class MorsePlayerWAA {
         // basically set the time base to now but
         //    - to avoid clipping the first note: add on startPadding
         this._tZero = morseAudioContext.getAudioContext().currentTime + 
-            Math.max(this.startPadding, this._initialStartPadding) / 1000;
-        this._initialStartPadding = 0;  // only use it once
+            (this.startPadding + this.minimumStartPadding) / 1000;
         this._startScheduling();
     }
 
@@ -424,7 +424,7 @@ export default class MorsePlayerWAA {
         //    - to avoid clipping the first note: add on startPadding
         this._tZero = morseAudioContext.getAudioContext().currentTime - 
             this._cTimings[this._nextNote] + 
-            this.startPadding / 1000;
+            (this.startPadding + this.minimumStartPadding) / 1000;
         // schedule the first note ASAP (directly) and then if there is more to schedule, set up an interval timer
         this._startScheduling();
     }
@@ -522,8 +522,8 @@ export default class MorsePlayerWAA {
                     this._sequenceSoundStartTimer = setTimeout(() => this.sequenceSoundStartCallback(), 1000 * (start - nowAbsolute));
                 }
                 if (this._playMode === 'sine') {
-                    this.onOffNode.gain.setTargetAtTime(1, start - 0.0015, 0.001);
-                    this.onOffNode.gain.setTargetAtTime(0, stop - 0.0015, 0.001);
+                    this.onOffNode.gain.setTargetAtTime(1, start + 0.0015, 0.001);
+                    this.onOffNode.gain.setTargetAtTime(0, stop + 0.0015, 0.001);
                     this.setFrequency(this._frequencies[this._nextNote], start);
                 } else {
                     // The only other option for 'mode' is 'sample'.
