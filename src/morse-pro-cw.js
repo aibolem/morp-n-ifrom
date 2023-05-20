@@ -294,10 +294,16 @@ export default class MorseCW extends Morse {
                         this.setFWPM(this.wpm);
                         break;
                     case "tag-pause-pauseValue":
-                        notes.push({ d: -child.children[0] });
+                        notes.push({
+                            d: -child.children[0],
+                            f: this.getFrequency()
+                        });
                         break;
                     case "tag-pause-pauseSpace":
-                        notes.push({ d: this.lengths[WORD_SPACE] * child.children.length });
+                        notes.push({
+                            d: this.lengths[WORD_SPACE] * child.children.length,
+                            f: this.getFrequency()
+                        });
                         break;
                     case "tag-pitch-pitchValue":
                         number = this.parseNumber(child.children[0]);

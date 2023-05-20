@@ -335,8 +335,18 @@ describe("MorseCW({dictionaryOptions:['tags']})", function () {
         // tests the standard timing but through the getAdjustedLength() method
         mcw.setWPM(20);
         mcw.setFWPM(20);
+        mcw.setFrequency(400);
         expect(mcw.getSequence(mcw.loadText("ET"), false)).toEqual(
             { timings: [ 60, -180, 180 ], frequencies: [ 400, 400, 400 ] }
+        );
+    });
+    it("does not have undefined frequencies", function () {
+        // the extra space did not have a frequency at one time
+        mcw.setWPM(20);
+        mcw.setFWPM(20);
+        mcw.setFrequency(400);
+        expect(mcw.getSequence(mcw.loadText("E[ ]E"), false)).toEqual(
+            { timings: [ 60, -420, 60 ], frequencies: [ 400, 400, 400 ] }
         );
     });
     // it("can rnd1", function () {
