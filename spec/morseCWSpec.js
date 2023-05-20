@@ -331,6 +331,14 @@ describe("MorseCW({dictionaryOptions:['tags']})", function () {
             [ { d: 60, f: 400, e: '.' }, { d: -420, f: 500, e: '■' }, { d: 60, f: 500, e: '.' }, { d: -420, f: 400, e: '■' }, { d: 60, f: 400, e: '.' } ]
         );
     });
+    it("works with non-standard timing", function () {
+        // tests the standard timing but through the getAdjustedLength() method
+        mcw.setWPM(20);
+        mcw.setFWPM(20);
+        expect(mcw.getSequence(mcw.loadText("ET"), false)).toEqual(
+            { timings: [ 60, -180, 180 ], frequencies: [ 400, 400, 400 ] }
+        );
+    });
     // it("can rnd1", function () {
     //     mcw.setLength('.', 100);
     //     mcw.setVariation('.', {sysOffset:0, sysSlope:1, rndRange:0, rndSlope:1, stdDev:100000});

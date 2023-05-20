@@ -511,7 +511,7 @@ export default class MorseCW extends Morse {
      * @returns {Number} - the duration in milliseconds, -ve number used for spaces
      */
     getAdjustedLength(element) {
-        let mean = this._lengths[element];
+        let mean = this.lengths[element];
         let {sysOffset, sysSlope, rndRange, rndSlope, stdDev} = this.getVariation(element);
         // add on a systematic error
         let sys = Math.abs(mean) * sysSlope + sysOffset;
