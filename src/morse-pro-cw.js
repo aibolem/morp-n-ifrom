@@ -165,6 +165,19 @@ export default class MorseCW extends Morse {
         return 60 * 1000 / paris;
     }
 
+    /**
+     * Get the effective character speed in WPM, using just the dit, dah and intra-character space.
+     * i.e. Calculate the duration of "PARIS " and just use that.
+     */
+    get effectiveCharacterWPM() {
+        let paris = 10 * this.lengths['.'] +
+        4 * this.lengths['-'] +
+        -9 * this.lengths[' '] +
+        4 * 3 * this.lengths['.'] +
+        1 * 7 * this.lengths['.'];
+        return 60 * 1000 / paris;
+    }
+
     setRatio(element, ratio) {
         // make sure the sign of the ratio is correct
         ratio = Math.abs(ratio) * (this.dictionary.ratio[element] > 0 ? 1 : -1);
