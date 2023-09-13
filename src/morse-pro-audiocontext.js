@@ -83,7 +83,7 @@ class MorseAudioContext {
     }
 
     loadSample(url, key) {
-        console.log(`Loading audio file (${key})`);
+        // console.log(`Loading audio file (${key})`);
         let request = new XMLHttpRequest();
         request.open('GET', url, true);
         request.responseType = 'arraybuffer';
@@ -99,7 +99,7 @@ class MorseAudioContext {
     decodeSample(key) {
         // Decoding seems to work even when AudioContext is suspended
         let ac = this.getAudioContext();
-        console.log(`Decoding audio file (${key})`);
+        // console.log(`Decoding audio file (${key})`);
         // Promise-based syntax does not work for Safari desktop, need to use callback variant
         // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/decodeAudioData
         ac.decodeAudioData(this.sounds[key], (buffer) => {
