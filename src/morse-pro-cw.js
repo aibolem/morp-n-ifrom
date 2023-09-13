@@ -153,10 +153,10 @@ export default class MorseCW extends Morse {
     }
 
     /**
-     * Get the equivalent WPM, given all the lengths.
+     * Get the effective WPM, given all the lengths.
      * i.e. Calculate the duration of "PARIS " and just use that.
      */
-    get equivalentWPM() {
+    get effectiveWPM() {
         let paris = 10 * this.lengths['.'] +
         4 * this.lengths['-'] +
         -9 * this.lengths[' '] +
