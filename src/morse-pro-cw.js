@@ -1,5 +1,5 @@
 /*!
-This code is © Copyright Stephen C. Phillips, 2018-2022.
+This code is © Copyright Stephen C. Phillips, 2018-2023.
 Email: steve@morsecode.world
 */
 /*
@@ -59,25 +59,24 @@ export default class MorseCW extends Morse {
     }
 
     /** 
-     * Set the WPM speed. Ensures that Farnsworth WPM is no faster than WPM.
+     * Set the WPM speed. Ensures that Farnsworth WPM is no faster than WPM (if it is defined).
      * @param {number} wpm
      */
     setWPM(wpm) {
         let fwpm = this.fwpm;  // recalculate fwpm first
         this._baseLength = undefined;
-        this._ratios = undefined;
         this._lengths = undefined;
 
         wpm = Math.max(1, wpm || 1);
         this._wpm = wpm;
-        if (fwpm === undefined) {
-            this._fwpm = this._wpm;
-        } else {
+        if (fwpm !== undefined) {
+            // if fwpm is defined, then update all the ratios, otherwise leave them alone (as advanced settings)
             this._fwpm = Math.min(this._wpm, fwpm);
+            this._ratios = undefined;
+            this.ratios;  // force an update
         }
 
-        let tmp = this.ratios;
-        tmp = this.baseLength;
+        this.baseLength;  // force an update
         return wpm;
     }
 
@@ -94,7 +93,7 @@ export default class MorseCW extends Morse {
     }
 
     /**
-     * Set the Farnsworth WPM speed. Ensures that WPM is no slower than Farnsworth WPM.
+     * Set the Farnsworth WPM speed. Forces the WPM to be set (cannot have FWPM without WPM). Ensures that WPM is no slower than Farnsworth WPM.
      * @param {number} fwpm
      */
     setFWPM(fwpm) {
