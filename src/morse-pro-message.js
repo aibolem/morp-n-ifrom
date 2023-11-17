@@ -86,15 +86,19 @@ export default class MorseMessage {
         return this.text;
     }
 
-    loadText(input) {
+    loadText(input, clean = false) {
         this._rawInput = input;
         this.inputWasMorse = false;
-        this._completeFields(this.morseCWWave.loadText(input));
+        if (clean) {
+            this._completeFields(this.morseCWWave.loadTextClean(input));
+        } else {
+            this._completeFields(this.morseCWWave.loadText(input));
+        }
         return this.morse;
     }
 
     cleanText() {
-        this._completeFields(this.morseCWWave.loadTextClean(this._rawInput));
+        this._completeFields(this.morseCWWave.cleanText(this.tokens));
         return this.text;
     }
 

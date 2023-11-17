@@ -22,19 +22,19 @@ class MorseAudioContext {
      * In Firefox (v75 Windows) you get a suspended AudioContext but it resumes (and runUnlockedActions executes) after a short while without interaction.
      */
     getAudioContext() {
-        // console.log("Getting AC");
+        // console.log(`Getting AudioContext at at ${new Date().toLocaleTimeString()}`);
         if (this.audioContext !== undefined) {
             if (this.audioContext.state === "running") {
-                // console.log("AC is running");
+                // console.log(`AudioContext is running at ${new Date().toLocaleTimeString()}`);
             } else {
-                // console.log("AudioContext is suspended");
+                // console.log(`AudioContext is suspended at ${new Date().toLocaleTimeString()}`);
                 this.audioContext.resume().then(() => {this.runUnlockedActions(1)});
             }
         } else {
-            console.log("Creating AudioContext");
+            console.log(`Creating AudioContext at ${new Date().toLocaleTimeString()}`);
             this.audioContext = new this.AudioContext();
             this.audioContext.createGain();  // Can help on Safari. Probably not needed but can't hurt
-            console.log(`AudioContext state: ${this.audioContext.state}`);
+            console.log(`AudioContext state: ${this.audioContext.state} at ${new Date().toLocaleTimeString()}`);
             // Will only work if using Firefox (and will take a short while) or where this method is called the first time with a user interaction, otherwise will be ignored
             this.audioContext.resume().then(() => {this.runUnlockedActions(2)});  
         }

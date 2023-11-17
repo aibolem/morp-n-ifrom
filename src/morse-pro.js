@@ -399,12 +399,11 @@ export default class Morse {
     }
 
     /**
-     * Convert from text to message object, silently removing any illegal characters
-     * @param {String} text - text string to process
+     * Cleans tokens, silently removing any illegal characters
+     * @param {String} tokens - tokens to process
      * @returns {Object} - message tokens
      */
-    loadTextClean(text) {
-        let tokens = this.loadText(text);
+    cleanText(tokens) {
         tokens.error = false;
         for (let child of tokens.children) {
             if (child.error) {
@@ -422,6 +421,16 @@ export default class Morse {
             }
         }
         return tokens;
+    }
+    
+    /**
+     * Convert from text to message object, silently removing any illegal characters
+     * @param {String} text - text string to process
+     * @returns {Object} - message tokens
+     */
+    loadTextClean(text) {
+        let tokens = this.loadText(text);
+        return this.cleanText(tokens);
     }
 
     parseNumber(num) {
