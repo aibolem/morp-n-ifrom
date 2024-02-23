@@ -1,20 +1,20 @@
 import Morse from "../src/morse-pro.js";
-//TODO: use CHAR_SPACE and WORD_SPACE (defined in morse-pro) rather than the explicit chars
+import { CHAR_SPACE, WORD_SPACE } from '../src/constants.js'
 
 describe("Morse() with text", function () {
     let m = new Morse();
     it("tidies text", function () {
-        expect(m.processTextSpaces("   aaa")).toBe("a•a•a");
+        expect(m.processTextSpaces("   aaa")).toBe(`a${CHAR_SPACE}a${CHAR_SPACE}a`);
     });
     it("inserts character spaces in simple text", function () {
-        expect(m.processTextSpaces(" foo bar  baz")).toBe("f•o•o■b•a•r■b•a•z");
+        expect(m.processTextSpaces(" foo bar  baz")).toBe(`f${CHAR_SPACE}o${CHAR_SPACE}o${WORD_SPACE}b${CHAR_SPACE}a${CHAR_SPACE}r${WORD_SPACE}b${CHAR_SPACE}a${CHAR_SPACE}z`);
     });
     it("tokenises text", function () {
         expect(m.tokeniseText("one two")).toEqual(
             {
                 type: 'text',
                 children: [
-                    { type: 'textWords', children: ['o', '•', 'n', '•', 'e', '■', 't', '•', 'w', '•', 'o'] }
+                    { type: 'textWords', children: ['o', CHAR_SPACE, 'n', CHAR_SPACE, 'e', WORD_SPACE, 't', CHAR_SPACE, 'w', CHAR_SPACE, 'o'] }
                 ]
             }
         );
@@ -25,7 +25,7 @@ describe("Morse() with text", function () {
             {
                 type: 'text',
                 children: [
-                    { type: 'textWords', children: ['b', '•', 'a', '•', 'r', '■', 'b', '•', 'o', '•', 'b', '■', 'f', '•', 'o', '•', 'o'] }
+                    { type: 'textWords', children: ['b', CHAR_SPACE, 'a', CHAR_SPACE, 'r', WORD_SPACE, 'b', CHAR_SPACE, 'o', CHAR_SPACE, 'b', WORD_SPACE, 'f', CHAR_SPACE, 'o', CHAR_SPACE, 'o'] }
                 ]
             }
         );
@@ -37,8 +37,8 @@ describe("Morse() with text", function () {
                 children: [
                     {
                         type: 'textWords',
-                        children: ['a', '•', 'b', '■', 'c', '•', 'd'],
-                        translation: ['. -', '•', '- .t.t.', '■', '- . - .', '•', '- .t.']
+                        children: ['a', CHAR_SPACE, 'b', WORD_SPACE, 'c', CHAR_SPACE, 'd'],
+                        translation: ['. -', CHAR_SPACE, '- .t.t.', WORD_SPACE, '- . - .', CHAR_SPACE, '- .t.']
                     }
                 ],
                 error: false
@@ -52,8 +52,8 @@ describe("Morse() with text", function () {
                 children: [
                     {
                         type: 'textWords',
-                        children: ['a', '•', 'b', '■', '#', '•', 'd'],
-                        translation: ['. -', '•', '- .t.t.', '■', undefined, '•', '- .t.'],
+                        children: ['a', CHAR_SPACE, 'b', WORD_SPACE, '#', CHAR_SPACE, 'd'],
+                        translation: ['. -', CHAR_SPACE, '- .t.t.', WORD_SPACE, undefined, CHAR_SPACE, '- .t.'],
                         error: true
                     }
                 ],
@@ -68,8 +68,8 @@ describe("Morse() with text", function () {
                 children: [
                     {
                         type: 'textWords',
-                        children: ['a', '•', '<', 'b', '•', 't', '>', '•', 'a'],
-                        translation: ['. -', '•', undefined, '- .t.t.', '•', '-', undefined, '•', '. -'],
+                        children: ['a', CHAR_SPACE, '<', 'b', CHAR_SPACE, 't', '>', CHAR_SPACE, 'a'],
+                        translation: ['. -', CHAR_SPACE, undefined, '- .t.t.', CHAR_SPACE, '-', undefined, CHAR_SPACE, '. -'],
                         error: true
                     }
                 ],
@@ -84,8 +84,8 @@ describe("Morse() with text", function () {
                 children: [
                     {
                         type: 'textWords',
-                        children: ['a', '[', 'v', '•', '1', '•', '0', '•', '0', ']', 'a'],
-                        translation: ['. -', undefined, '.t.t. -', '•', '. -h-h-h-', '•', '-h-h-h-h-', '•', '-h-h-h-h-', undefined, '. -'],
+                        children: ['a', '[', 'v', CHAR_SPACE, '1', CHAR_SPACE, '0', CHAR_SPACE, '0', ']', 'a'],
+                        translation: ['. -', undefined, '.t.t. -', CHAR_SPACE, '. -h-h-h-', CHAR_SPACE, '-h-h-h-h-', CHAR_SPACE, '-h-h-h-h-', undefined, '. -'],
                         error: true
                     }
                 ],
@@ -100,8 +100,8 @@ describe("Morse() with text", function () {
                 children: [
                     {
                         type: 'textWords',
-                        children: ['a', '•', 'b', '•', 'c', '•', 'q'],
-                        translation: ['. -', '•', '- .t.t.', '•', '- . - .', '•', '-h- . -'],
+                        children: ['a', CHAR_SPACE, 'b', CHAR_SPACE, 'c', CHAR_SPACE, 'q'],
+                        translation: ['. -', CHAR_SPACE, '- .t.t.', CHAR_SPACE, '- . - .', CHAR_SPACE, '-h- . -'],
                         error: false
                     }
                 ],
@@ -113,20 +113,20 @@ describe("Morse() with text", function () {
 describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
     let m = new Morse({ dictionaryOptions: ['tags'] });
     it("tidies text containing tags", function () {
-        expect(m.processTextSpaces(" aaa  [v100] b [v]c[f550] d[t]e ")).toBe("a•a•a[v100]■b[v]■c[f550]■d[t]•e");
+        expect(m.processTextSpaces(" aaa  [v100] b [v]c[f550] d[t]e ")).toBe(`a${CHAR_SPACE}a${CHAR_SPACE}a[v100]${WORD_SPACE}b[v]${WORD_SPACE}c[f550]${WORD_SPACE}d[t]${CHAR_SPACE}e`);
     });
     it("inserts character spaces in text containing tags", function () {
-        expect(m.processTextSpaces("foo [v110] bar")).toBe("f•o•o[v110]■b•a•r");
-        expect(m.processTextSpaces("foo[v110]bar")).toBe("f•o•o[v110]•b•a•r");
-        expect(m.processTextSpaces("foo[v110]bar[v100]")).toBe("f•o•o[v110]•b•a•r[v100]");
-        expect(m.processTextSpaces("foo[v110]b[v100]ar")).toBe("f•o•o[v110]•b[v100]•a•r");
+        expect(m.processTextSpaces("foo [v110] bar")).toBe(`f${CHAR_SPACE}o${CHAR_SPACE}o[v110]${WORD_SPACE}b${CHAR_SPACE}a${CHAR_SPACE}r`);
+        expect(m.processTextSpaces("foo[v110]bar")).toBe(`f${CHAR_SPACE}o${CHAR_SPACE}o[v110]${CHAR_SPACE}b${CHAR_SPACE}a${CHAR_SPACE}r`);
+        expect(m.processTextSpaces("foo[v110]bar[v100]")).toBe(`f${CHAR_SPACE}o${CHAR_SPACE}o[v110]${CHAR_SPACE}b${CHAR_SPACE}a${CHAR_SPACE}r[v100]`);
+        expect(m.processTextSpaces("foo[v110]b[v100]ar")).toBe(`f${CHAR_SPACE}o${CHAR_SPACE}o[v110]${CHAR_SPACE}b[v100]${CHAR_SPACE}a${CHAR_SPACE}r`);
     })
     it("protects pause spaces", function () {
         expect(m.processTextSpaces("[  ]")).toBe("[  ]");
     });
     it("leaves 1 other space around a pause space", function () {
-        expect(m.processTextSpaces("s [  ]s")).toBe("s[  ]■s");
-        expect(m.processTextSpaces("s [  ] s")).toBe("s[  ]■s");
+        expect(m.processTextSpaces("s [  ]s")).toBe(`s[  ]${WORD_SPACE}s`);
+        expect(m.processTextSpaces("s [  ] s")).toBe(`s[  ]${WORD_SPACE}s`);
     });
     it("can parse text with volume tags in", function () {
         let message = "abc [v] def[v100] [v200]ghi[v300]xyz";
@@ -134,14 +134,14 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
             {
                 type: 'text',
                 children: [
-                    { type: 'textWords', children: ['a', '•', 'b', '•', 'c'] },
+                    { type: 'textWords', children: ['a', CHAR_SPACE, 'b', CHAR_SPACE, 'c'] },
                     { type: 'tag-volume-volumeReset', tag: '[v]' },
-                    { type: 'textWords', children: ['■', 'd', '•', 'e', '•', 'f'] },
+                    { type: 'textWords', children: [WORD_SPACE, 'd', CHAR_SPACE, 'e', CHAR_SPACE, 'f'] },
                     { type: 'tag-volume-volumeValue', children: ['100'], tag: '[v100]' },
                     { type: 'tag-volume-volumeValue', children: ['200'], tag: '[v200]' },
-                    { type: 'textWords', children: ['■', 'g', '•', 'h', '•', 'i'] },
+                    { type: 'textWords', children: [WORD_SPACE, 'g', CHAR_SPACE, 'h', CHAR_SPACE, 'i'] },
                     { type: 'tag-volume-volumeValue', children: ['300'], tag: '[v300]' },
-                    { type: 'textWords', children: ['•', 'x', '•', 'y', '•', 'z'] }
+                    { type: 'textWords', children: [CHAR_SPACE, 'x', CHAR_SPACE, 'y', CHAR_SPACE, 'z'] }
                 ]
             }
         )
@@ -152,14 +152,14 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
             {
                 type: 'text',
                 children: [
-                    { type: 'textWords', children: ['a', '•', 'b', '•', 'c'] },
+                    { type: 'textWords', children: ['a', CHAR_SPACE, 'b', CHAR_SPACE, 'c'] },
                     { type: 'tag-pitch-pitchReset', tag: '[p]' },
-                    { type: 'textWords', children: ['■', 'd', '•', 'e', '•', 'f'] },
+                    { type: 'textWords', children: [WORD_SPACE, 'd', CHAR_SPACE, 'e', CHAR_SPACE, 'f'] },
                     { type: 'tag-pitch-pitchValue', children: ['100'], tag: '[p100]' },
                     { type: 'tag-pitch-pitchValue', children: ['200'], tag: '[f200]' },
-                    { type: 'textWords', children: ['■', 'g', '•', 'h', '•', 'i'] },
+                    { type: 'textWords', children: [WORD_SPACE, 'g', CHAR_SPACE, 'h', CHAR_SPACE, 'i'] },
                     { type: 'tag-pitch-pitchValue', children: ['300'], tag: '[f300]' },
-                    { type: 'textWords', children: ['•', 'x', '•', 'y', '•', 'z'] }
+                    { type: 'textWords', children: [CHAR_SPACE, 'x', CHAR_SPACE, 'y', CHAR_SPACE, 'z'] }
                 ]
             }
         )
@@ -180,7 +180,7 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                 type: 'text',
                 children: [
                     { type: 'tag-timing-timingReset', tag: '[t]' },
-                    { type: 'textWords', children: ['s', '•', 'o', '•', 's'] }
+                    { type: 'textWords', children: ['s', CHAR_SPACE, 'o', CHAR_SPACE, 's'] }
                 ]
             }
         );
@@ -213,7 +213,7 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                 children: [
                     { type: 'textWords', children: ['e'] },
                     { type: 'tag-pause-pauseSpace', children: [' ', ' '], tag: '[  ]' },
-                    { type: 'textWords', children: ['■', 'e'] }
+                    { type: 'textWords', children: [WORD_SPACE, 'e'] }
                 ]
             }
         );
@@ -224,7 +224,7 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                 children: [
                     { type: 'textWords', children: ['e'] },
                     { type: 'tag-pause-pauseValue', children: ['99'], tag: '[99]' },
-                    { type: 'textWords', children: ['■', 'e'] }
+                    { type: 'textWords', children: [WORD_SPACE, 'e'] }
                 ]
             }
         );
@@ -281,9 +281,9 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
             {
                 type: 'text',
                 children: [
-                    { type: 'textWords', children: ['o', '•', 'n', '•', 'e'] },
+                    { type: 'textWords', children: ['o', CHAR_SPACE, 'n', CHAR_SPACE, 'e'] },
                     { type: 'tag-pitch-pitchValue', children: ['550'], tag: '[f550]' },
-                    { type: 'textWords', children: ['■', 't', '•', 'w', '•', 'o'] }
+                    { type: 'textWords', children: [WORD_SPACE, 't', CHAR_SPACE, 'w', CHAR_SPACE, 'o'] }
                 ]
             }
         );
@@ -295,16 +295,16 @@ describe("Morse({ dictionaryOptions: ['tags']}) with text", function () {
                 children: [
                     {
                         type: 'textWords',
-                        children: ['a', '•', 'b'],
-                        translation: ['. -', '•', '- .t.t.']
+                        children: ['a', CHAR_SPACE, 'b'],
+                        translation: ['. -', CHAR_SPACE, '- .t.t.']
                     },
                     {
                         type: 'tag-volume-volumeReset', tag: '[v]'
                     },
                     {
                         type: 'textWords',
-                        children: ['•', 'c', '•', 'q'],
-                        translation: ['•', '- . - .', '•', '-h- . -'],
+                        children: [CHAR_SPACE, 'c', CHAR_SPACE, 'q'],
+                        translation: [CHAR_SPACE, '- . - .', CHAR_SPACE, '-h- . -'],
                         error: false
                     }
                 ],
@@ -334,7 +334,7 @@ describe("Morse({ dictionaryOptions: ['prosigns']}) with text", function () {
             {
                 type: 'text',
                 children: [
-                    { type: 'textWords', children: ['a', '■', '<BT>', '■', 'b'] }
+                    { type: 'textWords', children: ['a', WORD_SPACE, '<BT>', WORD_SPACE, 'b'] }
                 ]
             }
         );
@@ -364,7 +364,7 @@ describe("Morse() with International Morse", function () {
             {
                 type: 'morse',
                 children: [
-                    { type: 'morseWords', children: ['.t.', '•', '. -', '■', '-h-'] }
+                    { type: 'morseWords', children: ['.t.', CHAR_SPACE, '. -', WORD_SPACE, '-h-'] }
                 ]
             }
         );
@@ -377,8 +377,8 @@ describe("Morse() with International Morse", function () {
                 children: [
                     {
                         type: 'morseWords',
-                        children: ['.t.', '•', '. -', '■', '-h-'],
-                        translation: ['I', '•', 'A', '■', 'M']
+                        children: ['.t.', CHAR_SPACE, '. -', WORD_SPACE, '-h-'],
+                        translation: ['I', CHAR_SPACE, 'A', WORD_SPACE, 'M']
                     }
                 ],
                 error: false
@@ -392,8 +392,8 @@ describe("Morse() with International Morse", function () {
                 children: [
                     {
                         type: 'morseWords',
-                        children: ['-h-', '•', '. - . - . - . - . -'],
-                        translation: ['M', '•', undefined],
+                        children: ['-h-', CHAR_SPACE, '. - . - . - . - . -'],
+                        translation: ['M', CHAR_SPACE, undefined],
                         error: true
                     }
                 ],
@@ -462,7 +462,7 @@ describe("Morse() with American Morse", function () {
         //TODO: add a few more
     });
     it("processes morse spaces", function () {
-        expect(m.processMorseSpaces(m.tidyMorse("\u2e3a\u2e3b.- .   .. / -_"))).toBe("\u2e3a \u2e3b . -s.•. .■- -");
+        expect(m.processMorseSpaces(m.tidyMorse("\u2e3a\u2e3b.- .   .. / -_"))).toBe(`\u2e3a \u2e3b . -s.${CHAR_SPACE}. .${WORD_SPACE}- -`);
     });
     it("tokenises Morse", function () {
         expect(m.tokeniseMorse("\u2e3a\u2e3b.- .   .. / -")).toEqual(
@@ -471,7 +471,7 @@ describe("Morse() with American Morse", function () {
                 children: [
                     {
                         type: 'morseWords',
-                        children: ['⸺ ⸻ . -s.', '•', '. .', '■', '-']
+                        children: ['⸺ ⸻ . -s.', CHAR_SPACE, '. .', WORD_SPACE, '-']
                     }
                 ]
             }
@@ -484,8 +484,8 @@ describe("Morse() with American Morse", function () {
                 children: [
                     {
                         type: 'morseWords',
-                        children: ['. .s.', '•', '⸺', '•', '⸻', '■', '. -', '•', '- . . .'],
-                        translation: ['C', '•', 'L', '•', '0', '■', 'A', '•', 'B']
+                        children: ['. .s.', CHAR_SPACE, '⸺', CHAR_SPACE, '⸻', WORD_SPACE, '. -', CHAR_SPACE, '- . . .'],
+                        translation: ['C', CHAR_SPACE, 'L', CHAR_SPACE, '0', WORD_SPACE, 'A', CHAR_SPACE, 'B']
                     }
                 ],
                 error: false
@@ -499,8 +499,8 @@ describe("Morse() with American Morse", function () {
                 children: [
                     {
                         type: 'textWords',
-                        children: ['C', '•', 'L', '•', '0', '■', 'A', '•', 'B'],
-                        translation: ['. .s.', '•', '⸺', '•', '⸻', '■', '. -', '•', '- . . .']
+                        children: ['C', CHAR_SPACE, 'L', CHAR_SPACE, '0', WORD_SPACE, 'A', CHAR_SPACE, 'B'],
+                        translation: ['. .s.', CHAR_SPACE, '⸺', CHAR_SPACE, '⸻', WORD_SPACE, '. -', CHAR_SPACE, '- . . .']
                     }
                 ],
                 error: false

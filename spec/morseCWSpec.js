@@ -1,8 +1,5 @@
 import MorseCW from "../src/morse-pro-cw.js";
-
-//TODO: define these once
-const CHAR_SPACE = '•';  // \u2022
-const WORD_SPACE = '■';  // \u25a0
+import { CHAR_SPACE, WORD_SPACE } from '../src/constants.js'
 
 describe("MorseCW()", function () {
     let mcw = new MorseCW();

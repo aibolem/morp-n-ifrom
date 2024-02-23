@@ -11,12 +11,9 @@ See the Licence for the specific language governing permissions and limitations 
 */
 
 import Morse from './morse-pro.js';
+import { CHAR_SPACE, WORD_SPACE } from './constants.js'
 
 const MS_IN_MINUTE = 60000;  /** number of milliseconds in 1 minute */
-
-//TODO: define these once
-const CHAR_SPACE = '•';  // \u2022
-const WORD_SPACE = '■';  // \u25a0
 
 /**
  * Class to create the on/off timings needed by e.g. sound generators. Timings are in milliseconds; "off" timings are negative.

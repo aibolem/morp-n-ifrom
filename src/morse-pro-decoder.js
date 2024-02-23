@@ -10,6 +10,7 @@ See the Licence for the specific language governing permissions and limitations 
 */
 
 import MorseCW from './morse-pro-cw.js';
+import { CHAR_SPACE, WORD_SPACE } from './constants.js'
 
 /**
  * Class to convert from timings to Morse code. Uses "international" dictionary.
@@ -29,6 +30,7 @@ import MorseCW from './morse-pro-cw.js';
  * }
  * decoder.flush();  // make sure all the data is pushed through the decoder
  */
+
 export default class MorseDecoder extends MorseCW {
     /**
      * Constructor
@@ -66,7 +68,7 @@ export default class MorseDecoder extends MorseCW {
     }
 
     get spaceThreshold() {
-        this._spaceThreshold = this._spaceThreshold || -(this.lengths.charSpace + this.lengths.wordSpace) / 2;
+        this._spaceThreshold = this._spaceThreshold || -(this.lengths[CHAR_SPACE] + this.lengths[WORD_SPACE]) / 2;
         return this._spaceThreshold;
     }
 

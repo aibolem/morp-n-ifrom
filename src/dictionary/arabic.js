@@ -1,3 +1,5 @@
+import { CHAR_SPACE, WORD_SPACE } from '../constants.js'
+
 export var dictionary = {
     id: 'arabic',
 
@@ -71,8 +73,8 @@ export var dictionary = {
         '.': 1,
         '-': 3,
         ' ': -1,
-        'charSpace': -3,
-        'wordSpace': -7
+        [CHAR_SPACE]: -3,
+        [WORD_SPACE]: -7
     },
 
     baseElement: '.',
@@ -81,8 +83,8 @@ export var dictionary = {
         '.': 550,
         '-': 550,
         ' ': 0,
-        'charSpace': 0,
-        'wordSpace': 0
+        [CHAR_SPACE]: 0,
+        [WORD_SPACE]: 0
     },
 
     display: {
@@ -92,8 +94,8 @@ export var dictionary = {
             ' ': ''
         },
         join: {
-            charSpace: ' ',
-            wordSpace: ' / '
+            [CHAR_SPACE]: ' ',
+            [WORD_SPACE]: ' / '
         }
     },
 
@@ -112,7 +114,7 @@ export var dictionary = {
     morseMatch: new RegExp('^\\s*[\\.\\-_]+[\\.\\-_\\s\\/\\|]*$'),
 
     displayName: {
-        keys: ['.', '-', ' ', 'charSpace', 'wordSpace'],
+        keys: ['.', '-', ' ', CHAR_SPACE, WORD_SPACE],
         values: ['Dit length', 'Dah length', 'Intra-character space', 'Inter-character space', 'Inter-word space']
     },
 

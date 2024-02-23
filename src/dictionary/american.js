@@ -1,5 +1,5 @@
-const CHAR_SPACE = '•';  // \u2022
-const WORD_SPACE = '■';  // \u25a0
+import { CHAR_SPACE, WORD_SPACE } from '../constants.js'
+
 const LONG_DASH = '\u2e3a'
 const VERY_LONG_DASH = '\u2e3b'
 
@@ -67,8 +67,8 @@ export let dictionary = {
         '\u2e3b': 5,
         ' ': -1,
         's': -1.5,
-        '•': -2,
-        '■': -3
+        [CHAR_SPACE]: -2,
+        [WORD_SPACE]: -3
     },
 
     baseElement: '.',
@@ -80,8 +80,8 @@ export let dictionary = {
         '\u2e3b': 550,
         ' ': 0,
         's': 0,
-        '•': 0,
-        '■': 0
+        [CHAR_SPACE]: 0,
+        [WORD_SPACE]: 0
     },
 
     display: {
@@ -94,8 +94,8 @@ export let dictionary = {
             's': ' '
         },
         join: {
-            '•': '   ',
-            '■': ' / '
+            [CHAR_SPACE]: '   ',
+            [WORD_SPACE]: ' / '
         }
     },
 

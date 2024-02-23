@@ -1,5 +1,4 @@
-const CHAR_SPACE = '•';  // \u2022
-const WORD_SPACE = '■';  // \u25a0
+import { CHAR_SPACE, WORD_SPACE } from '../constants.js'
 
 export let dictionary = {
     id: 'international',
@@ -73,8 +72,8 @@ export let dictionary = {
         ' ': -1,  // a space between dit and dah or dah and dit
         't': -1,  // a space between two dits
         'h': -1,  // a space between two dahs
-        '•': -3,
-        '■': -7
+        [CHAR_SPACE]: -3,
+        [WORD_SPACE]: -7
     },
 
     baseElement: '.',
@@ -85,8 +84,8 @@ export let dictionary = {
         ' ': 0,
         't': 0,
         'h': 0,
-        '•': 0,
-        '■': 0
+        [CHAR_SPACE]: 0,
+        [WORD_SPACE]: 0
     },
 
     display: {
@@ -98,8 +97,8 @@ export let dictionary = {
             'h': ''
         },
         join: {
-            '•': ' ',
-            '■': ' / '
+            [CHAR_SPACE]: ' ',
+            [WORD_SPACE]: ' / '
         }
     },
 
@@ -123,15 +122,6 @@ export let dictionary = {
         morse = morse.replace(/\-(?=\-)/g, "-h");
         morse = morse.replace(/\.(?=\-)/g, ". ");
         morse = morse.replace(/\-(?=\.)/g, "- ");
-        // // insert " " between character elements using zero-width lookahead assertion
-        // let insertSpaces = new RegExp(`([^${CHAR_SPACE}${WORD_SPACE}])(?=[^${CHAR_SPACE}${WORD_SPACE}])`, "g");
-        // morse = morse.replace(insertSpaces, "$1 ");
-        // // remove " " from inside tags (added in previous step)
-        // // TODO: really this should only happen if tags are enabled
-        // let removeCharSpaces = /(.*\[[^\]]*) ([^\]]*\])/;
-        // while (morse.match(removeCharSpaces)) {
-        //     morse = morse.replace(removeCharSpaces, "$1$2");
-        // }
         return morse;
     },
 

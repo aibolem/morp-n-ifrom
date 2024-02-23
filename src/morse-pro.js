@@ -16,10 +16,7 @@ See the Licence for the specific language governing permissions and limitations 
 
 import { Grammars } from 'ebnf';
 import { dictionaries } from "./dictionary/index.js";
-
-//TODO: define these once
-const CHAR_SPACE = '•';  // \u2022
-const WORD_SPACE = '■';  // \u25a0
+import { CHAR_SPACE, WORD_SPACE } from "./constants.js";
 
 const tags = {
     tag: 'volume | pitch | timing | pause',
