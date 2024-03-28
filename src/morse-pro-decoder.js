@@ -49,6 +49,7 @@ export default class MorseDecoder extends MorseCW {
         this.timings = [];  // all the ms timings received, all +ve
         this.characters = [];  // all the decoded characters ('.', '-', etc)
         this.unusedTimes = [];
+        this.processedTimings = [];
         this.noiseThreshold = 5.4;  // a duration <= noiseThreshold is assumed to be an error. Timestep with 256 FFT 5.3ms.
         this.morse = "";  // string of morse
         this.message = "";  // string of decoded message
@@ -167,6 +168,12 @@ export default class MorseDecoder extends MorseCW {
         }
     }
 
+    addTimings(timings) {
+        for (const t of timings) {
+            this.addTiming(t);
+        }
+    }
+
     /**
      * Process the buffer of unused timings, converting them into Morse and converting the generated Morse into a message.
      * Should be called only when a character space has been reached (or the message is at an end).
@@ -198,6 +205,8 @@ export default class MorseDecoder extends MorseCW {
         let t = this.displayText(this.loadMorse(m), {});  // will be '#' if there's an error
         this.morse += m;
         this.message += t;
+        this.processedTimings = this.processedTimings.concat(u);
+
         if (last < 0) {
             this.unusedTimes = [last];  // put the space back on the end in case there is more quiet to come
         } else {
