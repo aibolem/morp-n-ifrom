@@ -50,7 +50,7 @@ export default class MorseDecoder extends MorseCW {
         this.characters = [];  // all the decoded characters ('.', '-', etc)
         this.unusedTimes = [];
         this.processedTimings = [];
-        this.noiseThreshold = 5.4;  // a duration <= noiseThreshold is assumed to be an error. Timestep with 256 FFT 5.3ms.
+        this.noiseThreshold = this.ditLen / 4;  // a duration <= noiseThreshold is assumed to be an error
         this.morse = "";  // string of morse
         this.message = "";  // string of decoded message
     }
