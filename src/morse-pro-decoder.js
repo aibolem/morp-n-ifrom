@@ -53,6 +53,7 @@ export default class MorseDecoder extends MorseCW {
         this.noiseThreshold = this.ditLen / 4;  // a duration <= noiseThreshold is assumed to be an error
         this.morse = "";  // string of morse
         this.message = "";  // string of decoded message
+        this._fditLen = this.wordSpace / 7;
     }
 
     /**
