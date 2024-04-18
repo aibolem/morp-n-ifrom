@@ -31,6 +31,8 @@ import { CHAR_SPACE, WORD_SPACE } from './constants.js'
  * decoder.flush();  // make sure all the data is pushed through the decoder
  */
 
+// TODO: consider having this class just use a MorseCW instance rather than extending it.
+
 export default class MorseDecoder extends MorseCW {
     /**
      * Constructor
@@ -199,6 +201,8 @@ export default class MorseDecoder extends MorseCW {
         let last = this.unusedTimes[this.unusedTimes.length - 1];
         if ((last < 0) && (-last < this.dahWordSpaceThreshold)) {
             this.unusedTimes.pop();
+        } else {
+            last = undefined;
         }
 
         let u = this.unusedTimes;
@@ -208,7 +212,7 @@ export default class MorseDecoder extends MorseCW {
         this.message += t;
         this.processedTimings = this.processedTimings.concat(u);
 
-        if (last < 0) {
+        if (last !== undefined) {
             this.unusedTimes = [last];  // put the space back on the end in case there is more quiet to come
         } else {
             this.unusedTimes = [];
