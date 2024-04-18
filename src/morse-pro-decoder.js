@@ -213,11 +213,40 @@ export default class MorseDecoder extends MorseCW {
         } else {
             this.unusedTimes = [];
         }
-        this.messageCallback({
-            timings: u,
-            morse: m,
-            message: t
-        });
+
+        // At this point, the timings/message may include a character space at the start, and may also have a word space at the end.
+        // We need to split the timings/message into individual characters (including the character and word spaces) and call the messageCallback for each one.
+        // In this way, the recipient of the callbacks can associate the timings with the correct character.
+
+        let timingsList = [];
+        let morseList = [];
+        let messageList = [];
+
+        if (u[0] < 0) {
+            // character space at the start, reflected in the morse but not the message
+            timingsList.push([u.shift()]);
+            morseList.push(" ");  // first char of m
+            messageList.push("");
+            m = m.substring(1);
+        }
+        if (t[t.length - 1] === ' ') {
+            // word space on the end which requires all 3 elements to be split
+            timingsList.push(u.slice(0, -1), u.slice(-1));
+            morseList.push(m.substring(0, m.length - 1), "/");  // last char of m is "/"
+            messageList.push(t.substring(0, t.length - 1), " ");  // last char of t is " "
+        } else {
+            timingsList.push(u);
+            morseList.push(m);
+            messageList.push(t);    
+        }
+
+        for (let i = 0; i < timingsList.length; i++) {
+            this.messageCallback({
+                timings: timingsList[i],
+                morse: morseList[i],
+                message: messageList[i]
+            });
+        }
     }
 
     /**
