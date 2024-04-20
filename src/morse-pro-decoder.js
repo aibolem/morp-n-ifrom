@@ -1,5 +1,5 @@
 /*
-This code is © Copyright Stephen C. Phillips, 2018-2022.
+This code is © Copyright Stephen C. Phillips, 2018-2024.
 Email: steve@morsecode.world
 
 Licensed under the EUPL, Version 1.2 or – as soon they will be approved by the European Commission - subsequent versions of the EUPL (the "Licence");
@@ -31,16 +31,18 @@ import { CHAR_SPACE, WORD_SPACE } from './constants.js'
  * decoder.flush();  // make sure all the data is pushed through the decoder
  */
 
+// TODO: consider having this class just use a MorseCW instance rather than extending it.
+
 export default class MorseDecoder extends MorseCW {
     /**
      * Constructor
-     * @param {Object} params - dictionary of optional parameters.
-     * @param {string} [params.dictionary='international'] - optional dictionary to use. Must have same timing as 'international'.
-     * @param {string[]} params.dictionaryOptions - optional additional dictionaries such as 'prosigns'.
-     * @param {number} params.wpm - speed in words per minute using "PARIS " as the standard word.
-     * @param {number} params.fwpm - farnsworth speed.
-     * @param {function()} params.messageCallback - Callback executed with {message: string, timings: number[], morse: string} when decoder buffer is flushed (every character).
-     * @param {function()} params.speedCallback - Callback executed with {wpm: number, fwpm: number} if the wpm or fwpm speed changes. The speed in this class doesn't change by itself, but e.g. the fwpm can change if wpm is changed. Returned dictionary has keys 'fwpm' and 'wpm'.
+     * @param {Object} params - dictionary of parameters.
+     * @param {string} [params.dictionary='international'] - dictionary to use. Must have same timing as 'international'.
+     * @param {string[]} [params.dictionaryOptions] - additional dictionaries such as 'prosigns'.
+     * @param {number} [params.wpm] - speed in words per minute using "PARIS " as the standard word.
+     * @param {number} [params.fwpm] - farnsworth speed.
+     * @param {function()} [params.messageCallback] - Callback executed with {message: string, timings: number[], morse: string} when decoder buffer is flushed (every character).
+     * @param {function()} [params.speedCallback] - Callback executed with {wpm: number, fwpm: number} if the wpm or fwpm speed changes. The speed in this class doesn't change by itself, but e.g. the fwpm can change if wpm is changed. Returned dictionary has keys 'fwpm' and 'wpm'.
     */
     constructor({dictionary='international', dictionaryOptions, wpm, fwpm, messageCallback, speedCallback} = {}) {
         super({dictionary, dictionaryOptions, wpm, fwpm});
@@ -49,9 +51,11 @@ export default class MorseDecoder extends MorseCW {
         this.timings = [];  // all the ms timings received, all +ve
         this.characters = [];  // all the decoded characters ('.', '-', etc)
         this.unusedTimes = [];
-        this.noiseThreshold = 5.4;  // a duration <= noiseThreshold is assumed to be an error. Timestep with 256 FFT 5.3ms.
+        this.processedTimings = [];
+        this.noiseThreshold = this.ditLen / 4;  // a duration <= noiseThreshold is assumed to be an error
         this.morse = "";  // string of morse
         this.message = "";  // string of decoded message
+        this._fditLen = this.wordSpace / 7;
     }
 
     /**
@@ -59,7 +63,8 @@ export default class MorseDecoder extends MorseCW {
      */
     _clearThresholds() {
         this._ditDahThreshold = undefined;
-        this._spaceThreshold = undefined;
+        this._ditDahSpaceThreshold = undefined;
+        this._dahWordSpaceThreshold = undefined;
     }
 
     get ditDahThreshold() {
@@ -67,9 +72,19 @@ export default class MorseDecoder extends MorseCW {
         return this._ditDahThreshold;
     }
 
-    get spaceThreshold() {
-        this._spaceThreshold = this._spaceThreshold || -(this.lengths[CHAR_SPACE] + this.lengths[WORD_SPACE]) / 2;
-        return this._spaceThreshold;
+    /* The following two functions are used to calculate the thresholds for the 3 space characters.
+     * The thresholds are used to determine if a duration is a dit, letter-space (dah) or word-space, calculated as the 
+     * average of the actual space durations, and are cached.
+     * When wpm != fwpm ths ditDahSpaceThreshold is not the same as the ditDahThreshold.
+     */
+    get ditDahSpaceThreshold() {
+        this._ditDahSpaceThreshold = this._ditDahSpaceThreshold || (this.lengths['.'] - this.lengths[CHAR_SPACE]) / 2;
+        return this._ditDahSpaceThreshold;
+    }
+
+    get dahWordSpaceThreshold() {
+        this._dahWordSpaceThreshold = this._dahWordSpaceThreshold || -(this.lengths[CHAR_SPACE] + this.lengths[WORD_SPACE]) / 2;
+        return this._dahWordSpaceThreshold;
     }
 
     /**
@@ -102,7 +117,7 @@ export default class MorseDecoder extends MorseCW {
     set ditLen(dit) {
         this._fditLen = Math.max(dit, this._fditLen || 1);
         this.setWPMfromDitLen(dit);
-        this._setFWPMfromRatio(dit / this._fditLen);
+        this.setFWPMfromRatio(this._fditLen / dit);
         this._clearThresholds();
     }
 
@@ -132,7 +147,7 @@ export default class MorseDecoder extends MorseCW {
      * @param {number} duration - millisecond duration to add, positive for a dit or dah, negative for a space
      */
     addTiming(duration) {
-        if (duration === 0) {
+        if (isNaN(duration) || duration === 0) {
             return;
         }
         if (this.unusedTimes.length > 0) {
@@ -151,9 +166,14 @@ export default class MorseDecoder extends MorseCW {
         this.unusedTimes.push(duration);
 
         // If we have just received a character space or longer then flush the timings
-        if (-duration >= this.ditDahThreshold) {
-            // TODO: if fwpm != wpm then the ditDahThreshold only applies to sound, not spaces so this is slightly wrong (need another threshold)
+        if (-duration >= this.ditDahSpaceThreshold) {
             this.flush();
+        }
+    }
+
+    addTimings(timings) {
+        for (const t of timings) {
+            this.addTiming(t);
         }
     }
 
@@ -179,8 +199,10 @@ export default class MorseDecoder extends MorseCW {
 
         // If last element is quiet but it is not enough for a space character then pop it off and replace afterwards
         let last = this.unusedTimes[this.unusedTimes.length - 1];
-        if ((last < 0) && (-last < this.spaceThreshold)) {
+        if ((last < 0) && (-last < this.dahWordSpaceThreshold)) {
             this.unusedTimes.pop();
+        } else {
+            last = undefined;
         }
 
         let u = this.unusedTimes;
@@ -188,16 +210,47 @@ export default class MorseDecoder extends MorseCW {
         let t = this.displayText(this.loadMorse(m), {});  // will be '#' if there's an error
         this.morse += m;
         this.message += t;
-        if (last < 0) {
+        this.processedTimings = this.processedTimings.concat(u);
+
+        if (last !== undefined) {
             this.unusedTimes = [last];  // put the space back on the end in case there is more quiet to come
         } else {
             this.unusedTimes = [];
         }
-        this.messageCallback({
-            timings: u,
-            morse: m,
-            message: t
-        });
+
+        // At this point, the timings/message may include a character space at the start, and may also have a word space at the end.
+        // We need to split the timings/message into individual characters (including the character and word spaces) and call the messageCallback for each one.
+        // In this way, the recipient of the callbacks can associate the timings with the correct character.
+
+        let timingsList = [];
+        let morseList = [];
+        let messageList = [];
+
+        if (u[0] < 0) {
+            // character space at the start, reflected in the morse but not the message
+            timingsList.push([u.shift()]);
+            morseList.push(" ");  // first char of m
+            messageList.push("");
+            m = m.substring(1);
+        }
+        if (t[t.length - 1] === ' ') {
+            // word space on the end which requires all 3 elements to be split
+            timingsList.push(u.slice(0, -1), u.slice(-1));
+            morseList.push(m.substring(0, m.length - 1), "/");  // last char of m is "/"
+            messageList.push(t.substring(0, t.length - 1), " ");  // last char of t is " "
+        } else {
+            timingsList.push(u);
+            morseList.push(m);
+            messageList.push(t);    
+        }
+
+        for (let i = 0; i < timingsList.length; i++) {
+            this.messageCallback({
+                timings: timingsList[i],
+                morse: morseList[i],
+                message: messageList[i]
+            });
+        }
     }
 
     /**
@@ -221,9 +274,9 @@ export default class MorseDecoder extends MorseCW {
                 }
             } else {
                 d = -d;
-                if (d < this.ditDahThreshold) {
+                if (d < this.ditDahSpaceThreshold) {
                     c = "";
-                } else if (d < this.spaceThreshold) {
+                } else if (d < this.dahWordSpaceThreshold) {
                     c = " ";
                 } else {
                     c = "/";

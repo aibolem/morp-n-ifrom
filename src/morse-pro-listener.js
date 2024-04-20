@@ -1,5 +1,5 @@
 /*!
-This code is © Copyright Stephen C. Phillips, 2021-2022.
+This code is © Copyright Stephen C. Phillips, 2021-2024.
 Email: steve@morsecode.world
 */
 /*
@@ -10,71 +10,58 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the Licence for the specific language governing permissions and limitations under the Licence.
 */
 
+import morseAudioContext from './morse-pro-audiocontext.js';
+import { WORD_SPACE } from './constants.js'
+
 /**
- * A class to 'listen' for Morse code from the microphone or an audio file, filter the sound and pass timings to a decoder to convert to text.
+ * This class listens to the microphone or a file and passes the perceived timing data to a MorseDecoder.
+ * It also provides the current spectrogram data.
  */
-
- import morseAudioContext from './morse-pro-audiocontext.js';
-
- //TOOD: change constructor so that it uses a dictionary of parameters
-
 export default class MorseListener {
     /**
-     * @param {number} fftSize - Size of the discrete Fourier transform to use. Must be a power of 2 >= 256 (defaults to 256). A smaller fftSize gives better time resolution but worse frequency resolution.
-     * @param {number} [volumeFilterMin=-60] - Sound less than this volume (in dB) is ignored.
-     * @param {number} [volumeFilterMax=-30] - Sound greater than this volume (in dB) is ignored.
-     * @param {number} [frequencyFilterMin=550] - Sound less than this frequency (in Hz) is ignored.
-     * @param {number} [frequencyFilterMax=550] - Sound greater than this frequency (in Hz) is ignored.
-     * @param {number} [volumeThreshold=220] - If the volume is greater than this then the signal is taken as "on" (part of a dit or dah) (range 0-255).
-     * @param {Object} decoder - An instance of a configured decoder class.
-     * @param {function()} spectrogramCallback - Called every time fftSize samples are read.
-        Called with a dictionary parameter:
-            {
-                frequencyData: output of the DFT (the real values including DC component)
-                frequencyStep: frequency resolution in Hz
-                timeStep: time resolution in Hz
-                filterBinLow: index of the lowest frequency bin being analysed
-                filterBinHigh: index of the highest frequency bin being analysed
-                filterRegionVolume: volume in the analysed region
-                isOn: whether the analysis detected a signal or not
-            }
-     * @param {function()} frequencyFilterCallback - Called when the frequency filter parameters change.
+     * @param {Object} params - A dictionary of parameters.
+     * @param {number} [params.fftSize=256] - Size of the discrete Fourier transform to use. Must be a power of 2 >= 256. A smaller fftSize gives better time resolution but worse frequency resolution.
+     * @param {number} [params.volumeFilterMin=-60] - Sound less than this volume (in dB) is ignored.
+     * @param {number} [params.volumeFilterMax=-30] - Sound greater than this volume (in dB) is ignored.
+     * @param {number} [params.frequencyFilterMin=550] - Sound less than this frequency (in Hz) is ignored.
+     * @param {number} [params.frequencyFilterMax=550] - Sound greater than this frequency (in Hz) is ignored.
+     * @param {number} [params.volumeThreshold=220] - If the volume is greater than this then the signal is taken as "on" (part of a dit or dah) (range 0-255).
+     * @param {Object} params.decoder - An instance of a configured decoder class.
+     * @param {function()} [params.frequencyFilterCallback] - Called when the frequency filter parameters change.
         Called with a dictionary parameter:
             {
                 min: lowest frequency in Hz
                 max: highest frequency in Hz
             }
             The frequencies may well be different to that which is set as they are quantised.
-     * @param {function()} volumeFilterCallback - Called when the volume filter parameters change.
+     * @param {function()} [params.volumeFilterCallback] - Called when the volume filter parameters change.
         Called with a dictionary parameter:
             {
                 min: low volume (in dB)
                 max: high volume (in dB)
             }
             If the set volumes are not numeric or out of range then the callback will return in range numbers.
-     * @param {function()} volumeThresholdCallback - Called with a single number as the argument when the volume filter threshold changes.
-     * @param {function()} micSuccessCallback - Called when the microphone has successfully been connected.
-     * @param {function()} micErrorCallback - Called with the error as the argument if there is an error connecting to the microphone.
-     * @param {function()} fileLoadCallback - Called with the AudioBuffer object as the argument when a file has successfully been loaded (and decoded).
-     * @param {function()} fileErrorCallback - Called with the error as the argument if there is an error in decoding a file.
-     * @param {function()} EOFCallback - Called when the playback of a file ends.
+     * @param {function()} [params.volumeThresholdCallback] - Called with a single number as the argument when the volume filter threshold changes.
+     * @param {function()} [params.micSuccessCallback] - Called when the microphone has successfully been connected.
+     * @param {function()} [params.micErrorCallback] - Called with the error as the argument if there is an error connecting to the microphone.
+     * @param {function()} [params.fileLoadCallback] - Called with the AudioBuffer object as the argument when a file has successfully been loaded (and decoded).
+     * @param {function()} [params.fileErrorCallback] - Called with the error as the argument if there is an error in decoding a file.
+     * @param {function()} [params.EOFCallback] - Called when the playback of a file ends.
      */
-    constructor(
-            fftSize,
-            volumeFilterMin, volumeFilterMax,
-            frequencyFilterMin, frequencyFilterMax,
-            volumeThreshold,
-            decoder,
-            spectrogramCallback,
-            frequencyFilterCallback, volumeFilterCallback, volumeThresholdCallback,
-            micSuccessCallback, micErrorCallback,
-            fileLoadCallback, fileErrorCallback, EOFCallback
-        )
-    {
+    constructor({
+        fftSize = 256,
+        volumeFilterMin = -60, volumeFilterMax = -30,
+        frequencyFilterMin = 550, frequencyFilterMax = 550,
+        volumeThreshold = 200,
+        decoder,
+        frequencyFilterCallback,
+        volumeFilterCallback, volumeThresholdCallback,
+        micSuccessCallback, micErrorCallback,
+        fileLoadCallback, fileErrorCallback, EOFCallback
+    } = {}) {
         // audio input and output
         this.audioContext = morseAudioContext.getAudioContext();  // must have already been init()
 
-        if (spectrogramCallback !== undefined) this.spectrogramCallback = spectrogramCallback;
         if (frequencyFilterCallback !== undefined) this.frequencyFilterCallback = frequencyFilterCallback;
         if (volumeFilterCallback !== undefined) this.volumeFilterCallback = volumeFilterCallback;
         if (volumeThresholdCallback !== undefined) this.volumeThresholdCallback = volumeThresholdCallback;
@@ -89,7 +76,7 @@ export default class MorseListener {
         this.sampleRate = this.audioContext.sampleRate;  // in Hz, 48000 on Chrome
         this.maxFreq = this.sampleRate / 2;  // in Hz; Nyquist theorem
         this.freqBins = this.fftSize / 2;
-        this.timeStep = 1000 / (this.sampleRate / this.fftSize);  // in ms
+        this.timeStep = this.fftSize / this.sampleRate;  // in s
         this.freqStep = this.maxFreq / this.freqBins;
 
         this.initialiseAudioNodes();
@@ -110,7 +97,11 @@ export default class MorseListener {
         this.decoder = decoder;
 
         this.notStarted = true;
-        this.flushTime = 500;  // how long to wait before pushing data to the decoder if e.g. you have a very long pause
+        // flushTime is how long to wait before pushing data to the decoder if e.g. you have a very long pause
+        // Setting it to the WORD_SPACE means we will recognise a WORD_SPACE as soon as we see it.
+        this.flushTime = -this.decoder.lengths[WORD_SPACE];
+        this.lastAnalysisTime;
+        this.lastChangeTime;
 
         this.input = undefined;  // current state: undefined, "mic", "file"
     }
@@ -128,7 +119,7 @@ export default class MorseListener {
         v = Math.min(0, v);
         this.analyserNode.minDecibels = v;
         this.analyserNode.maxDecibels = Math.max(this.analyserNode.maxDecibels, v);
-        this.volumeFilterCallback({min: this.analyserNode.minDecibels, max: this.analyserNode.maxDecibels});
+        this.volumeFilterCallback({ min: this.analyserNode.minDecibels, max: this.analyserNode.maxDecibels });
     }
 
     get volumeFilterMin() {
@@ -148,7 +139,7 @@ export default class MorseListener {
         v = Math.min(0, v);
         this.analyserNode.maxDecibels = v;
         this.analyserNode.minDecibels = Math.min(this.analyserNode.minDecibels, v);
-        this.volumeFilterCallback({min: this.analyserNode.minDecibels, max: this.analyserNode.maxDecibels});
+        this.volumeFilterCallback({ min: this.analyserNode.minDecibels, max: this.analyserNode.maxDecibels });
     }
 
     get volumeFilterMax() {
@@ -167,7 +158,7 @@ export default class MorseListener {
         f = Math.min(Math.max(f, 0), this.maxFreq);
         this._filterBinLow = Math.min(Math.max(Math.round(f / this.freqStep), 1), this.freqBins);  // at least 1 to avoid DC component
         this._filterBinHigh = Math.max(this._filterBinLow, this._filterBinHigh);  // high must be at least low
-        this.frequencyFilterCallback({min: this.frequencyFilterMin, max: this.frequencyFilterMax});
+        this.frequencyFilterCallback({ min: this.frequencyFilterMin, max: this.frequencyFilterMax });
     }
 
     get frequencyFilterMin() {
@@ -186,7 +177,7 @@ export default class MorseListener {
         f = Math.min(Math.max(f, 0), this.maxFreq);
         this._filterBinHigh = Math.min(Math.max(Math.round(f / this.freqStep), 1), this.freqBins);  // at least 1 to avoid DC component
         this._filterBinLow = Math.min(this._filterBinHigh, this._filterBinLow);  // low must be at most high
-        this.frequencyFilterCallback({min: this.frequencyFilterMin, max: this.frequencyFilterMax});
+        this.frequencyFilterCallback({ min: this.frequencyFilterMin, max: this.frequencyFilterMax });
     }
 
     get frequencyFilterMax() {
@@ -238,62 +229,77 @@ export default class MorseListener {
      */
     startListening() {
         this.stop();
-        navigator.mediaDevices.getUserMedia({audio: true, video: false})
-        .then(function(stream) {
-            // create an audio node from the stream
-            this.sourceNode = this.audioContext.createMediaStreamSource(stream);
-            this.input = "mic";
-            // connect nodes but don't connect mic to audio output to avoid feedback
-            this.sourceNode.connect(this.analyserNode);
-            this.jsNode.connect(this.audioContext.destination);
-            this.micSuccessCallback();
-        }.bind(this))
-        .catch(function(error) {
-            this.input = undefined;
-            this.micErrorCallback(error);
-        }.bind(this));
+        navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+            .then(stream => {
+                // create an audio node from the stream
+                this.sourceNode = this.audioContext.createMediaStreamSource(stream);
+                this.input = "mic";
+                this.start();
+                // connect nodes but don't connect mic to audio output to avoid feedback
+                this.sourceNode.connect(this.analyserNode);
+                this.jsNode.connect(this.audioContext.destination);
+                this.micSuccessCallback();
+            })
+            .catch(error => {
+                this.input = undefined;
+                this.micErrorCallback(error);
+            });
     }
 
     /**
      * Load audio data from an ArrayBuffer. Use a FileReader to load from a file.
      * Calls fileLoadCallback or fileErrorCallback on success or error.
      * @param {ArrayBuffer} arrayBuffer 
+     * @access private
      */
     loadArrayBuffer(arrayBuffer) {
         // by separating loading (decoding) and playing, the playing can be done multiple times
         this.audioContext.decodeAudioData(
             arrayBuffer,
-            function(audioBuffer) {
+            audioBuffer => {
                 this.fileAudioBuffer = audioBuffer;
                 this.fileLoadCallback(audioBuffer);
-            }.bind(this),
-            function(error) {
+            },
+            error => {
                 this.fileAudioBuffer = undefined;
                 this.fileErrorCallback(error);
-            }.bind(this)
+            }
         );
     }
 
     /**
      * Play a loaded audio file (through speakers) and decode it.
      * Calls EOFCallback when buffer ends.
+     * @access private
      */
     playArrayBuffer() {
         this.stop();
         // make BufferSource node
         this.sourceNode = this.audioContext.createBufferSource();
         this.sourceNode.buffer = this.fileAudioBuffer;
-        this.sourceNode.onended = function() {
+        this.sourceNode.onended = () => {
             this.stop();
             this.EOFCallback();
-        }.bind(this);
+        };
         // connect nodes
         this.jsNode.connect(this.audioContext.destination);
         this.sourceNode.connect(this.analyserNode);
         this.sourceNode.connect(this.audioContext.destination);
         this.input = "file";
         // play
+        this.start();
         this.sourceNode.start();
+    }
+
+    /**
+     * Initialise listening
+     * @access private
+     */
+    start() {
+        this.notStarted = true;
+        this.startTime = this.audioContext.currentTime;
+        this.lastAnalysisTime = undefined;
+        this.spectrogramData = undefined;
     }
 
     /**
@@ -312,78 +318,105 @@ export default class MorseListener {
         this.flush();
         this.decoder.flush();
         this.input = undefined;
+        this.spectrogramData = null;
     }
 
     /**
-     * This ScriptProcessorNode is called when it is full, we then actually look at the data in the analyserNode node to measure the volume in the frequency band of interest. We don't actually use the input or output of the ScriptProcesorNode.
+     * Get the current spectrogram data.
+     * @returns {Object} - a dictionary of the current spectrogram data. Set to undefined at the start before any data is available. Set to null after the end of the data.
+        {
+            frequencyData: output of the DFT (the real values including DC component)
+            frequencyStep: frequency resolution / Hz
+            timeStep: time resolution / s
+            filterBinLow: index of the lowest frequency bin being analysed
+            filterBinHigh: index of the highest frequency bin being analysed
+            filterRegionVolume: volume in the analysed region
+            isOn: whether the analysis detected a signal or not
+            time: time of the analysis relative to the start of listening / s
+        }
+     */
+    get spectrogram() {
+        return this.spectrogramData;
+    }
+
+    /**
+     * This ScriptProcessorNode is (theoretically) called when it is full, we then actually look at the data in the analyserNode node to measure the volume in the frequency band of interest. We don't actually use the input or output of the ScriptProcesorNode.
      * @access private
+     * @returns {boolean} - whether processing was performed
      */
     processSound() {
+        let analysisTime = this.audioContext.currentTime - this.startTime;
+        if (analysisTime === this.lastAnalysisTime) {
+            return false;  // for small FFT sizes the ScriptProcessorNode gets called irregularly and can be called twice with the same time
+        }
+
         // get the data from the analyserNode node and put into frequencyData
         this.analyserNode.getByteFrequencyData(this.frequencyData);
 
         // find the average volume in the filter region
-        var filterRegionVolume = 0;
-        for (var i = this._filterBinLow; i <= this._filterBinHigh; i++) {
+        let filterRegionVolume = 0;
+        for (let i = this._filterBinLow; i <= this._filterBinHigh; i++) {
             filterRegionVolume += this.frequencyData[i];
         }
         filterRegionVolume /= 1.0 * (this._filterBinHigh - this._filterBinLow + 1);
 
         // record the data
-        var isOn = filterRegionVolume >= this._volumeThreshold;
-        this.recordOnOrOff(isOn);
+        let isOn = filterRegionVolume >= this._volumeThreshold;
+        this.recordOnOrOff(isOn, analysisTime);
 
-        this.spectrogramCallback({
+        this.spectrogramData = {
             frequencyData: this.frequencyData,
             frequencyStep: this.freqStep,
             timeStep: this.timeStep,
             filterBinLow: this._filterBinLow,
             filterBinHigh: this._filterBinHigh,
             filterRegionVolume: filterRegionVolume,
-            isOn: isOn
-        });
+            isOn: isOn,
+            time: analysisTime
+        };
+        this.lastAnalysisTime = analysisTime;
+        return true;
     }
 
     /**
      * Called each tick with whether the sound is judged to be on or off. If a change from on to off or off to on is detected then the number of ticks of the segment is passed to the decoder.
      * @access private
      */
-    recordOnOrOff(soundIsOn) {
+    recordOnOrOff(soundIsOn, t) {
         if (this.notStarted) {
-            if (!soundIsOn) {
-                // wait until we hear something
-                return;
-            } else {
+            if (soundIsOn) {
                 this.notStarted = false;
                 this.lastSoundWasOn = true;
-                this.ticks = 0;
+                this.lastChangeTime = t;
             }
+            return;
         }
         if (this.lastSoundWasOn === soundIsOn) {
             // accumulating an on or an off
-            this.ticks++;
-            if (this.ticks * this.timeStep > this.flushTime) {
+            if (t - this.lastChangeTime > this.flushTime) {
                 // then it's e.g. a very long pause, so flush it through to decoder and keep counting
-                this.flush(soundIsOn);
-                this.ticks = 0;
+                this.flush(soundIsOn, t - this.lastChangeTime);
+                this.lastChangeTime = t;
             }
         } else {
             // we've just changed from on to off or vice versa
-            this.flush(!soundIsOn);  // flush the previous segment
+            this.flush(!soundIsOn, t - this.lastChangeTime);  // flush the previous segment
             this.lastSoundWasOn = soundIsOn;
-            this.ticks = 1;  // at this moment we just saw the first tick of the new segment
+            this.lastChangeTime = t;
         }
     }
 
     /**
-     * Flush the current ticks to the decoder. Parameter is whether the ticks represent sound (on) or not.
+     * Flush the current segment to the decoder.
+     * @param {boolean} on - whether the last segment was on or off.
+     * @param {number} t - the duration in seconds of the current segment.
      */
-    flush(on = this.lastSoundWasOn) {
-        this.decoder.addTiming((on ? 1 : -1) * this.ticks * this.timeStep);
+    flush(on = this.lastSoundWasOn, t) {
+        this.decoder.addTiming((on ? 1 : -1) * t * 1000);  // decoder expects ms, audioContext uses seconds
+        this.flushTime = -this.decoder.lengths[WORD_SPACE] / 1000;
     }
 
     // empty callbacks to avoid errors
-    spectrogramCallback(jsonData) { }
     frequencyFilterCallback(jsonData) { }
     volumeFilterCallback(jsonData) { }
     volumeThresholdCallback(volume) { }
@@ -398,15 +431,15 @@ export default class MorseListener {
 if (navigator.mediaDevices) {
     // Shim from https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
     if (navigator.mediaDevices.getUserMedia === undefined) {
-        navigator.mediaDevices.getUserMedia = function(constraints) {
+        navigator.mediaDevices.getUserMedia = function (constraints) {
             // First get ahold of the legacy getUserMedia, if present
-            var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+            let getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
             // Some browsers just don't implement it - return a rejected promise with an error      // to keep a consistent interface
             if (!getUserMedia) {
                 return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
             }
             // Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
-            return new Promise(function(resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 getUserMedia.call(navigator, constraints, resolve, reject);
             });
         }

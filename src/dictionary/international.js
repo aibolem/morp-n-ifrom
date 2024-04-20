@@ -139,16 +139,18 @@ export let dictionary = {
                 '<AR>': '. - . - .',
                 '<AS>': '. - .t.t.',
                 '<BK>': '- .t.t. - . -',
+                '<TV>': '- .t.t. -',
                 '<BT>': '- .t.t. -', // also <TV>
                 '<CL>': '- . - .t. - .t.',
-                '<CT>': '- . - . -',
+                '<KA>': '- . - . -',
+                '<CT>': '- . - . -',  // also <KA>
                 '<DO>': '- .t. -h-h-',
                 '<KA>': '- . - . -',
                 '<KN>': '- . -h- .',
-                '<SK>': '.t.t. - . -', // also <VA>
-                '<SN>': '.t.t. - .', // also <VE>
                 '<VA>': '.t.t. - . -',
+                '<SK>': '.t.t. - . -', // also <VA> (put this second to make it the preferred translation)
                 '<VE>': '.t.t. - .',
+                '<SN>': '.t.t. - .', // also <VE>
                 '<SOS>': '.t.t. -h-h- .t.t.'
             },
             textGrammar: {
