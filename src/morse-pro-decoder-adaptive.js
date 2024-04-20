@@ -1,5 +1,5 @@
 /*!
-This code is © Copyright Stephen C. Phillips, 2019-2022.
+This code is © Copyright Stephen C. Phillips, 2019-2024.
 Email: steve@morsecode.world
 */
 /*
@@ -32,7 +32,7 @@ import MorseDecoder from './morse-pro-decoder.js';
  */
 export default class MorseAdaptiveDecoder extends MorseDecoder {
     /**
-     * 
+     * Constructor for MorseAdaptiveDecoder
      * @param {Object} params - dictionary of parameters.
      * @param {string} [params.dictionary='international'] - optional dictionary to use. Must have same timing as 'international'.
      * @param {string[]} [params.dictionaryOptions] - optional additional dictionaries such as 'prosigns'.
@@ -40,8 +40,8 @@ export default class MorseAdaptiveDecoder extends MorseDecoder {
      * @param {number} [params.fwpm] - farnsworth speed.
      * @param {function()} [params.messageCallback] - Callback executed with {message: string, timings: number[], morse: string} when decoder buffer is flushed (every character).
      * @param {function()} [params.speedCallback] - Callback executed with {wpm: number, fwpm: number} if the wpm or fwpm speed changes. The speed in this class doesn't change by itself, but e.g. the fwpm can change if wpm is changed. Returned dictionary has keys 'fwpm' and 'wpm'.
-     * @param {number} [bufferSize=30] - Size of the buffer to average over
-     * @param {number} [allowedVariation=0.5] - Allowed percentage variation of any length from the average (as a decimal)
+     * @param {number} [params.bufferSize=30] - Size of the buffer to average over
+     * @param {number} [params.allowedVariation=0.5] - Allowed percentage variation of any length from the average (as a decimal)
      */
     constructor({ dictionary = 'international', dictionaryOptions, wpm, fwpm, messageCallback, speedCallback, bufferSize = 30, allowedVariation = 0.5 } = {}) {
         super({ dictionary, dictionaryOptions, wpm, fwpm, messageCallback, speedCallback });
